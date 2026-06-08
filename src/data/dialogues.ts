@@ -362,6 +362,10 @@ export const DIALOGUES: DialogueItem[] = [
       text: "Many parents in your situation find it helpful to lead with curiosity rather than consequences. You could begin by asking what he likes or doesn't like about vaping, and listen before sharing your concerns.",
       source: "ai",
     },
+    parentReplyA:
+      "Yeah… honestly I haven't even thought about it that way. Maybe I could just ask him what's going on first, before I say anything about the vape itself.",
+    parentReplyB:
+      "Okay, so just start by asking about it without making it a big thing. I could try that. I just hope he doesn't shut down the second I bring it up.",
   },
   {
     id: "MIRA-003",
@@ -392,5 +396,10 @@ export const DIALOGUES: DialogueItem[] = [
       text: "Mornings are a common challenge for families managing daily medications. Pairing the inhaler with an existing habit, like brushing teeth, can reduce the need for reminders. Would you like to explore options that fit your routine?",
       source: "ai",
     },
+    parentReplyA:
+      "One small thing… maybe putting the inhaler next to his backpack the night before. That at least takes me out of the morning yelling.",
+    parentReplyB:
+      "Pairing it with brushing teeth could actually work — that's the one thing he does without me reminding him. I'd be willing to try that for a week.",
   },
+
 ];
