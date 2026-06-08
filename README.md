@@ -151,9 +151,130 @@ flowchart TD
 - **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (ratings, stronger-response choice, source guess, comments) instead of local component state.
 - **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, source-ID accuracy, stronger-response distribution, inter-rater agreement) instead of `summarizeProgress` over mock arrays.
 
+## Data Model (proposed real backend)
+
+The tables below are what a real backend would persist. Sample rows are illustrative JSON, not literal SQL.
+
+### `reviewers`
+Authenticated raters and researchers. One row per user account.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `email` | text unique | login identity |
+| `display_name` | text | shown in researcher views |
+| `role` | enum(`reviewer`,`researcher`,`admin`) | RBAC |
+| `credentials` | text | e.g. "LCSW, 8 yrs MI" |
+| `created_at` | timestamptz | |
+| `last_active_at` | timestamptz | |
+```json
+{ "id": "r_8f2…", "email": "j.doe@uni.edu", "display_name": "J. Doe",
+  "role": "reviewer", "credentials": "LCSW", "last_active_at": "2026-06-08T14:02:11Z" }
+```
+
+### `dialogues`
+A client utterance scenario. Turns are stored inline as JSON since they're read together.
+| column | type | notes |
+|---|---|---|
+| `id` | text (pk) | e.g. `MIRA-014` |
+| `review_set` | text | "Pilot Set B" |
+| `scenario` | text | one-line summary |
+| `turns` | jsonb | `[{ "speaker": "parent", "text": "…" }]` |
+| `created_at` | timestamptz | |
+```json
+{ "id": "MIRA-014", "review_set": "Pilot Set B",
+  "scenario": "Parent uncertain about ADHD medication.",
+  "turns": [{ "speaker": "parent", "text": "I just don't know…" }] }
+```
+
+### `responses`
+Two candidate counselor responses per dialogue. `source` is ground truth; never returned to reviewers.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `dialogue_id` | fk → dialogues | |
+| `title` | text | "Response 1" |
+| `text` | text | response body |
+| `source` | enum(`human`,`ai`) | hidden from reviewers |
+| `model_name` | text null | e.g. `gpt-5`, null if human |
+| `author_id` | uuid null | fk → clinicians, null if AI |
+```json
+{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response 1",
+  "text": "It sounds like…", "source": "ai", "model_name": "gpt-5" }
+```
+
+### `assignments`
+Which dialogues are queued for which reviewer, and how A/B were shuffled.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `reviewer_id` | fk | |
+| `dialogue_id` | fk | |
+| `position_shuffle` | bool | `true` = response B shown as A |
+| `assigned_at` | timestamptz | |
+| `due_at` | timestamptz null | |
+```json
+{ "id": "asg_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
+  "position_shuffle": true, "assigned_at": "2026-06-01T09:00:00Z" }
+```
+
+### `reviews`
+One row per submitted review. Rubric scores live in a child table.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `assignment_id` | fk unique | |
+| `selected` | enum(`A`,`B`,`neither`,`too_similar`) | stronger response |
+| `guess_a` | enum(`human`,`ai`) null | reviewer's source guess |
+| `guess_b` | enum(`human`,`ai`) null | |
+| `comments` | text | free-text |
+| `submitted_at` | timestamptz | |
+```json
+{ "id": "rev_…", "assignment_id": "asg_…", "selected": "A",
+  "guess_a": "human", "guess_b": "ai", "comments": "A reflects feeling better.",
+  "submitted_at": "2026-06-02T17:23:09Z" }
+```
+
+### `rubric_scores`
+Per-criterion 1–5 score for each response within a review.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `review_id` | fk | |
+| `response_label` | enum(`A`,`B`) | |
+| `criterion` | text | fk → rubric_criteria.name |
+| `score` | int (1–5) | |
+```json
+{ "review_id": "rev_…", "response_label": "A", "criterion": "Empathy", "score": 5 }
+```
+
+### `rubric_criteria`
+Editable list of rubric items so researchers can revise without a deploy.
+```json
+{ "id": "c_emp", "name": "Empathy", "description": "…",
+  "display_order": 1, "active": true }
+```
+
+### `audit_log`
+Append-only trail of edits (re-opening reviews, admin overrides).
+```json
+{ "actor_id": "r_admin", "action": "review.reopen",
+  "entity": "reviews", "entity_id": "rev_…", "at": "2026-06-03T10:00:00Z",
+  "meta": { "reason": "Reviewer flagged misclick." } }
+```
+
+### Randomization & assignment rules
+
+- **Unseen sampling**: each reviewer only ever gets dialogues they haven't reviewed.
+- **A/B position shuffle**: `assignments.position_shuffle` randomizes which response appears as A vs B so source position can't bias ratings.
+- **Balanced human/AI**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue.
+- **Overlap dialogues**: a configurable subset (e.g. 10 of 100) is assigned to every reviewer so inter-rater agreement can be computed.
+
+See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
+
 ## Notes
 
 - No backend is wired up; all reviewer/dialogue data is mock data for design and prototyping.
 - Routes are auto-registered by the TanStack Router Vite plugin — do not edit `src/routeTree.gen.ts` by hand.
 - The Progress Tracker intentionally surfaces completed rows first so the design team can preview the populated state.
+
 
