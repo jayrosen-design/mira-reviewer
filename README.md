@@ -56,7 +56,8 @@ src/
       DialogueContext.tsx     # Client utterance context block
       DialogueReview.tsx      # Review page container + state
       ResponseComparison.tsx  # Side-by-side response cards
-      ResponseCard.tsx        # Single response card + Human/AI guess
+      ResponseCard.tsx           # Single response card + "Preview in dialogue context"
+      DialoguePreviewPanel.tsx   # Optional separated preview area (not scored)
       RubricRating.tsx        # Per-criterion rating controls
       ReviewerComments.tsx    # Free-text comments
       ReviewActions.tsx       # Submit / navigation actions
