@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ClipboardList, LayoutDashboard, MessagesSquare } from "lucide-react";
+import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare } from "lucide-react";
 
 const links = [
-  { to: "/", label: "Review", icon: MessagesSquare },
-  { to: "/progress", label: "Progress Tracker", icon: ClipboardList },
-  { to: "/dashboard", label: "Research Dashboard", icon: LayoutDashboard },
+  { to: "/", label: "Review", icon: MessagesSquare, exact: true },
+  { to: "/progress", label: "Progress Tracker", icon: ClipboardList, exact: true },
+  { to: "/dashboard", label: "Research Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/api-docs", label: "API Docs", icon: BookOpen, exact: false },
 ] as const;
+
 
 export function NavBar() {
   return (
@@ -15,11 +17,11 @@ export function NavBar() {
           MIRA
         </Link>
         <ul className="flex flex-1 items-center gap-1">
-          {links.map(({ to, label, icon: Icon }) => (
+          {links.map(({ to, label, icon: Icon, exact }) => (
             <li key={to}>
               <Link
                 to={to}
-                activeOptions={{ exact: true }}
+                activeOptions={{ exact }}
                 activeProps={{
                   className:
                     "bg-primary-soft text-primary",

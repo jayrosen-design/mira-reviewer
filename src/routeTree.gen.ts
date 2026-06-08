@@ -11,7 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
+import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
+import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
+import { Route as ApiDocsMetricsRouteImport } from './routes/api-docs.metrics'
+import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogues'
+import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
 
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
@@ -23,38 +30,124 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDocsIndexRoute = ApiDocsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsReviewsRoute = ApiDocsReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsProgressRoute = ApiDocsProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsMetricsRoute = ApiDocsMetricsRouteImport.update({
+  id: '/metrics',
+  path: '/metrics',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsDialoguesRoute = ApiDocsDialoguesRouteImport.update({
+  id: '/dialogues',
+  path: '/dialogues',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsAuthRoute = ApiDocsAuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
+  '/api-docs/auth': typeof ApiDocsAuthRoute
+  '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
+  '/api-docs/metrics': typeof ApiDocsMetricsRoute
+  '/api-docs/progress': typeof ApiDocsProgressRoute
+  '/api-docs/reviews': typeof ApiDocsReviewsRoute
+  '/api-docs/': typeof ApiDocsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
+  '/api-docs/auth': typeof ApiDocsAuthRoute
+  '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
+  '/api-docs/metrics': typeof ApiDocsMetricsRoute
+  '/api-docs/progress': typeof ApiDocsProgressRoute
+  '/api-docs/reviews': typeof ApiDocsReviewsRoute
+  '/api-docs': typeof ApiDocsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
+  '/api-docs/auth': typeof ApiDocsAuthRoute
+  '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
+  '/api-docs/metrics': typeof ApiDocsMetricsRoute
+  '/api-docs/progress': typeof ApiDocsProgressRoute
+  '/api-docs/reviews': typeof ApiDocsReviewsRoute
+  '/api-docs/': typeof ApiDocsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/progress'
+  fullPaths:
+    | '/'
+    | '/api-docs'
+    | '/dashboard'
+    | '/progress'
+    | '/api-docs/auth'
+    | '/api-docs/dialogues'
+    | '/api-docs/metrics'
+    | '/api-docs/progress'
+    | '/api-docs/reviews'
+    | '/api-docs/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/progress'
-  id: '__root__' | '/' | '/dashboard' | '/progress'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/progress'
+    | '/api-docs/auth'
+    | '/api-docs/dialogues'
+    | '/api-docs/metrics'
+    | '/api-docs/progress'
+    | '/api-docs/reviews'
+    | '/api-docs'
+  id:
+    | '__root__'
+    | '/'
+    | '/api-docs'
+    | '/dashboard'
+    | '/progress'
+    | '/api-docs/auth'
+    | '/api-docs/dialogues'
+    | '/api-docs/metrics'
+    | '/api-docs/progress'
+    | '/api-docs/reviews'
+    | '/api-docs/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiDocsRoute: typeof ApiDocsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   ProgressRoute: typeof ProgressRoute
 }
@@ -75,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-docs': {
+      id: '/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -82,11 +182,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-docs/': {
+      id: '/api-docs/'
+      path: '/'
+      fullPath: '/api-docs/'
+      preLoaderRoute: typeof ApiDocsIndexRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/reviews': {
+      id: '/api-docs/reviews'
+      path: '/reviews'
+      fullPath: '/api-docs/reviews'
+      preLoaderRoute: typeof ApiDocsReviewsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/progress': {
+      id: '/api-docs/progress'
+      path: '/progress'
+      fullPath: '/api-docs/progress'
+      preLoaderRoute: typeof ApiDocsProgressRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/metrics': {
+      id: '/api-docs/metrics'
+      path: '/metrics'
+      fullPath: '/api-docs/metrics'
+      preLoaderRoute: typeof ApiDocsMetricsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/dialogues': {
+      id: '/api-docs/dialogues'
+      path: '/dialogues'
+      fullPath: '/api-docs/dialogues'
+      preLoaderRoute: typeof ApiDocsDialoguesRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/auth': {
+      id: '/api-docs/auth'
+      path: '/auth'
+      fullPath: '/api-docs/auth'
+      preLoaderRoute: typeof ApiDocsAuthRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
   }
 }
 
+interface ApiDocsRouteChildren {
+  ApiDocsAuthRoute: typeof ApiDocsAuthRoute
+  ApiDocsDialoguesRoute: typeof ApiDocsDialoguesRoute
+  ApiDocsMetricsRoute: typeof ApiDocsMetricsRoute
+  ApiDocsProgressRoute: typeof ApiDocsProgressRoute
+  ApiDocsReviewsRoute: typeof ApiDocsReviewsRoute
+  ApiDocsIndexRoute: typeof ApiDocsIndexRoute
+}
+
+const ApiDocsRouteChildren: ApiDocsRouteChildren = {
+  ApiDocsAuthRoute: ApiDocsAuthRoute,
+  ApiDocsDialoguesRoute: ApiDocsDialoguesRoute,
+  ApiDocsMetricsRoute: ApiDocsMetricsRoute,
+  ApiDocsProgressRoute: ApiDocsProgressRoute,
+  ApiDocsReviewsRoute: ApiDocsReviewsRoute,
+  ApiDocsIndexRoute: ApiDocsIndexRoute,
+}
+
+const ApiDocsRouteWithChildren =
+  ApiDocsRoute._addFileChildren(ApiDocsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiDocsRoute: ApiDocsRouteWithChildren,
   DashboardRoute: DashboardRoute,
   ProgressRoute: ProgressRoute,
 }
