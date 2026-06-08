@@ -178,7 +178,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "This vaccine is just about cancer prevention; it has nothing to do with sex. You're overthinking it.",
+      text: "Many parents have shared that same worry. The research on this vaccine has actually looked at exactly that question, and kids who get the HPV vaccine don't start sexual activity any earlier than kids who don't. It can help to frame it the same way you would any other cancer-prevention step — focused on long-term protection rather than on behavior.",
       source: "mira",
     },
     meta: {
