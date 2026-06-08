@@ -58,10 +58,10 @@ function ResearchDashboardPage() {
   );
 
   const selectionData = [
-    { name: "Response A", value: summary.aPicks, color: "hsl(var(--primary))" },
-    { name: "Response B", value: summary.bPicks, color: "hsl(217 91% 60%)" },
-    { name: "Neither", value: summary.neither, color: "hsl(var(--muted-foreground))" },
-    { name: "Too similar", value: summary.tooSim, color: "hsl(43 96% 56%)" },
+    { name: "Response A", value: summary.aPicks, color: "var(--primary)" },
+    { name: "Response B", value: summary.bPicks, color: "var(--accent)" },
+    { name: "Neither", value: summary.neither, color: "var(--muted-foreground)" },
+    { name: "Too similar", value: summary.tooSim, color: "oklch(0.78 0.15 80)" },
   ];
 
   const criterionData = CRITERION_AVERAGES.map((c) => ({
@@ -108,21 +108,21 @@ function ResearchDashboardPage() {
                   data={completionData}
                   margin={{ top: 8, right: 8, left: 0, bottom: 30 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="name"
                     interval={0}
                     angle={-35}
                     textAnchor="end"
                     height={50}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
-                  <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
                   <Tooltip
-                    cursor={{ fill: "hsl(var(--muted))" }}
+                    cursor={{ fill: "var(--muted)" }}
                     contentStyle={{
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
                       borderRadius: 6,
                       fontSize: 12,
                     }}
@@ -131,13 +131,13 @@ function ResearchDashboardPage() {
                   <Bar
                     dataKey="completed"
                     stackId="a"
-                    fill="hsl(var(--primary))"
+                    fill="var(--primary)"
                     name="Completed"
                   />
                   <Bar
                     dataKey="remaining"
                     stackId="a"
-                    fill="hsl(var(--muted))"
+                    fill="var(--muted)"
                     name="Remaining"
                   />
                 </BarChart>
@@ -163,8 +163,8 @@ function ResearchDashboardPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
                       borderRadius: 6,
                       fontSize: 12,
                     }}
@@ -184,31 +184,31 @@ function ResearchDashboardPage() {
                   data={criterionData}
                   margin={{ top: 8, right: 8, left: 0, bottom: 50 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="name"
                     interval={0}
                     angle={-25}
                     textAnchor="end"
                     height={70}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <YAxis
                     domain={[0, 5]}
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <Tooltip
-                    cursor={{ fill: "hsl(var(--muted))" }}
+                    cursor={{ fill: "var(--muted)" }}
                     contentStyle={{
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
                       borderRadius: 6,
                       fontSize: 12,
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="Response A" fill="hsl(var(--primary))" />
-                  <Bar dataKey="Response B" fill="hsl(217 91% 60%)" />
+                  <Bar dataKey="Response A" fill="var(--primary)" />
+                  <Bar dataKey="Response B" fill="var(--accent)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
