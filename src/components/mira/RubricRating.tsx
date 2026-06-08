@@ -49,6 +49,46 @@ function RatingRow({
   );
 }
 
+function CriterionInfo({ criterion }: { criterion: Criterion }) {
+  const guide = RUBRIC_GUIDES[criterion];
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label={`About ${criterion}`}
+          className="inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{criterion}</DialogTitle>
+          <DialogDescription>{guide.description}</DialogDescription>
+        </DialogHeader>
+        <div className="mt-2 space-y-3">
+          {guide.examples.map((ex) => (
+            <div
+              key={ex.score}
+              className="rounded-lg border border-border bg-muted/40 p-3"
+            >
+              <div className="mb-1 flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
+                  {ex.score}
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {ex.label}
+                </span>
+              </div>
+              <p className="text-sm text-foreground">{ex.example}</p>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
   return (
@@ -106,43 +146,3 @@ export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
   );
 }
 
-function CriterionInfo({ criterion }: { criterion: Criterion }) {
-  const guide = RUBRIC_GUIDES[criterion];
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label={`About ${criterion}`}
-          className="inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        >
-          <Info className="h-3.5 w-3.5" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{criterion}</DialogTitle>
-          <DialogDescription>{guide.description}</DialogDescription>
-        </DialogHeader>
-        <div className="mt-2 space-y-3">
-          {guide.examples.map((ex) => (
-            <div
-              key={ex.score}
-              className="rounded-lg border border-border bg-muted/40 p-3"
-            >
-              <div className="mb-1 flex items-center gap-2">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-                  {ex.score}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {ex.label}
-                </span>
-              </div>
-              <p className="text-sm text-foreground">{ex.example}</p>
-            </div>
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
