@@ -76,16 +76,17 @@ function MetricsDocs() {
             {
               reviewer_id: "r_8f2a3b",
               display_name: "Reviewer 1",
-              completed: 84,
-              avg_score: 3.9,
-              source_accuracy: 0.74,
-              picked_human: 41,
-              picked_ai: 39,
+              role: "parent",
+              completed: 32,
+              avg_parent_score: 5.6,
+              preferred_a: 18,
+              preferred_b: 12,
             },
           ],
         }}
         errors={[{ status: 403, meaning: "Researcher role required." }]}
       />
+
     </div>
   );
 }
