@@ -190,6 +190,11 @@ export type Reviewer = {
   neither: number;
   tooSim: number;
   medianMinutes: number;
+  /** Percent of source-identification guesses (Human vs AI) that were correct. */
+  sourceAccuracy: number;
+  /** Number of times the reviewer picked the human-authored response when choosing A or B. */
+  pickedHuman: number;
+  pickedAi: number;
 };
 
 export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
@@ -202,6 +207,11 @@ export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
   const bPicks = Math.round(remaining * 0.78);
   const neither = Math.round((remaining - bPicks) * 0.6);
   const tooSim = Math.max(0, remaining - bPicks - neither);
+  const ab = aPicks + bPicks;
+  const humanPickRate = 0.45 + rand(idx + 601) * 0.3;
+  const pickedHuman = Math.round(ab * humanPickRate);
+  const pickedAi = Math.max(0, ab - pickedHuman);
+  const sourceAccuracy = Math.round(50 + rand(idx + 701) * 40);
   return {
     id: `R-${String(idx + 1).padStart(2, "0")}`,
     name: `Anon ${animal}`,
@@ -214,6 +224,9 @@ export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
     neither,
     tooSim,
     medianMinutes: Math.round((4 + rand(idx + 501) * 6) * 10) / 10,
+    sourceAccuracy,
+    pickedHuman,
+    pickedAi,
   };
 });
 
@@ -227,6 +240,10 @@ export function reviewerAverages(rs: Reviewer[]) {
   const bPicks = rs.reduce((s, r) => s + r.bPicks, 0);
   const neither = rs.reduce((s, r) => s + r.neither, 0);
   const tooSim = rs.reduce((s, r) => s + r.tooSim, 0);
+  const pickedHuman = rs.reduce((s, r) => s + r.pickedHuman, 0);
+  const pickedAi = rs.reduce((s, r) => s + r.pickedAi, 0);
+  const meanSourceAcc =
+    rs.reduce((s, r) => s + r.sourceAccuracy, 0) / rs.length;
   return {
     reviewers: rs.length,
     totalCompleted,
@@ -238,6 +255,9 @@ export function reviewerAverages(rs: Reviewer[]) {
     bPicks,
     neither,
     tooSim,
+    pickedHuman,
+    pickedAi,
+    meanSourceAccuracy: Math.round(meanSourceAcc),
     medianMinutes:
       Math.round(
         (rs.reduce((s, r) => s + r.medianMinutes, 0) / rs.length) * 10,
