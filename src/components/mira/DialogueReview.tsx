@@ -8,7 +8,7 @@ import { ResponseComparison, type Selection } from "./ResponseComparison";
 import { RubricRating, type Ratings } from "./RubricRating";
 import { ReviewerComments } from "./ReviewerComments";
 import { ReviewActions } from "./ReviewActions";
-import { ResearchMetadata } from "./ResearchMetadata";
+
 import { SubmittedState } from "./SubmittedState";
 
 type ReviewState = {
@@ -72,13 +72,18 @@ export function DialogueReview() {
     };
   }, []);
 
-  const handleRate = (which: "A" | "B", criterion: Criterion, value: number) => {
-    if (which === "A") {
-      updateReview({ ratingsA: { ...review.ratingsA, [criterion]: value } });
-    } else {
-      updateReview({ ratingsB: { ...review.ratingsB, [criterion]: value } });
-    }
+  const handleRate = (
+    which: "A" | "B",
+    criterion: Criterion,
+    value: number | null,
+  ) => {
+    const key = which === "A" ? "ratingsA" : "ratingsB";
+    const next = { ...review[key] };
+    if (value === null) delete next[criterion];
+    else next[criterion] = value;
+    updateReview({ [key]: next } as Partial<ReviewState>);
   };
+
 
   const handleSaveDraft = () => {
     updateReview({ status: "draft" });
@@ -152,11 +157,6 @@ export function DialogueReview() {
             />
           </>
         )}
-
-        <ResearchMetadata
-          dialogueId={current.id}
-          reviewSet={current.reviewSet}
-        />
       </main>
 
       <Toaster />

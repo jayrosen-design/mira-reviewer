@@ -14,7 +14,7 @@ export type Ratings = Partial<Record<Criterion, number>>;
 type Props = {
   ratingsA: Ratings;
   ratingsB: Ratings;
-  onChange: (which: "A" | "B", criterion: Criterion, value: number) => void;
+  onChange: (which: "A" | "B", criterion: Criterion, value: number | null) => void;
 };
 
 function RatingRow({
@@ -22,7 +22,7 @@ function RatingRow({
   onChange,
 }: {
   value: number | undefined;
-  onChange: (v: number) => void;
+  onChange: (v: number | null) => void;
 }) {
   return (
     <div className="flex gap-1.5">
@@ -32,8 +32,9 @@ function RatingRow({
           <button
             key={n}
             type="button"
-            onClick={() => onChange(n)}
-            aria-label={`Rate ${n}`}
+            onClick={() => onChange(active ? null : n)}
+            aria-label={active ? `Clear rating ${n}` : `Rate ${n}`}
+            aria-pressed={active}
             className={`h-8 w-8 rounded-md border text-xs font-medium transition ${
               active
                 ? "border-primary bg-primary text-primary-foreground"
@@ -47,6 +48,7 @@ function RatingRow({
     </div>
   );
 }
+
 
 export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
   return (
