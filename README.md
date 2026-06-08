@@ -356,16 +356,16 @@ Append-only trail of edits (re-opening reviews, admin overrides).
 ```
 
 ### `simulated_exchanges`
-Optional record of the in-app "Send to dialogue" simulator. When a reviewer clicks **Send to dialogue** on Response A or B, the chosen response is appended to the visible conversation and a simulated parent reply is generated. Only the most recent exchange per (reviewer, dialogue) is kept, so a new send overwrites the previous row.
+Optional record of the in-app **Optional Dialogue Preview** ("Preview in dialogue context"). When a reviewer previews a response, the chosen response is shown in a separate preview panel with a simulated parent reply. Only the most recent preview per (reviewer, dialogue) is kept, so a new preview overwrites the previous row. This table is research-only and is **not** part of the formal review.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `reviewer_id` | fk → reviewers | |
 | `dialogue_id` | fk → dialogues | |
-| `sent_response_id` | fk → responses | which candidate was sent |
+| `sent_response_id` | fk → responses | which candidate was previewed |
 | `sent_label` | enum(`A`,`B`) | label as shown to this reviewer (post-shuffle) |
-| `simulated_parent_reply` | text | model- or template-generated parent turn |
-| `generator` | text | e.g. `template-v1`, `gpt-5-sim` |
+| `simulated_parent_reply` | text | template- or model-generated parent turn (no live AI in the prototype) |
+| `generator` | text | e.g. `template-v1` |
 | `created_at` | timestamptz | |
 ```json
 { "id": "sim_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
@@ -378,9 +378,13 @@ Optional record of the in-app "Send to dialogue" simulator. When a reviewer clic
 
 - **Unseen sampling**: each reviewer only ever gets dialogues they haven't reviewed.
 - **A/B position shuffle**: `assignments.position_shuffle` randomizes which response appears as A vs B so source position can't bias ratings.
-- **Balanced human/AI**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue.
-- **Overlap dialogues**: a configurable subset (e.g. 10 of 100) is assigned to every reviewer so inter-rater agreement can be computed.
-- **Simulated exchanges**: not part of the formal review record — they exist only to let reviewers see how a parent might respond. They are excluded from rubric scoring and aggregate metrics.
+- **Balanced source mix**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue. Source identity is hidden from reviewers.
+- **Overlap dialogues**: a configurable subset is assigned to every reviewer so inter-rater agreement can be computed.
+- **Optional dialogue previews**: not part of the formal review record. They are excluded from rubric scoring and aggregate review metrics.
+
+### Prototype boundary
+
+This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, authentication, or production data storage. The Optional Dialogue Preview uses canned parent replies and is purely illustrative.
 
 See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
 
