@@ -5,6 +5,7 @@ import { DIALOGUES, type Criterion } from "@/data/dialogues";
 import { Header } from "./Header";
 import { DialogueContext } from "./DialogueContext";
 import { ResponseComparison, type Selection } from "./ResponseComparison";
+import type { SourceGuess } from "./ResponseCard";
 import { RubricRating, type Ratings } from "./RubricRating";
 import { ReviewerComments } from "./ReviewerComments";
 import { ReviewActions } from "./ReviewActions";
@@ -13,6 +14,8 @@ import { SubmittedState } from "./SubmittedState";
 
 type ReviewState = {
   selectedStronger: Selection;
+  guessA: SourceGuess;
+  guessB: SourceGuess;
   ratingsA: Ratings;
   ratingsB: Ratings;
   comments: string;
@@ -22,6 +25,8 @@ type ReviewState = {
 function emptyReview(): ReviewState {
   return {
     selectedStronger: null,
+    guessA: null,
+    guessB: null,
     ratingsA: {},
     ratingsB: {},
     comments: "",
@@ -136,6 +141,11 @@ export function DialogueReview() {
               responseB={current.responseB}
               selected={review.selectedStronger}
               onSelect={handleSelect}
+              guessA={review.guessA}
+              guessB={review.guessB}
+              onGuess={(which, g) =>
+                updateReview(which === "A" ? { guessA: g } : { guessB: g })
+              }
             />
 
 
