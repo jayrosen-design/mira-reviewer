@@ -81,13 +81,17 @@ export function DialogueReview() {
   }, []);
 
   const handleSendToChat = (which: "A" | "B") => {
-    if (parentTyping) return;
     const clinicianText = which === "A" ? current.responseA.text : current.responseB.text;
-    setSimulatedTurns((prev) => [...prev, { speaker: "clinician", text: clinicianText }]);
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    // Replace any prior simulated exchange with this new one.
+    setSimulatedTurns([{ speaker: "clinician", text: clinicianText }]);
     setParentTyping(true);
     typingTimeout.current = setTimeout(() => {
-      const reply = pickParentReply(simulatedTurns.length);
-      setSimulatedTurns((prev) => [...prev, { speaker: "parent", text: reply }]);
+      const reply = pickParentReply(0);
+      setSimulatedTurns([
+        { speaker: "clinician", text: clinicianText },
+        { speaker: "parent", text: reply },
+      ]);
       setParentTyping(false);
     }, 1800);
   };
