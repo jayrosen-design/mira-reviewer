@@ -130,6 +130,14 @@ function ProgressTrackerPage() {
               <Stat label="Too similar" value={summary.tooSim} />
               <Stat label="Avg A" value={summary.avgA.toFixed(1)} />
               <Stat label="Avg B" value={summary.avgB.toFixed(1)} />
+              <Stat
+                label="Human vs AI accuracy"
+                value={`${summary.sourceAccuracy}%`}
+              />
+              <Stat
+                label="Picked Human / AI"
+                value={`${summary.pickedHuman} / ${summary.pickedAi}`}
+              />
             </div>
           </div>
           <div className="mt-4">
@@ -151,6 +159,7 @@ function ProgressTrackerPage() {
                 <TableHead className="w-36">Selected</TableHead>
                 <TableHead className="w-24 text-right">Avg A</TableHead>
                 <TableHead className="w-24 text-right">Avg B</TableHead>
+                <TableHead className="w-44">Source guess (A / B)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -186,6 +195,14 @@ function ProgressTrackerPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Grade value={item.avgB} />
+                  </TableCell>
+                  <TableCell>
+                    <SourceGuessCell
+                      guessA={item.guessA}
+                      guessB={item.guessB}
+                      sourceA={item.sourceA}
+                      sourceB={item.sourceB}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
