@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "MIRA" },
+      { name: "description", content: "Motivational Interviewing Response Assessment" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "MIRA" },
+      { property: "og:description", content: "Motivational Interviewing Response Assessment" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "MIRA" },
+      { name: "twitter:description", content: "Motivational Interviewing Response Assessment" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/516cf84a-a2e1-46eb-8f5f-e99cd6409728/id-preview-293a28d5--b6d70d23-f9c0-459a-bbac-4512c1d2011f.lovable.app-1780940085948.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/516cf84a-a2e1-46eb-8f5f-e99cd6409728/id-preview-293a28d5--b6d70d23-f9c0-459a-bbac-4512c1d2011f.lovable.app-1780940085948.png" },
     ],
     links: [
       {
