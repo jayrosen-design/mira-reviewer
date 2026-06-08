@@ -72,13 +72,18 @@ export function DialogueReview() {
     };
   }, []);
 
-  const handleRate = (which: "A" | "B", criterion: Criterion, value: number) => {
-    if (which === "A") {
-      updateReview({ ratingsA: { ...review.ratingsA, [criterion]: value } });
-    } else {
-      updateReview({ ratingsB: { ...review.ratingsB, [criterion]: value } });
-    }
+  const handleRate = (
+    which: "A" | "B",
+    criterion: Criterion,
+    value: number | null,
+  ) => {
+    const key = which === "A" ? "ratingsA" : "ratingsB";
+    const next = { ...review[key] };
+    if (value === null) delete next[criterion];
+    else next[criterion] = value;
+    updateReview({ [key]: next } as Partial<ReviewState>);
   };
+
 
   const handleSaveDraft = () => {
     updateReview({ status: "draft" });
