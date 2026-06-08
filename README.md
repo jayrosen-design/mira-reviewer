@@ -355,12 +355,32 @@ Append-only trail of edits (re-opening reviews, admin overrides).
   "meta": { "reason": "Reviewer flagged misclick." } }
 ```
 
+### `simulated_exchanges`
+Optional record of the in-app "Send to dialogue" simulator. When a reviewer clicks **Send to dialogue** on Response A or B, the chosen response is appended to the visible conversation and a simulated parent reply is generated. Only the most recent exchange per (reviewer, dialogue) is kept, so a new send overwrites the previous row.
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `reviewer_id` | fk → reviewers | |
+| `dialogue_id` | fk → dialogues | |
+| `sent_response_id` | fk → responses | which candidate was sent |
+| `sent_label` | enum(`A`,`B`) | label as shown to this reviewer (post-shuffle) |
+| `simulated_parent_reply` | text | model- or template-generated parent turn |
+| `generator` | text | e.g. `template-v1`, `gpt-5-sim` |
+| `created_at` | timestamptz | |
+```json
+{ "id": "sim_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
+  "sent_response_id": "rsp_7710", "sent_label": "A",
+  "simulated_parent_reply": "Hmm, that actually makes me feel a little better.",
+  "generator": "template-v1", "created_at": "2026-06-08T14:05:22Z" }
+```
+
 ### Randomization & assignment rules
 
 - **Unseen sampling**: each reviewer only ever gets dialogues they haven't reviewed.
 - **A/B position shuffle**: `assignments.position_shuffle` randomizes which response appears as A vs B so source position can't bias ratings.
 - **Balanced human/AI**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue.
 - **Overlap dialogues**: a configurable subset (e.g. 10 of 100) is assigned to every reviewer so inter-rater agreement can be computed.
+- **Simulated exchanges**: not part of the formal review record — they exist only to let reviewers see how a parent might respond. They are excluded from rubric scoring and aggregate metrics.
 
 See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
 
