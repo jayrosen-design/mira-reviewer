@@ -157,11 +157,6 @@ export function DialogueReview() {
             />
           </>
         )}
-
-        <ResearchMetadata
-          dialogueId={current.id}
-          reviewSet={current.reviewSet}
-        />
       </main>
 
       <Toaster />
