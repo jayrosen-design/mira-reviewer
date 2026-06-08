@@ -17,11 +17,11 @@ export function NavBar() {
           MIRA
         </Link>
         <ul className="flex flex-1 items-center gap-1">
-          {links.map(({ to, label, icon: Icon }) => (
+          {links.map(({ to, label, icon: Icon, exact }) => (
             <li key={to}>
               <Link
                 to={to}
-                activeOptions={{ exact: true }}
+                activeOptions={{ exact }}
                 activeProps={{
                   className:
                     "bg-primary-soft text-primary",
