@@ -284,12 +284,12 @@ Two candidate counselor responses per dialogue. `source` is ground truth; never 
 | `dialogue_id` | fk → dialogues | |
 | `title` | text | "Response 1" |
 | `text` | text | response body |
-| `source` | enum(`human`,`ai`) | hidden from reviewers |
-| `model_name` | text null | e.g. `gpt-5`, null if human |
-| `author_id` | uuid null | fk → clinicians, null if AI |
+| `source` | enum(`human`,`mira`) | hidden from reviewers; researcher-only |
+| `model_name` | text null | e.g. `mira-v0.4.1`, null if human |
+| `author_id` | uuid null | fk → clinicians, null if Mira-generated |
 ```json
-{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response 1",
-  "text": "It sounds like…", "source": "ai", "model_name": "gpt-5" }
+{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response A",
+  "text": "It sounds like…", "source": "mira", "model_name": "mira-v0.4.1" }
 ```
 
 ### `assignments`
