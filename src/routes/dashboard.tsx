@@ -71,6 +71,26 @@ function ResearchDashboardPage() {
     "Response B": c.responseB,
   }));
 
+  const accuracyData = [...REVIEWERS]
+    .sort((a, b) => b.sourceAccuracy - a.sourceAccuracy)
+    .map((r) => ({
+      name: r.name.replace("Anon ", ""),
+      accuracy: r.sourceAccuracy,
+    }));
+
+  const sourcePickData = [
+    {
+      name: "Picked Human",
+      value: summary.pickedHuman,
+      color: "var(--primary)",
+    },
+    {
+      name: "Picked AI",
+      value: summary.pickedAi,
+      color: "var(--accent)",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
