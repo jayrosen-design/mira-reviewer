@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Square, Equal, Ban } from "lucide-react";
+import { CheckCircle2, Square, Equal, Ban, Check, X } from "lucide-react";
 import {
   Table,
   TableBody,
