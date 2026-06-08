@@ -95,8 +95,65 @@ bun run build    # production build
 bun run lint     # eslint
 ```
 
+## How it works
+
+The diagram below shows the current mock-data flow (solid lines) alongside how the same flow would operate when wired to a real backend with authenticated users and a randomized dialogue queue (dashed lines).
+
+```mermaid
+flowchart TD
+    Reviewer([Reviewer])
+
+    subgraph Client["Client (TanStack Start app)"]
+        ReviewPage["/ Review page"]
+        ProgressPage["/progress Tracker"]
+        DashboardPage["/dashboard Research Dashboard"]
+    end
+
+    subgraph Mock["Current: mock data"]
+        Dialogues["src/data/dialogues.ts"]
+        ProgressData["src/data/mockProgress.ts"]
+    end
+
+    subgraph Real["Future: real backend"]
+        Auth["Auth (reviewer login)"]
+        API["Server functions / API"]
+        DB[("Database<br/>dialogues • responses<br/>reviews • reviewers")]
+        Sampler["Randomized dialogue<br/>sampler / assignment"]
+        Aggregator["Aggregation jobs<br/>(KPIs, accuracy, agreement)"]
+    end
+
+    Reviewer --> ReviewPage
+    Reviewer --> ProgressPage
+    Reviewer --> DashboardPage
+
+    ReviewPage --> Dialogues
+    ProgressPage --> ProgressData
+    DashboardPage --> ProgressData
+
+    Reviewer -.-> Auth
+    Auth -.-> API
+    ReviewPage -.->|fetch next dialogue| API
+    API -.-> Sampler
+    Sampler -.->|unseen, balanced sample| DB
+    ReviewPage -.->|submit ratings, guess, comments| API
+    API -.->|persist review| DB
+    ProgressPage -.->|reviewer's own progress| API
+    DashboardPage -.->|aggregate metrics| Aggregator
+    Aggregator -.-> DB
+    API -.-> DB
+```
+
+### From mock to real
+
+- **Dialogues** — replace `src/data/dialogues.ts` with a `dialogues` + `responses` table; the Review page fetches the next assignment via a server function instead of indexing a static array.
+- **Randomization** — a sampler assigns each reviewer an unseen, order-randomized pair (Response A/B shuffled per view) so source position can't bias ratings.
+- **Users** — add authentication so each reviewer has an identity; reviews are written with `reviewer_id` and progress/dashboard queries scope to the logged-in user (or aggregate across all reviewers for researchers).
+- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (ratings, stronger-response choice, source guess, comments) instead of local component state.
+- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, source-ID accuracy, stronger-response distribution, inter-rater agreement) instead of `summarizeProgress` over mock arrays.
+
 ## Notes
 
 - No backend is wired up; all reviewer/dialogue data is mock data for design and prototyping.
 - Routes are auto-registered by the TanStack Router Vite plugin — do not edit `src/routeTree.gen.ts` by hand.
 - The Progress Tracker intentionally surfaces completed rows first so the design team can preview the populated state.
+
