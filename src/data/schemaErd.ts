@@ -74,4 +74,14 @@ export const SCHEMA_ERD = `erDiagram
     timestamptz at
     jsonb meta
   }
+  SIMULATED_EXCHANGES {
+    uuid id PK
+    uuid reviewer_id FK
+    text dialogue_id FK
+    uuid sent_response_id FK
+    enum sent_label
+    text simulated_parent_reply
+    text generator
+    timestamptz created_at
+  }
 `;
