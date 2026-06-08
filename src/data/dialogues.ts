@@ -19,7 +19,12 @@ export type DialogueItem = {
   dialogue: DialogueTurn[];
   responseA: Response;
   responseB: Response;
+  /** Simulated parent reply if Response A is chosen and inserted into the chat. */
+  parentReplyA: string;
+  /** Simulated parent reply if Response B is chosen and inserted into the chat. */
+  parentReplyB: string;
 };
+
 
 export const RUBRIC_CRITERIA = [
   "Empathy",
