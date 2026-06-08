@@ -1,5 +1,7 @@
 import { DIALOGUES, RUBRIC_CRITERIA } from "./dialogues";
 
+export type Source = "human" | "ai";
+
 export type DialogueProgress = {
   id: string;
   reviewSet: string;
@@ -7,6 +9,12 @@ export type DialogueProgress = {
   selected: "A" | "B" | "neither" | "too_similar" | null;
   avgA: number | null;
   avgB: number | null;
+  /** Ground truth — which response was authored by a human. */
+  sourceA: Source;
+  sourceB: Source;
+  /** Reviewer's guess for each response. null if not yet guessed. */
+  guessA: Source | null;
+  guessB: Source | null;
   completed: boolean;
 };
 
@@ -61,12 +69,20 @@ export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
   const r = rand(idx + 1);
   // ~62% completed
   const completed = r < 0.62;
+  // Ground truth: roughly half human-A / half human-B
+  const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "ai";
+  const sourceB: Source = sourceA === "human" ? "ai" : "human";
+
   if (!completed) {
     return {
       ...d,
       selected: null,
       avgA: null,
       avgB: null,
+      sourceA,
+      sourceB,
+      guessA: null,
+      guessB: null,
       completed: false,
     };
   }
@@ -78,7 +94,24 @@ export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
   const baseB = 3.0 + rand(idx + 53) * 1.5;
   const avgA = Math.round(baseA * 10) / 10;
   const avgB = Math.round(baseB * 10) / 10;
-  return { ...d, selected, avgA, avgB, completed };
+
+  // Reviewers guess correctly ~68% of the time
+  const guessA: Source =
+    rand(idx + 91) < 0.68 ? sourceA : sourceA === "human" ? "ai" : "human";
+  const guessB: Source =
+    rand(idx + 113) < 0.68 ? sourceB : sourceB === "human" ? "ai" : "human";
+
+  return {
+    ...d,
+    selected,
+    avgA,
+    avgB,
+    sourceA,
+    sourceB,
+    guessA,
+    guessB,
+    completed,
+  };
 });
 
 export function summarizeProgress(items: DialogueProgress[]) {
@@ -98,6 +131,30 @@ export function summarizeProgress(items: DialogueProgress[]) {
     ratedB.length === 0
       ? 0
       : ratedB.reduce((s, i) => s + (i.avgB ?? 0), 0) / ratedB.length;
+  // Source-identification accuracy
+  const guessed = items.filter((i) => i.guessA != null && i.guessB != null);
+  let correct = 0;
+  let total2 = 0;
+  for (const i of guessed) {
+    total2 += 2;
+    if (i.guessA === i.sourceA) correct++;
+    if (i.guessB === i.sourceB) correct++;
+  }
+  const sourceAccuracy =
+    total2 === 0 ? 0 : Math.round((correct / total2) * 100);
+
+  // Picked the human-authored response when choosing A or B
+  const pickedHuman = items.filter(
+    (i) =>
+      (i.selected === "A" && i.sourceA === "human") ||
+      (i.selected === "B" && i.sourceB === "human"),
+  ).length;
+  const pickedAi = items.filter(
+    (i) =>
+      (i.selected === "A" && i.sourceA === "ai") ||
+      (i.selected === "B" && i.sourceB === "ai"),
+  ).length;
+
   return {
     completed,
     total,
@@ -107,6 +164,9 @@ export function summarizeProgress(items: DialogueProgress[]) {
     tooSim,
     avgA: Math.round(avgA * 10) / 10,
     avgB: Math.round(avgB * 10) / 10,
+    sourceAccuracy,
+    pickedHuman,
+    pickedAi,
   };
 }
 
@@ -130,6 +190,11 @@ export type Reviewer = {
   neither: number;
   tooSim: number;
   medianMinutes: number;
+  /** Percent of source-identification guesses (Human vs AI) that were correct. */
+  sourceAccuracy: number;
+  /** Number of times the reviewer picked the human-authored response when choosing A or B. */
+  pickedHuman: number;
+  pickedAi: number;
 };
 
 export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
@@ -142,6 +207,11 @@ export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
   const bPicks = Math.round(remaining * 0.78);
   const neither = Math.round((remaining - bPicks) * 0.6);
   const tooSim = Math.max(0, remaining - bPicks - neither);
+  const ab = aPicks + bPicks;
+  const humanPickRate = 0.45 + rand(idx + 601) * 0.3;
+  const pickedHuman = Math.round(ab * humanPickRate);
+  const pickedAi = Math.max(0, ab - pickedHuman);
+  const sourceAccuracy = Math.round(50 + rand(idx + 701) * 40);
   return {
     id: `R-${String(idx + 1).padStart(2, "0")}`,
     name: `Anon ${animal}`,
@@ -154,6 +224,9 @@ export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
     neither,
     tooSim,
     medianMinutes: Math.round((4 + rand(idx + 501) * 6) * 10) / 10,
+    sourceAccuracy,
+    pickedHuman,
+    pickedAi,
   };
 });
 
@@ -167,6 +240,10 @@ export function reviewerAverages(rs: Reviewer[]) {
   const bPicks = rs.reduce((s, r) => s + r.bPicks, 0);
   const neither = rs.reduce((s, r) => s + r.neither, 0);
   const tooSim = rs.reduce((s, r) => s + r.tooSim, 0);
+  const pickedHuman = rs.reduce((s, r) => s + r.pickedHuman, 0);
+  const pickedAi = rs.reduce((s, r) => s + r.pickedAi, 0);
+  const meanSourceAcc =
+    rs.reduce((s, r) => s + r.sourceAccuracy, 0) / rs.length;
   return {
     reviewers: rs.length,
     totalCompleted,
@@ -178,6 +255,9 @@ export function reviewerAverages(rs: Reviewer[]) {
     bPicks,
     neither,
     tooSim,
+    pickedHuman,
+    pickedAi,
+    meanSourceAccuracy: Math.round(meanSourceAcc),
     medianMinutes:
       Math.round(
         (rs.reduce((s, r) => s + r.medianMinutes, 0) / rs.length) * 10,

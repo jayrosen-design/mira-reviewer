@@ -71,6 +71,26 @@ function ResearchDashboardPage() {
     "Response B": c.responseB,
   }));
 
+  const accuracyData = [...REVIEWERS]
+    .sort((a, b) => b.sourceAccuracy - a.sourceAccuracy)
+    .map((r) => ({
+      name: r.name.replace("Anon ", ""),
+      accuracy: r.sourceAccuracy,
+    }));
+
+  const sourcePickData = [
+    {
+      name: "Picked Human",
+      value: summary.pickedHuman,
+      color: "var(--primary)",
+    },
+    {
+      name: "Picked AI",
+      value: summary.pickedAi,
+      color: "var(--accent)",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
@@ -83,7 +103,7 @@ function ResearchDashboardPage() {
           </p>
         </header>
 
-        <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <KpiCard label="Reviewers" value={summary.reviewers} />
           <KpiCard
             label="Reviews completed"
@@ -93,6 +113,11 @@ function ResearchDashboardPage() {
           <KpiCard
             label="Avg score (A / B)"
             value={`${summary.meanA.toFixed(1)} / ${summary.meanB.toFixed(1)}`}
+          />
+          <KpiCard
+            label="Human vs AI accuracy"
+            value={`${summary.meanSourceAccuracy}%`}
+            sub="mean across reviewers"
           />
           <KpiCard
             label="Median time / review"
@@ -215,6 +240,87 @@ function ResearchDashboardPage() {
           </Card>
         </section>
 
+        <section className="grid gap-4 lg:grid-cols-2">
+          <Card title="Source-identification accuracy per reviewer">
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={accuracyData}
+                  margin={{ top: 8, right: 8, left: 0, bottom: 30 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis
+                    dataKey="name"
+                    interval={0}
+                    angle={-35}
+                    textAnchor="end"
+                    height={50}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+                    tickFormatter={(v) => `${v}%`}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "var(--muted)" }}
+                    contentStyle={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}
+                    formatter={(v: number) => `${v}%`}
+                  />
+                  <Bar
+                    dataKey="accuracy"
+                    name="Accuracy"
+                    fill="var(--primary)"
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Percent of Human / AI source guesses each reviewer got correct.
+              Chance is 50%.
+            </p>
+          </Card>
+
+          <Card title="Stronger response by true source">
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sourcePickData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={55}
+                    outerRadius={95}
+                    paddingAngle={2}
+                  >
+                    {sourcePickData.map((e) => (
+                      <Cell key={e.name} fill={e.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 6,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Of the A/B picks across all reviewers, share that landed on the
+              human-authored vs. AI-authored response.
+            </p>
+          </Card>
+        </section>
+
         <section className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-5 py-3">
             <h2 className="text-sm font-semibold text-foreground">
@@ -233,6 +339,8 @@ function ResearchDashboardPage() {
                 <TableHead className="text-right">Picked B</TableHead>
                 <TableHead className="text-right">Avg A</TableHead>
                 <TableHead className="text-right">Avg B</TableHead>
+                <TableHead className="text-right">Source acc.</TableHead>
+                <TableHead className="text-right">Human / AI picks</TableHead>
                 <TableHead className="text-right">Median time</TableHead>
               </TableRow>
             </TableHeader>
@@ -264,6 +372,12 @@ function ResearchDashboardPage() {
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {r.avgB.toFixed(1)}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {r.sourceAccuracy}%
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">
+                        {r.pickedHuman} / {r.pickedAi}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
                         {r.medianMinutes.toFixed(1)} min

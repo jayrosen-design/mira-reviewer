@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Square, Equal, Ban } from "lucide-react";
+import { CheckCircle2, Square, Equal, Ban, Check, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -130,6 +130,14 @@ function ProgressTrackerPage() {
               <Stat label="Too similar" value={summary.tooSim} />
               <Stat label="Avg A" value={summary.avgA.toFixed(1)} />
               <Stat label="Avg B" value={summary.avgB.toFixed(1)} />
+              <Stat
+                label="Human vs AI accuracy"
+                value={`${summary.sourceAccuracy}%`}
+              />
+              <Stat
+                label="Picked Human / AI"
+                value={`${summary.pickedHuman} / ${summary.pickedAi}`}
+              />
             </div>
           </div>
           <div className="mt-4">
@@ -151,6 +159,7 @@ function ProgressTrackerPage() {
                 <TableHead className="w-36">Selected</TableHead>
                 <TableHead className="w-24 text-right">Avg A</TableHead>
                 <TableHead className="w-24 text-right">Avg B</TableHead>
+                <TableHead className="w-44">Source guess (A / B)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -186,6 +195,14 @@ function ProgressTrackerPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <Grade value={item.avgB} />
+                  </TableCell>
+                  <TableCell>
+                    <SourceGuessCell
+                      guessA={item.guessA}
+                      guessB={item.guessB}
+                      sourceA={item.sourceA}
+                      sourceB={item.sourceB}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -253,5 +270,60 @@ function Stat({ label, value }: { label: string; value: string | number }) {
         {value}
       </span>
     </div>
+  );
+}
+
+function SourceGuessCell({
+  guessA,
+  guessB,
+  sourceA,
+  sourceB,
+}: {
+  guessA: "human" | "ai" | null;
+  guessB: "human" | "ai" | null;
+  sourceA: "human" | "ai";
+  sourceB: "human" | "ai";
+}) {
+  if (guessA == null && guessB == null)
+    return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <GuessChip label="A" guess={guessA} truth={sourceA} />
+      <GuessChip label="B" guess={guessB} truth={sourceB} />
+    </div>
+  );
+}
+
+function GuessChip({
+  label,
+  guess,
+  truth,
+}: {
+  label: string;
+  guess: "human" | "ai" | null;
+  truth: "human" | "ai";
+}) {
+  if (guess == null)
+    return (
+      <span className="rounded border border-dashed border-border px-1.5 py-0.5 text-muted-foreground">
+        {label}: —
+      </span>
+    );
+  const correct = guess === truth;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-medium ${
+        correct
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
+    >
+      {label}: {guess === "human" ? "Human" : "AI"}
+      {correct ? (
+        <Check className="h-3 w-3" />
+      ) : (
+        <X className="h-3 w-3" />
+      )}
+    </span>
   );
 }
