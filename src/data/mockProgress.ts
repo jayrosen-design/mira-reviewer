@@ -65,54 +65,58 @@ export const TOTAL_DIALOGUES = 100;
 
 export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
   TOTAL_DIALOGUES,
-).map((d, idx) => {
-  const r = rand(idx + 1);
-  // ~62% completed
-  const completed = r < 0.62;
-  // Ground truth: roughly half human-A / half human-B
-  const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "ai";
-  const sourceB: Source = sourceA === "human" ? "ai" : "human";
+)
+  .map((d, idx) => {
+    const r = rand(idx + 1);
+    // ~62% completed
+    const completed = r < 0.62;
+    // Ground truth: roughly half human-A / half human-B
+    const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "ai";
+    const sourceB: Source = sourceA === "human" ? "ai" : "human";
 
-  if (!completed) {
+    if (!completed) {
+      return {
+        ...d,
+        selected: null,
+        avgA: null,
+        avgB: null,
+        sourceA,
+        sourceB,
+        guessA: null,
+        guessB: null,
+        completed: false,
+      };
+    }
+    const pick = rand(idx + 17);
+    const selected: DialogueProgress["selected"] =
+      pick < 0.55 ? "A" : pick < 0.85 ? "B" : pick < 0.93 ? "neither" : "too_similar";
+
+    const baseA = 3.2 + rand(idx + 31) * 1.4;
+    const baseB = 3.0 + rand(idx + 53) * 1.5;
+    const avgA = Math.round(baseA * 10) / 10;
+    const avgB = Math.round(baseB * 10) / 10;
+
+    // Reviewers guess correctly ~68% of the time
+    const guessA: Source =
+      rand(idx + 91) < 0.68 ? sourceA : sourceA === "human" ? "ai" : "human";
+    const guessB: Source =
+      rand(idx + 113) < 0.68 ? sourceB : sourceB === "human" ? "ai" : "human";
+
     return {
       ...d,
-      selected: null,
-      avgA: null,
-      avgB: null,
+      selected,
+      avgA,
+      avgB,
       sourceA,
       sourceB,
-      guessA: null,
-      guessB: null,
-      completed: false,
+      guessA,
+      guessB,
+      completed,
     };
-  }
-  const pick = rand(idx + 17);
-  const selected: DialogueProgress["selected"] =
-    pick < 0.55 ? "A" : pick < 0.85 ? "B" : pick < 0.93 ? "neither" : "too_similar";
-
-  const baseA = 3.2 + rand(idx + 31) * 1.4;
-  const baseB = 3.0 + rand(idx + 53) * 1.5;
-  const avgA = Math.round(baseA * 10) / 10;
-  const avgB = Math.round(baseB * 10) / 10;
-
-  // Reviewers guess correctly ~68% of the time
-  const guessA: Source =
-    rand(idx + 91) < 0.68 ? sourceA : sourceA === "human" ? "ai" : "human";
-  const guessB: Source =
-    rand(idx + 113) < 0.68 ? sourceB : sourceB === "human" ? "ai" : "human";
-
-  return {
-    ...d,
-    selected,
-    avgA,
-    avgB,
-    sourceA,
-    sourceB,
-    guessA,
-    guessB,
-    completed,
-  };
-});
+  })
+  // Show completed scenarios first so reviewers (and the design team) see
+  // what a finished row looks like on the first page.
+  .sort((a, b) => Number(b.completed) - Number(a.completed));
 
 export function summarizeProgress(items: DialogueProgress[]) {
   const completed = items.filter((i) => i.completed).length;
