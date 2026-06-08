@@ -69,6 +69,42 @@ function DialoguesDocs() {
           { status: 404, meaning: "Dialogue not found." },
         ]}
       />
+
+      <ApiEndpoint
+        method="POST"
+        path="/v1/dialogues/:id/simulated-exchange"
+        summary="Send a candidate response into the conversation and get a simulated parent reply. Overwrites any prior simulated exchange for this reviewer + dialogue."
+        auth="reviewer"
+        requestExample={{
+          sent_label: "A",
+          sent_response_id: "rsp_7710",
+        }}
+        responseExample={{
+          id: "sim_4a2",
+          reviewer_id: "r_8f2",
+          dialogue_id: "MIRA-014",
+          sent_response_id: "rsp_7710",
+          sent_label: "A",
+          simulated_parent_reply:
+            "Hmm, that actually makes me feel a little better about it.",
+          generator: "template-v1",
+          created_at: "2026-06-08T14:05:22Z",
+        }}
+        errors={[
+          { status: 401, meaning: "Not authenticated." },
+          { status: 404, meaning: "Dialogue or response not found." },
+          { status: 422, meaning: "sent_response_id does not belong to dialogue." },
+        ]}
+      />
+
+      <ApiEndpoint
+        method="DELETE"
+        path="/v1/dialogues/:id/simulated-exchange"
+        summary="Clear the reviewer's simulated exchange for this dialogue (e.g. when moving to the next item)."
+        auth="reviewer"
+        responseExample={{ ok: true }}
+        errors={[{ status: 401, meaning: "Not authenticated." }]}
+      />
     </div>
   );
 }
