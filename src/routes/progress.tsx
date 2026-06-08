@@ -208,23 +208,21 @@ function ProgressTrackerPage() {
                   const prev = pageNumbers[i - 1];
                   const showEllipsis = prev != null && n - prev > 1;
                   return (
-                    <span key={n} className="flex items-center">
+                    <PaginationItem key={n}>
                       {showEllipsis && (
                         <span className="px-2 text-sm text-muted-foreground">…</span>
                       )}
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#"
-                          isActive={n === page}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setPage(n);
-                          }}
-                        >
-                          {n}
-                        </PaginationLink>
-                      </PaginationItem>
-                    </span>
+                      <PaginationLink
+                        href="#"
+                        isActive={n === page}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPage(n);
+                        }}
+                      >
+                        {n}
+                      </PaginationLink>
+                    </PaginationItem>
                   );
                 })}
                 <PaginationItem>
