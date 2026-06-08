@@ -327,7 +327,12 @@ export const DIALOGUES: DialogueItem[] = [
       text: "The HPV vaccine is recommended for children at this age because it can help prevent certain cancers later in life. Many parents have questions about safety, and we can review the information together so you can make a decision that feels informed.",
       source: "ai",
     },
+    parentReplyA:
+      "Yeah… I think what worries me most is the side effects. If we could just talk through what's actually been seen, that would help me feel like I'm not just guessing.",
+    parentReplyB:
+      "Okay. I guess I do want the real information, not just what I'm reading online. Can you tell me what kind of side effects people actually see?",
   },
+
   {
     id: "MIRA-002",
     reviewSet: "Pilot Set A",
