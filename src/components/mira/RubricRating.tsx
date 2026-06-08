@@ -45,27 +45,26 @@ export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
       aria-label="Rating rubric"
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Rating rubric</h2>
-          <p className="text-sm text-muted-foreground">
-            Rate each response from 1 (low) to 5 (high).
-          </p>
-        </div>
-        <div className="hidden gap-12 text-xs font-semibold uppercase tracking-wide text-muted-foreground sm:flex">
-          <span>Response A</span>
-          <span>Response B</span>
-        </div>
+      <div className="mb-5">
+        <h2 className="text-lg font-semibold text-foreground">Rating rubric</h2>
+        <p className="text-sm text-muted-foreground">
+          Rate each response from 1 (low) to 5 (high).
+        </p>
+      </div>
+
+      <div className="hidden grid-cols-3 items-center gap-6 border-b border-border pb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground sm:grid">
+        <span className="justify-self-center">Response A</span>
+        <span className="text-center">Criterion</span>
+        <span className="justify-self-center">Response B</span>
       </div>
 
       <ul className="divide-y divide-border">
         {RUBRIC_CRITERIA.map((c) => (
           <li
             key={c}
-            className="grid gap-3 py-4 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-8"
+            className="grid gap-3 py-4 sm:grid-cols-3 sm:items-center sm:gap-6"
           >
-            <span className="text-sm font-medium text-foreground">{c}</span>
-            <div>
+            <div className="order-2 sm:order-1 sm:justify-self-center">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
                 Response A
               </div>
@@ -74,7 +73,10 @@ export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
                 onChange={(v) => onChange("A", c, v)}
               />
             </div>
-            <div>
+            <span className="order-1 text-sm font-medium text-foreground sm:order-2 sm:text-center">
+              {c}
+            </span>
+            <div className="order-3 sm:justify-self-center">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
                 Response B
               </div>
