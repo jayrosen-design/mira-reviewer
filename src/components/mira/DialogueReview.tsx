@@ -199,8 +199,6 @@ export function DialogueReview() {
               parentConcern={current.parentConcern}
               barrierCategory={current.barrierCategory}
               priorDialogue={current.priorDialogue}
-              simulatedTurns={simulatedTurns}
-              parentTyping={parentTyping}
             />
 
             <ResponseComparison
@@ -208,6 +206,13 @@ export function DialogueReview() {
               responseB={current.responseB}
               onSend={handleSendToChat}
               sendDisabled={parentTyping}
+            />
+
+            <DialoguePreviewPanel
+              simulatedTurns={simulatedTurns}
+              parentTyping={parentTyping}
+              sentLabel={sentLabel}
+              onClear={handleClearPreview}
             />
 
             {role === "expert" ? (
