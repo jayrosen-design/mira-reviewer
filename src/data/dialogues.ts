@@ -236,7 +236,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Nine is the right age based on current guidelines. You should do it now while she's here.",
+      text: "That reaction makes sense — nine can feel early, and you're the one who knows your daughter best. Current guidance points to ages 9–12 because the immune response is strongest then and protection is in place before any exposure. We don't need to decide today; I'm happy to talk through whatever would help.",
       source: "mira",
     },
     meta: {
