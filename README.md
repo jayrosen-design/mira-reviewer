@@ -1,41 +1,35 @@
 # MIRA — Motivational Interviewing Response Assessment
 
-MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a client utterance with two candidate counselor responses (one human-authored, one AI-generated), and asked to compare, rate, and annotate them across multiple rubric criteria. The platform also provides progress tracking for individual reviewers and aggregate analytics across the full reviewer pool.
+MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a parent concern with two blinded candidate counselor responses (Response A and Response B). Source identity (human interviewer vs Mira) is hidden from reviewers during the task and stored internally for researcher-side analysis. The platform also provides progress tracking for individual reviewers and aggregate analytics across the full reviewer pool.
 
 ## Purpose
 
-The project supports a research study comparing human- and AI-generated counselor responses in motivational interviewing dialogues. The interface is designed for:
+The project supports the CTSI Mira dialogue review/evaluation workflow, comparing Mira-generated motivational interviewing responses against human-interviewer responses in a blinded study. The interface is designed for two reviewer roles:
 
-- **Reviewers** — clinicians or trained raters who score 100+ dialogue comparisons.
-- **Researchers** — study leads who monitor reviewer progress, inter-rater agreement, and human-vs-AI identification accuracy.
+- **Parent reviewers** — rate each response on a 7-point agreement scale across appropriateness, harm, clarity, sense-making, responsibility, and empathy.
+- **Expert reviewers** — answer yes / no / unsure on medical safety, accuracy, and relevance, with optional safety notes.
+- **Researchers** — monitor reviewer progress, inter-rater agreement, preferred-response distributions, and (post-hoc) source comparisons.
+
+Reviewers are **not** asked to guess which response is human vs Mira. Source identification is an optional researcher-only analysis, not a reviewer task.
 
 ## Pages
 
 ### `/` — Review
-The main scoring screen for a single dialogue comparison.
-- Conversation context with the prompting client utterance.
-- Two side-by-side response cards (Response A / Response B):
-  - "Select stronger response" button.
-  - Human / AI source-guess buttons (reviewer guesses which response is human-authored).
-- Rubric ratings for each response across multiple MI criteria.
+The main scoring screen for a single review item.
+- Parent Concern + barrier category badge.
+- Prior Dialogue Context (expanded by default).
+- Side-by-side blinded Response A / Response B cards.
+- Role-appropriate rubric (parent 7-point or expert yes/no/unsure + safety notes).
+- Preferred response selection (A, B, neither, too similar).
 - Free-text reviewer comments.
-- Submit / navigate between dialogues.
+- Optional Dialogue Preview panel: a "Preview in dialogue context" affordance on each response shows how the response might land with a simulated parent reply. This preview is clearly separated from the review stimulus, is not scored, and uses no live AI.
+- Save draft / Submit.
 
 ### `/progress` — Progress Tracker
-Personal progress view for an individual reviewer.
-- Overall progress bar and summary stats (completed count, average grades, Human-vs-AI identification accuracy, picked-Human vs picked-AI ratio).
-- Paged table of 10 dialogue scenarios per page showing:
-  - Completion status (green check vs grey checkbox).
-  - Which response was selected as stronger (A/B).
-  - Average grades for A and B.
-  - Source-guess correctness chips for A and B.
-- Completed scenarios are surfaced first. Rows are clickable and route to the Review page.
+Personal progress view for an individual reviewer across the 35-item review set, grouped by HPV barrier category, with completion status and per-item ratings summary.
 
 ### `/dashboard` — Research Dashboard
-Aggregate metrics across all reviewers (e.g. 20 reviewers × 100 comparisons).
-- KPI cards: total reviewers, completion rate, mean rubric scores, Human-vs-AI identification accuracy.
-- Charts: per-reviewer completion, per-reviewer source-identification accuracy, distribution of stronger-response selections by true source.
-- Reviewer leaderboard with anonymized reviewer names, completion, average scores, source accuracy, and Human/AI pick counts.
+Aggregate metrics across all parent and expert reviewers: completion, preferred-response distribution, parent rubric means, expert safety/accuracy/relevance pass rates, barrier-category summaries, and export mockups.
 
 ## Tech Stack
 
