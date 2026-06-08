@@ -2,23 +2,13 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Response } from "@/data/dialogues";
 
-export type SourceGuess = "human" | "ai" | null;
-
 type Props = {
   response: Response;
   selected: boolean;
   onSelect: () => void;
-  guess: SourceGuess;
-  onGuess: (g: SourceGuess) => void;
 };
 
-export function ResponseCard({
-  response,
-  selected,
-  onSelect,
-  guess,
-  onGuess,
-}: Props) {
+export function ResponseCard({ response, selected, onSelect }: Props) {
   return (
     <div
       className={`flex h-full flex-col rounded-2xl border bg-card p-6 shadow-sm transition ${
@@ -46,49 +36,6 @@ export function ResponseCard({
       >
         {selected ? "Selected as stronger response" : "Select as stronger response"}
       </Button>
-
-      <div className="mt-4 border-t border-border pt-3">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Guess the source
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          <GuessButton
-            label="Human"
-            active={guess === "human"}
-            onClick={() => onGuess(guess === "human" ? null : "human")}
-          />
-          <GuessButton
-            label="AI"
-            active={guess === "ai"}
-            onClick={() => onGuess(guess === "ai" ? null : "ai")}
-          />
-        </div>
-      </div>
     </div>
-  );
-}
-
-function GuessButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`rounded-md border px-3 py-1.5 text-sm font-medium transition ${
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-      }`}
-    >
-      {label}
-    </button>
   );
 }
