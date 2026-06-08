@@ -143,8 +143,8 @@ flowchart TD
 - **Dialogues** — replace `src/data/dialogues.ts` with a `dialogues` + `responses` table; the Review page fetches the next assignment via a server function instead of indexing a static array.
 - **Randomization** — a sampler assigns each reviewer an unseen, order-randomized pair (Response A/B shuffled per view) so source position can't bias ratings.
 - **Users** — add authentication so each reviewer has an identity; reviews are written with `reviewer_id` and progress/dashboard queries scope to the logged-in user (or aggregate across all reviewers for researchers).
-- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (ratings, stronger-response choice, source guess, comments) instead of local component state.
-- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, source-ID accuracy, stronger-response distribution, inter-rater agreement) instead of `summarizeProgress` over mock arrays.
+- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (rubric ratings, preferred-response choice, comments) instead of local component state. Reviewers do not submit source guesses.
+- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, preferred-response distribution, parent rubric means, expert pass rates, inter-rater agreement) instead of `summarizeProgress` over mock arrays. Source comparisons are computed post-hoc from the hidden `responses.source` column.
 
 ## Data Model (proposed real backend)
 
