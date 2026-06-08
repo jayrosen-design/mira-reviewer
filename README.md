@@ -161,8 +161,11 @@ The tables below are what a real backend would persist. Sample rows are illustra
 erDiagram
     REVIEWERS ||--o{ ASSIGNMENTS : "is assigned"
     REVIEWERS ||--o{ AUDIT_LOG : "acts in"
+    REVIEWERS ||--o{ SIMULATED_EXCHANGES : "triggers"
     DIALOGUES ||--o{ RESPONSES : "has 2"
     DIALOGUES ||--o{ ASSIGNMENTS : "appears in"
+    DIALOGUES ||--o{ SIMULATED_EXCHANGES : "simulated in"
+    RESPONSES ||--o{ SIMULATED_EXCHANGES : "sent as"
     ASSIGNMENTS ||--o| REVIEWS : "produces"
     REVIEWS ||--o{ RUBRIC_SCORES : "contains"
     RUBRIC_CRITERIA ||--o{ RUBRIC_SCORES : "scored by"
