@@ -33,6 +33,178 @@ export const RUBRIC_CRITERIA = [
 
 export type Criterion = (typeof RUBRIC_CRITERIA)[number];
 
+export type RubricGuide = {
+  description: string;
+  examples: { score: 5 | 3 | 1; label: string; example: string }[];
+};
+
+export const RUBRIC_GUIDES: Record<Criterion, RubricGuide> = {
+  Empathy: {
+    description:
+      "The degree to which the response conveys genuine understanding of, and care for, the parent's feelings and perspective.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"It sounds really hard to weigh all of this when you just want to do what's best for your daughter. That care comes through clearly.\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example:
+          "\"I understand this is a tough decision for many parents. Let's talk through it.\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example:
+          "\"The vaccine is safe and recommended. There's no real reason to wait.\"",
+      },
+    ],
+  },
+  "Reflective listening": {
+    description:
+      "The response accurately mirrors what the parent said or felt, showing the clinician heard them before moving forward.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"You're worried about side effects, and eleven feels young to you for something that doesn't seem urgent yet.\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example: "\"So you have some concerns about side effects and timing.\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example: "\"Let me explain how the vaccine works.\"",
+      },
+    ],
+  },
+  "Open-ended question use": {
+    description:
+      "Use of questions that invite the parent to share more rather than answer yes/no, supporting exploration and engagement.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"What would feel most helpful to talk through together before you decide?\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example: "\"Can you tell me a bit more about what you've read?\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example: "\"Do you want the vaccine today, yes or no?\"",
+      },
+    ],
+  },
+  "Respect for parent autonomy": {
+    description:
+      "The response affirms the parent's right to make the decision and avoids pressure, judgment, or coercion.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"This is your decision, and I want to make sure you have what you need to feel good about it, whatever you choose.\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example:
+          "\"It's up to you. I can share information if that would help.\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example:
+          "\"You really need to do this now. Waiting isn't a responsible choice.\"",
+      },
+    ],
+  },
+  "Motivational interviewing consistency": {
+    description:
+      "Alignment with MI spirit and techniques: partnership, acceptance, compassion, evocation, and avoiding the righting reflex.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"You care a lot about getting this right. What feels most important to you as you think it through?\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example:
+          "\"I hear your concerns. Would it be okay if I shared some information, and then we can talk about what you think?\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example:
+          "\"You shouldn't rely on what you read online. The right answer is to vaccinate now.\"",
+      },
+    ],
+  },
+  "Clarity and helpfulness": {
+    description:
+      "How clearly and usefully the response communicates, including being concrete, well-organized, and easy to follow.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "\"The most common side effects are soreness and tiredness for a day or two. Would it help if I walked through what to expect?\"",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example:
+          "\"Side effects are usually mild. We can go over them if you'd like.\"",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example: "\"It's fine. Everyone gets it.\"",
+      },
+    ],
+  },
+  "Overall response quality": {
+    description:
+      "Holistic judgment of how well the response works as a motivational interviewing reply in this context.",
+    examples: [
+      {
+        score: 5,
+        label: "Strong",
+        example:
+          "Reflects the parent's concern, affirms autonomy, asks an open question, and offers information collaboratively.",
+      },
+      {
+        score: 3,
+        label: "Adequate",
+        example:
+          "Acknowledges concerns and offers information, but reflection or autonomy support feels generic.",
+      },
+      {
+        score: 1,
+        label: "Weak",
+        example:
+          "Dismisses the parent's concerns and pushes a recommendation without engagement.",
+      },
+    ],
+  },
+};
+
+
 export const DIALOGUES: DialogueItem[] = [
   {
     id: "MIRA-001",
