@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { DialogueTurn } from "@/data/dialogues";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import {
