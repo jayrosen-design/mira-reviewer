@@ -1,71 +1,67 @@
-# MIRA — Dialogue Review POC
+## Goal
 
-A frontend-only React proof of concept for reviewers to evaluate motivational interviewing responses. Single main page, mock data, local state only.
+Document the data model and API surface for the future real-backend version of MIRA so the design and engineering teams have a concrete reference. Surface it in two places: the README, and new in-app API docs pages reachable from the navbar.
 
-## Design system
+## 1. README additions
 
-Update `src/styles.css` tokens for a calm academic look:
-- Light background (near-white, slight warm tint)
-- Deep blue primary (UF-inspired, e.g. oklch ~0.32 0.12 255)
-- Subtle orange accent (e.g. oklch ~0.75 0.15 55) for highlights/selected states
-- Generous spacing, rounded-2xl cards, soft borders, restrained shadows
-- Typography: system sans, clear hierarchy
+Add two new sections after the existing "How it works" diagram:
 
-All colors via semantic tokens (`bg-background`, `text-primary`, `bg-accent`, etc.) — no hardcoded hex in components.
+### Data model (example tables)
 
-## Routes
+Concise table-by-table reference with column name, type, and a sample row. Tables:
 
-Replace placeholder `src/routes/index.tsx` with the Dialogue Review page (sets proper `<title>` and meta). No new routes needed.
+- **reviewers** — `id (uuid)`, `email`, `display_name`, `role (reviewer|researcher|admin)`, `credentials`, `created_at`, `last_active_at`
+- **dialogues** — `id`, `review_set`, `scenario`, `turns (jsonb: [{speaker, text}])`, `created_at`
+- **responses** — `id`, `dialogue_id (fk)`, `label (A|B)`, `title`, `text`, `source (human|ai)`, `model_name` (nullable), `author_id` (nullable, for human-authored)
+- **assignments** — `id`, `reviewer_id (fk)`, `dialogue_id (fk)`, `position_shuffle (bool — whether A/B were swapped at display)`, `assigned_at`, `due_at`
+- **reviews** — `id`, `assignment_id (fk)`, `selected (A|B|neither|too_similar)`, `guess_a (human|ai|null)`, `guess_b (human|ai|null)`, `comments`, `submitted_at`
+- **rubric_scores** — `id`, `review_id (fk)`, `response_label (A|B)`, `criterion`, `score (1–5)`
+- **rubric_criteria** — `id`, `name`, `description`, `display_order`, `active`
+- **audit_log** — `id`, `actor_id`, `action`, `entity`, `entity_id`, `at`, `meta`
 
-## Mock data
+Each table gets a one-line "why it exists" note and a single sample JSON row for clarity.
 
-`src/data/dialogues.ts` — 3 sample review items, each with:
-- `id`, `reviewSet`
-- `scenario` (one-sentence summary)
-- `dialogue`: array of `{ speaker: "parent" | "clinician", text }` turns
-- `responseA`, `responseB`: `{ title, text }` (sources hidden in UI)
-- metadata (sources stored but rendered as "Hidden")
+### Randomization & assignment rules
 
-Topics: HPV vaccine hesitation, adolescent vaping, medication adherence.
+Short callout describing: per-reviewer unseen sampling, A/B position shuffle, balanced human/AI distribution, optional overlap dialogues for inter-rater agreement.
 
-## Component structure
+## 2. New in-app API docs pages
 
-```
-src/routes/index.tsx                  -> renders <DialogueReview />
-src/components/mira/
-  Header.tsx                          -> title, subtitle, description, "Review N of M"
-  DialogueContext.tsx                 -> scenario + chat bubbles (parent vs clinician styling)
-  ResponseCard.tsx                    -> title, text, "Select as stronger response" button, selected state
-  ResponseComparison.tsx              -> two ResponseCards side-by-side (stacks on tablet/mobile)
-  RubricRating.tsx                    -> 7 criteria × 1–5 clickable buttons, per response (A and B columns)
-  ReviewerComments.tsx                -> textarea
-  ReviewActions.tsx                   -> Save Draft / Submit Review / Next Dialogue
-  ResearchMetadata.tsx                -> collapsible (shadcn Collapsible), sources shown as "Hidden"
-  SubmittedState.tsx                  -> "Review submitted. Thank you." confirmation
-  DialogueReview.tsx                  -> page container, owns state, wires everything
-```
+Add an "API Docs" entry to `src/components/mira/NavBar.tsx` that links to `/api-docs` (overview/index page) with sub-routes for each resource group.
 
-Reuse existing shadcn primitives: `card`, `button`, `textarea`, `collapsible`, `separator`, `badge`, `sonner` (toast for Save Draft).
+### Routes (TanStack file-based)
 
-## State (local, per dialogue)
+- `src/routes/api-docs.tsx` — layout route (renders `<Outlet />` + a left-side sub-nav listing the resource groups).
+- `src/routes/api-docs.index.tsx` — overview: base URL, auth model (bearer JWT from reviewer login), versioning (`/v1`), error envelope, pagination convention.
+- `src/routes/api-docs.auth.tsx` — `POST /v1/auth/login`, `POST /v1/auth/logout`, `GET /v1/auth/me`.
+- `src/routes/api-docs.dialogues.tsx` — `GET /v1/dialogues/next` (returns next assignment with A/B shuffled), `GET /v1/dialogues/:id`.
+- `src/routes/api-docs.reviews.tsx` — `POST /v1/reviews` (submit ratings + guesses + comments), `GET /v1/reviews/:id`, `PATCH /v1/reviews/:id` (edit before deadline).
+- `src/routes/api-docs.progress.tsx` — `GET /v1/me/progress`, `GET /v1/reviewers/:id/progress` (researcher-only).
+- `src/routes/api-docs.metrics.tsx` — `GET /v1/metrics/overview`, `GET /v1/metrics/source-accuracy`, `GET /v1/metrics/inter-rater-agreement`, `GET /v1/metrics/leaderboard`.
 
-`DialogueReview` holds:
-- `currentIndex` (0..N-1)
-- `reviews[index] = { selectedStronger: "A" | "B" | null, ratingsA: Record<criterion, 1–5>, ratingsB: ..., comments: string, status: "draft" | "submitted" }`
+### Endpoint page format
 
-Behavior:
-- Selecting a stronger response toggles a subtle accent-bordered/filled state on the chosen card.
-- Rating buttons highlight selected value (1–5 pill row per criterion, two columns labeled A/B).
-- Save Draft → toast "Draft saved" (stays on item).
-- Submit Review → marks item submitted, swaps page body for `SubmittedState` with a "Next Dialogue" button.
-- Next Dialogue → advances `currentIndex` (wraps or disables at end), resets to review view for that item (preserving any prior state).
-- All ephemeral; no persistence, no backend.
+Each docs page renders a small reusable component (`ApiEndpoint`) for every endpoint with:
 
-## Responsiveness
+- HTTP method + path (color-coded badge)
+- One-sentence purpose
+- Auth requirement (reviewer / researcher / admin)
+- Request shape (params, query, JSON body) with a typed example
+- Response shape with a typed JSON example
+- Common error responses (`401`, `403`, `404`, `409`, `422`)
 
-- Desktop/tablet: A/B cards side-by-side (grid-cols-2), rubric in two columns.
-- Narrow tablet/mobile: stack to single column.
+All examples use mock JSON literals — no real fetch calls. This is documentation only, no backend wiring.
 
-## Out of scope
+## 3. Out of scope
 
-No auth, no backend, no Lovable Cloud, no routing beyond the index page.
+- No actual backend, auth, or database is wired up — content remains mock data.
+- No edits to existing Review / Progress / Dashboard pages beyond the navbar addition.
+- No code generation from a spec file (OpenAPI). The docs are hand-authored JSX so the design team can style and iterate freely.
+
+## Files touched
+
+- `README.md` — append Data model + Randomization sections.
+- `src/components/mira/NavBar.tsx` — add API Docs link.
+- `src/components/mira/ApiEndpoint.tsx` — new reusable docs block.
+- `src/routes/api-docs.tsx` — layout with sub-nav + `<Outlet />`.
+- `src/routes/api-docs.index.tsx` + 5 resource sub-pages listed above.
