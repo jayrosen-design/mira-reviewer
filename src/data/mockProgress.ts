@@ -1,277 +1,250 @@
-import { DIALOGUES, RUBRIC_CRITERIA } from "./dialogues";
+import { BARRIER_CATEGORIES, DIALOGUES, type BarrierCategory } from "./dialogues";
 
-export type Source = "human" | "ai";
+export type Source = "human" | "mira";
+export type Selection = "A" | "B" | "neither" | "too_similar" | null;
 
-export type DialogueProgress = {
+export type ReviewItemProgress = {
   id: string;
   reviewSet: string;
-  scenario: string;
-  selected: "A" | "B" | "neither" | "too_similar" | null;
+  barrierCategory: BarrierCategory;
+  parentConcern: string;
+  /** Reviewer's preferred response. */
+  preferred: Selection;
+  /** Mean parent rating (or expert yes-count) summary for A. */
   avgA: number | null;
   avgB: number | null;
-  /** Ground truth — which response was authored by a human. */
   sourceA: Source;
   sourceB: Source;
-  /** Reviewer's guess for each response. null if not yet guessed. */
-  guessA: Source | null;
-  guessB: Source | null;
-  completed: boolean;
+  status: "completed" | "draft" | "not_started";
 };
 
-// Deterministic pseudo-random
 function rand(seed: number) {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
 }
 
-const SCENARIO_TEMPLATES = [
-  "A parent is uncertain about transitioning their toddler from a bottle to a cup.",
-  "A parent is weighing the pros and cons of starting ADHD medication for their child.",
-  "A parent is worried about their teenager's screen time but fears conflict.",
-  "A parent is hesitant to start their child on insulin for newly diagnosed type 1 diabetes.",
-  "A parent is feeling overwhelmed by their child's eczema flare-ups and treatment routine.",
-  "A parent is unsure whether to pursue speech therapy for a late-talking toddler.",
-  "A parent is concerned about the flu vaccine for their child after a prior reaction.",
-  "A parent feels guilty about their child's weight and is unsure how to introduce changes.",
-  "A parent is anxious about their preteen's recent withdrawal from family activities.",
-  "A parent is unsure how to talk to their child about an upcoming surgery.",
-  "A parent is debating whether to allow their teen to drive after a minor accident.",
-  "A parent is reluctant to follow up on a referral to a child psychologist.",
-  "A parent worries their child's picky eating is more than just a phase.",
-  "A parent is uncertain about how to manage their child's anxiety before school.",
-  "A parent is hesitant about a recommended dental procedure under sedation.",
-];
+export const TOTAL_REVIEW_ITEMS = 35;
 
-const SETS = ["Pilot Set A", "Pilot Set B", "Pilot Set C"];
+const PARENT_CONCERN_TEMPLATES: Record<BarrierCategory, string[]> = {
+  "Vaccine effectiveness": [
+    "How well does this vaccine really work?",
+    "I'm not sure the studies are strong enough to be confident.",
+    "Does it really prevent cancer or just the virus?",
+  ],
+  "Safety or side effects": [
+    "I've heard about side effects, and I'm not sure my child needs this yet.",
+    "I'm worried about long-term effects we don't know about yet.",
+    "My nephew had a bad reaction to a vaccine. That's stuck with me.",
+  ],
+  "Sexual activity concern": [
+    "She's only ten — talking about this feels like it sends the wrong message.",
+    "I don't want him to think we're giving permission for something.",
+    "We're raising her with certain values, and this feels like it crosses that.",
+  ],
+  "Lack of clinician recommendation": [
+    "Our regular doctor never mentioned this, so I assumed it wasn't urgent.",
+    "If it was important, wouldn't we have heard about it sooner?",
+    "Nobody's pushed this on us before. Why now?",
+  ],
+  "Child is too young": [
+    "Nine just feels too young to be thinking about this.",
+    "Can't this wait a few more years until he's older?",
+    "She's still a kid. Why are we doing this now?",
+  ],
+};
 
-function buildExtendedScenarios(target: number) {
-  const items: { id: string; reviewSet: string; scenario: string }[] = DIALOGUES.map(
-    (d) => ({ id: d.id, reviewSet: d.reviewSet, scenario: d.scenario }),
-  );
+function buildItems(target: number): ReviewItemProgress[] {
+  const base: ReviewItemProgress[] = DIALOGUES.map((d, i) => ({
+    id: d.id,
+    reviewSet: d.reviewSet,
+    barrierCategory: d.barrierCategory,
+    parentConcern: d.parentConcern,
+    preferred: null,
+    avgA: null,
+    avgB: null,
+    sourceA: d.responseA.source,
+    sourceB: d.responseB.source,
+    status: i % 2 === 0 ? "completed" : "draft",
+  }));
+
+  const items: ReviewItemProgress[] = [...base];
   let i = items.length;
   while (items.length < target) {
-    const tmpl = SCENARIO_TEMPLATES[(i - DIALOGUES.length) % SCENARIO_TEMPLATES.length];
+    const category = BARRIER_CATEGORIES[i % BARRIER_CATEGORIES.length];
+    const templates = PARENT_CONCERN_TEMPLATES[category];
+    const concern = templates[(i * 7) % templates.length];
     items.push({
       id: `MIRA-${String(i + 1).padStart(3, "0")}`,
-      reviewSet: SETS[i % SETS.length],
-      scenario: tmpl,
+      reviewSet: `Pilot Set ${String.fromCharCode(65 + (i % 3))}`,
+      barrierCategory: category,
+      parentConcern: concern,
+      preferred: null,
+      avgA: null,
+      avgB: null,
+      sourceA: rand(i + 31) < 0.5 ? "human" : "mira",
+      sourceB: "human",
+      status: "not_started",
     });
     i++;
   }
-  return items;
-}
 
-export const TOTAL_DIALOGUES = 100;
+  // Apply statuses + mock metrics: ~60% completed, ~10% draft, rest not_started.
+  return items
+    .map((it, idx) => {
+      const r = rand(idx + 1);
+      let status: ReviewItemProgress["status"] = "not_started";
+      if (r < 0.6) status = "completed";
+      else if (r < 0.7) status = "draft";
 
-export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
-  TOTAL_DIALOGUES,
-)
-  .map((d, idx) => {
-    const r = rand(idx + 1);
-    // ~62% completed
-    const completed = r < 0.62;
-    // Ground truth: roughly half human-A / half human-B
-    const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "ai";
-    const sourceB: Source = sourceA === "human" ? "ai" : "human";
+      if (status === "not_started") {
+        return { ...it, status, sourceB: it.sourceA === "human" ? "mira" : "human" } as ReviewItemProgress;
+      }
 
-    if (!completed) {
+      const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "mira";
+      const sourceB: Source = sourceA === "human" ? "mira" : "human";
+      const pick = rand(idx + 17);
+      const preferred: Selection =
+        pick < 0.5 ? "A" : pick < 0.85 ? "B" : pick < 0.93 ? "neither" : "too_similar";
+
+      const avgA = Math.round((4.2 + rand(idx + 31) * 2.2) * 10) / 10;
+      const avgB = Math.round((4.0 + rand(idx + 53) * 2.4) * 10) / 10;
+
       return {
-        ...d,
-        selected: null,
-        avgA: null,
-        avgB: null,
+        ...it,
+        status,
+        preferred,
+        avgA: status === "completed" ? avgA : null,
+        avgB: status === "completed" ? avgB : null,
         sourceA,
         sourceB,
-        guessA: null,
-        guessB: null,
-        completed: false,
       };
-    }
-    const pick = rand(idx + 17);
-    const selected: DialogueProgress["selected"] =
-      pick < 0.55 ? "A" : pick < 0.85 ? "B" : pick < 0.93 ? "neither" : "too_similar";
+    })
+    .sort((a, b) => {
+      const rank = (s: ReviewItemProgress["status"]) =>
+        s === "completed" ? 0 : s === "draft" ? 1 : 2;
+      return rank(a.status) - rank(b.status);
+    });
+}
 
-    const baseA = 3.2 + rand(idx + 31) * 1.4;
-    const baseB = 3.0 + rand(idx + 53) * 1.5;
-    const avgA = Math.round(baseA * 10) / 10;
-    const avgB = Math.round(baseB * 10) / 10;
+export const REVIEW_ITEMS: ReviewItemProgress[] = buildItems(TOTAL_REVIEW_ITEMS);
 
-    // Reviewers guess correctly ~68% of the time
-    const guessA: Source =
-      rand(idx + 91) < 0.68 ? sourceA : sourceA === "human" ? "ai" : "human";
-    const guessB: Source =
-      rand(idx + 113) < 0.68 ? sourceB : sourceB === "human" ? "ai" : "human";
+export function summarizeProgress(items: ReviewItemProgress[]) {
+  const completed = items.filter((i) => i.status === "completed").length;
+  const draft = items.filter((i) => i.status === "draft").length;
+  const remaining = items.length - completed;
+  const byCategory: Record<BarrierCategory, { total: number; completed: number }> =
+    Object.fromEntries(
+      BARRIER_CATEGORIES.map((c) => [c, { total: 0, completed: 0 }]),
+    ) as Record<BarrierCategory, { total: number; completed: number }>;
 
-    return {
-      ...d,
-      selected,
-      avgA,
-      avgB,
-      sourceA,
-      sourceB,
-      guessA,
-      guessB,
-      completed,
-    };
-  })
-  // Show completed scenarios first so reviewers (and the design team) see
-  // what a finished row looks like on the first page.
-  .sort((a, b) => Number(b.completed) - Number(a.completed));
-
-export function summarizeProgress(items: DialogueProgress[]) {
-  const completed = items.filter((i) => i.completed).length;
-  const total = items.length;
-  const aPicks = items.filter((i) => i.selected === "A").length;
-  const bPicks = items.filter((i) => i.selected === "B").length;
-  const neither = items.filter((i) => i.selected === "neither").length;
-  const tooSim = items.filter((i) => i.selected === "too_similar").length;
-  const ratedA = items.filter((i) => i.avgA != null);
-  const ratedB = items.filter((i) => i.avgB != null);
-  const avgA =
-    ratedA.length === 0
-      ? 0
-      : ratedA.reduce((s, i) => s + (i.avgA ?? 0), 0) / ratedA.length;
-  const avgB =
-    ratedB.length === 0
-      ? 0
-      : ratedB.reduce((s, i) => s + (i.avgB ?? 0), 0) / ratedB.length;
-  // Source-identification accuracy
-  const guessed = items.filter((i) => i.guessA != null && i.guessB != null);
-  let correct = 0;
-  let total2 = 0;
-  for (const i of guessed) {
-    total2 += 2;
-    if (i.guessA === i.sourceA) correct++;
-    if (i.guessB === i.sourceB) correct++;
+  for (const it of items) {
+    byCategory[it.barrierCategory].total++;
+    if (it.status === "completed") byCategory[it.barrierCategory].completed++;
   }
-  const sourceAccuracy =
-    total2 === 0 ? 0 : Math.round((correct / total2) * 100);
-
-  // Picked the human-authored response when choosing A or B
-  const pickedHuman = items.filter(
-    (i) =>
-      (i.selected === "A" && i.sourceA === "human") ||
-      (i.selected === "B" && i.sourceB === "human"),
-  ).length;
-  const pickedAi = items.filter(
-    (i) =>
-      (i.selected === "A" && i.sourceA === "ai") ||
-      (i.selected === "B" && i.sourceB === "ai"),
-  ).length;
 
   return {
+    total: items.length,
     completed,
-    total,
-    aPicks,
-    bPicks,
-    neither,
-    tooSim,
-    avgA: Math.round(avgA * 10) / 10,
-    avgB: Math.round(avgB * 10) / 10,
-    sourceAccuracy,
-    pickedHuman,
-    pickedAi,
+    draft,
+    remaining,
+    byCategory,
   };
 }
 
-// -------- Reviewer dashboard mock data --------
+// -------- Researcher dashboard mock data --------
 
 const ANIMALS = [
   "Otter", "Falcon", "Heron", "Marmot", "Lynx", "Bison", "Crane",
   "Ibis", "Wren", "Badger", "Kestrel", "Vole", "Stoat", "Magpie",
-  "Auk", "Tern", "Shrew", "Sable", "Owl", "Finch",
+  "Auk", "Tern",
 ];
 
 export type Reviewer = {
   id: string;
   name: string;
+  type: "parent" | "expert";
+  assigned: number;
   completed: number;
-  total: number;
-  avgA: number;
-  avgB: number;
-  aPicks: number;
-  bPicks: number;
-  neither: number;
-  tooSim: number;
-  medianMinutes: number;
-  /** Percent of source-identification guesses (Human vs AI) that were correct. */
-  sourceAccuracy: number;
-  /** Number of times the reviewer picked the human-authored response when choosing A or B. */
-  pickedHuman: number;
-  pickedAi: number;
+  /** Mean parent score (1–7) across completed items. */
+  meanParentScore: number;
+  /** Share of expert "yes" responses across safety / accuracy / relevance. */
+  expertYesRate: number;
 };
 
 export const REVIEWERS: Reviewer[] = ANIMALS.map((animal, idx) => {
-  const total = TOTAL_DIALOGUES;
-  const completion = 0.15 + rand(idx + 101) * 0.85;
+  const total = TOTAL_REVIEW_ITEMS;
+  const completion = 0.2 + rand(idx + 101) * 0.8;
   const completed = Math.round(total * completion);
-  const aPickRate = 0.35 + rand(idx + 201) * 0.3;
-  const aPicks = Math.round(completed * aPickRate);
-  const remaining = completed - aPicks;
-  const bPicks = Math.round(remaining * 0.78);
-  const neither = Math.round((remaining - bPicks) * 0.6);
-  const tooSim = Math.max(0, remaining - bPicks - neither);
-  const ab = aPicks + bPicks;
-  const humanPickRate = 0.45 + rand(idx + 601) * 0.3;
-  const pickedHuman = Math.round(ab * humanPickRate);
-  const pickedAi = Math.max(0, ab - pickedHuman);
-  const sourceAccuracy = Math.round(50 + rand(idx + 701) * 40);
+  const type: Reviewer["type"] = idx % 3 === 0 ? "expert" : "parent";
   return {
     id: `R-${String(idx + 1).padStart(2, "0")}`,
     name: `Anon ${animal}`,
+    type,
+    assigned: total,
     completed,
-    total,
-    avgA: Math.round((3.4 + rand(idx + 301) * 1.2) * 10) / 10,
-    avgB: Math.round((3.2 + rand(idx + 401) * 1.3) * 10) / 10,
-    aPicks,
-    bPicks,
-    neither,
-    tooSim,
-    medianMinutes: Math.round((4 + rand(idx + 501) * 6) * 10) / 10,
-    sourceAccuracy,
-    pickedHuman,
-    pickedAi,
+    meanParentScore: Math.round((4.8 + rand(idx + 201) * 1.8) * 10) / 10,
+    expertYesRate: Math.round((0.6 + rand(idx + 301) * 0.35) * 100),
   };
 });
 
-export function reviewerAverages(rs: Reviewer[]) {
+export function reviewerSummary(rs: Reviewer[]) {
+  const totalAssigned = rs.reduce((s, r) => s + r.assigned, 0);
   const totalCompleted = rs.reduce((s, r) => s + r.completed, 0);
-  const totalPossible = rs.reduce((s, r) => s + r.total, 0);
-  const avgCompletionPct = Math.round((totalCompleted / totalPossible) * 100);
-  const meanA = rs.reduce((s, r) => s + r.avgA, 0) / rs.length;
-  const meanB = rs.reduce((s, r) => s + r.avgB, 0) / rs.length;
-  const aPicks = rs.reduce((s, r) => s + r.aPicks, 0);
-  const bPicks = rs.reduce((s, r) => s + r.bPicks, 0);
-  const neither = rs.reduce((s, r) => s + r.neither, 0);
-  const tooSim = rs.reduce((s, r) => s + r.tooSim, 0);
-  const pickedHuman = rs.reduce((s, r) => s + r.pickedHuman, 0);
-  const pickedAi = rs.reduce((s, r) => s + r.pickedAi, 0);
-  const meanSourceAcc =
-    rs.reduce((s, r) => s + r.sourceAccuracy, 0) / rs.length;
+  const completionRate = Math.round((totalCompleted / totalAssigned) * 100);
+  const parents = rs.filter((r) => r.type === "parent");
+  const experts = rs.filter((r) => r.type === "expert");
   return {
     reviewers: rs.length,
+    parents: parents.length,
+    experts: experts.length,
+    totalAssigned,
     totalCompleted,
-    totalPossible,
-    avgCompletionPct,
-    meanA: Math.round(meanA * 10) / 10,
-    meanB: Math.round(meanB * 10) / 10,
-    aPicks,
-    bPicks,
-    neither,
-    tooSim,
-    pickedHuman,
-    pickedAi,
-    meanSourceAccuracy: Math.round(meanSourceAcc),
-    medianMinutes:
+    completionRate,
+    meanParentScore:
       Math.round(
-        (rs.reduce((s, r) => s + r.medianMinutes, 0) / rs.length) * 10,
+        (parents.reduce((s, r) => s + r.meanParentScore, 0) /
+          Math.max(parents.length, 1)) * 10,
       ) / 10,
+    expertYesRate: Math.round(
+      experts.reduce((s, r) => s + r.expertYesRate, 0) /
+        Math.max(experts.length, 1),
+    ),
   };
 }
 
-// Per-criterion averages (overall, across all dialogues / reviewers — mocked)
-export const CRITERION_AVERAGES = RUBRIC_CRITERIA.map((c, idx) => ({
-  criterion: c,
-  responseA: Math.round((3.6 + rand(idx + 11) * 0.9) * 10) / 10,
-  responseB: Math.round((3.4 + rand(idx + 27) * 1.0) * 10) / 10,
+// Mean parent scores per construct (the 6 statements) by response.
+import { PARENT_STATEMENTS } from "./dialogues";
+
+export const CONSTRUCT_MEANS = PARENT_STATEMENTS.map((s, idx) => ({
+  statement: s,
+  responseA: Math.round((5.0 + rand(idx + 11) * 1.4) * 10) / 10,
+  responseB: Math.round((4.6 + rand(idx + 27) * 1.6) * 10) / 10,
+}));
+
+// Mean scores by true source (researcher-only — hidden from participants).
+export const SOURCE_MEANS = [
+  {
+    label: "Human-authored",
+    mean: Math.round((5.5 + rand(91) * 0.6) * 10) / 10,
+  },
+  {
+    label: "Mira-generated",
+    mean: Math.round((5.2 + rand(92) * 0.7) * 10) / 10,
+  },
+];
+
+// Preferred response distribution across all completed reviews.
+export const PREFERENCE_DISTRIBUTION = [
+  { label: "Response A", value: 38, color: "var(--primary)" },
+  { label: "Response B", value: 31, color: "var(--accent)" },
+  { label: "Too similar", value: 12, color: "oklch(0.78 0.04 250)" },
+  { label: "Neither acceptable", value: 6, color: "var(--muted-foreground)" },
+];
+
+// Aggregate results broken down by barrier category.
+export const CATEGORY_RESULTS = BARRIER_CATEGORIES.map((c, idx) => ({
+  category: c,
+  meanScore: Math.round((4.8 + rand(idx + 41) * 1.6) * 10) / 10,
+  safetyFlags: Math.round(rand(idx + 53) * 3),
+  reviewsCompleted: Math.round(40 + rand(idx + 61) * 60),
 }));

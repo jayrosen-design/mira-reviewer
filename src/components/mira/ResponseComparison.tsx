@@ -1,6 +1,6 @@
-import { Check, Equal, Ban } from "lucide-react";
+import { Ban, Equal, Star } from "lucide-react";
 import type { Response } from "@/data/dialogues";
-import { ResponseCard, type SourceGuess } from "./ResponseCard";
+import { ResponseCard } from "./ResponseCard";
 
 export type Selection = "A" | "B" | "neither" | "too_similar" | null;
 
@@ -9,100 +9,91 @@ type Props = {
   responseB: Response;
   selected: Selection;
   onSelect: (which: Selection) => void;
-  guessA: SourceGuess;
-  guessB: SourceGuess;
-  onGuess: (which: "A" | "B", guess: SourceGuess) => void;
 };
 
-export function ResponseComparison({
-  responseA,
-  responseB,
-  selected,
-  onSelect,
-  guessA,
-  guessB,
-  onGuess,
-}: Props) {
+export function ResponseComparison({ responseA, responseB }: Pick<Props, "responseA" | "responseB"> & { selected?: Selection }) {
   return (
     <section
       aria-label="Response comparison"
-      className="grid gap-4 md:grid-cols-[1fr_180px_1fr]"
+      className="grid gap-4 md:grid-cols-2"
     >
-      <ResponseCard
-        response={responseA}
-        selected={selected === "A"}
-        onSelect={() => onSelect(selected === "A" ? null : "A")}
-        guess={guessA}
-        onGuess={(g) => onGuess("A", g)}
-      />
-
-      <div className="flex flex-col gap-3">
-        <AltOption
-          label="Too similar"
-          description="Both responses are essentially equivalent in quality."
-          icon={<Equal className="h-4 w-4" />}
-          active={selected === "too_similar"}
-          onClick={() =>
-            onSelect(selected === "too_similar" ? null : "too_similar")
-          }
-        />
-        <AltOption
-          label="Neither"
-          description="Neither response is acceptable."
-          icon={<Ban className="h-4 w-4" />}
-          active={selected === "neither"}
-          onClick={() => onSelect(selected === "neither" ? null : "neither")}
-        />
-      </div>
-
-      <ResponseCard
-        response={responseB}
-        selected={selected === "B"}
-        onSelect={() => onSelect(selected === "B" ? null : "B")}
-        guess={guessB}
-        onGuess={(g) => onGuess("B", g)}
-      />
+      <ResponseCard response={responseA} preferred={false} />
+      <ResponseCard response={responseB} preferred={false} />
     </section>
   );
 }
 
-function AltOption({
-  label,
-  description,
-  icon,
-  active,
-  onClick,
-}: {
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}) {
+type PreferredProps = {
+  responseA: Response;
+  responseB: Response;
+  selected: Selection;
+  onSelect: (which: Selection) => void;
+};
+
+export function PreferredResponse({ responseA, responseB, selected, onSelect }: PreferredProps) {
+  const options: { id: Selection; label: string; sublabel?: string; icon?: React.ReactNode }[] = [
+    { id: "A", label: "Prefer Response A", sublabel: truncate(responseA.text) },
+    { id: "B", label: "Prefer Response B", sublabel: truncate(responseB.text) },
+    {
+      id: "too_similar",
+      label: "Responses are too similar to choose",
+      icon: <Equal className="h-4 w-4" />,
+    },
+    {
+      id: "neither",
+      label: "Neither response is acceptable",
+      icon: <Ban className="h-4 w-4" />,
+    },
+  ];
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex h-full flex-col items-start gap-2 rounded-2xl border bg-card p-4 text-left shadow-sm transition ${
-        active
-          ? "border-accent ring-2 ring-accent/40"
-          : "border-border hover:border-primary/40"
-      }`}
+    <section
+      aria-label="Preferred response"
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
-      <div className="flex w-full items-center justify-between">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-          {icon}
-          {label}
-        </span>
-        {active && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
-            <Check className="h-3 w-3" />
-          </span>
-        )}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-foreground">Preferred response</h2>
+        <p className="text-sm text-muted-foreground">
+          After rating both responses, choose which one you prefer overall.
+        </p>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">
-        {description}
-      </p>
-    </button>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {options.map((opt) => {
+          const active = selected === opt.id;
+          return (
+            <button
+              key={String(opt.id)}
+              type="button"
+              onClick={() => onSelect(active ? null : opt.id)}
+              aria-pressed={active}
+              className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
+                active
+                  ? "border-accent bg-accent-soft ring-2 ring-accent/40"
+                  : "border-border bg-card hover:border-primary/40"
+              }`}
+            >
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                {opt.icon}
+                {opt.label}
+                {active && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
+                    <Star className="h-3 w-3" /> Preferred
+                  </span>
+                )}
+              </span>
+              {opt.sublabel && (
+                <span className="line-clamp-2 text-xs text-muted-foreground">
+                  {opt.sublabel}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
+}
+
+function truncate(s: string, n = 120) {
+  return s.length > n ? s.slice(0, n - 1) + "…" : s;
 }
