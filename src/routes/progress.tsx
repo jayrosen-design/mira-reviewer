@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { CheckCircle2, Square, Equal, Ban, Check, X } from "lucide-react";
 import {
@@ -81,6 +81,7 @@ function Grade({ value }: { value: number | null }) {
 }
 
 function ProgressTrackerPage() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const summary = useMemo(() => summarizeProgress(DIALOGUE_PROGRESS), []);
   const totalPages = Math.ceil(DIALOGUE_PROGRESS.length / PAGE_SIZE);
@@ -164,7 +165,12 @@ function ProgressTrackerPage() {
             </TableHeader>
             <TableBody>
               {pageItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow
+                  key={item.id}
+                  onClick={() => navigate({ to: "/" })}
+                  className="cursor-pointer transition hover:bg-muted/60"
+                >
+
                   <TableCell className="text-center">
                     {item.completed ? (
                       <CheckCircle2
