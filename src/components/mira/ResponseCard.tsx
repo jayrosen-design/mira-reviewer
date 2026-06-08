@@ -2,13 +2,17 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Response } from "@/data/dialogues";
 
+export type SourceGuess = "human" | "ai" | null;
+
 type Props = {
   response: Response;
   selected: boolean;
   onSelect: () => void;
+  guess: SourceGuess;
+  onGuess: (g: SourceGuess) => void;
 };
 
-export function ResponseCard({ response, selected, onSelect }: Props) {
+export function ResponseCard({ response, selected, onSelect, guess, onGuess }: Props) {
   return (
     <div
       className={`flex h-full flex-col rounded-2xl border bg-card p-6 shadow-sm transition ${
@@ -36,6 +40,42 @@ export function ResponseCard({ response, selected, onSelect }: Props) {
       >
         {selected ? "Selected as stronger response" : "Select as stronger response"}
       </Button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <GuessButton
+          label="Human"
+          active={guess === "human"}
+          onClick={() => onGuess(guess === "human" ? null : "human")}
+        />
+        <GuessButton
+          label="AI"
+          active={guess === "ai"}
+          onClick={() => onGuess(guess === "ai" ? null : "ai")}
+        />
+      </div>
     </div>
+  );
+}
+
+function GuessButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+        active
+          ? "border-accent bg-accent-soft text-accent-foreground ring-1 ring-accent/40"
+          : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+      }`}
+    >
+      {label}
+    </button>
   );
 }

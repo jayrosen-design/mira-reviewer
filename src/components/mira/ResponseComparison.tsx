@@ -1,6 +1,6 @@
 import { Check, Equal, Ban } from "lucide-react";
 import type { Response } from "@/data/dialogues";
-import { ResponseCard } from "./ResponseCard";
+import { ResponseCard, type SourceGuess } from "./ResponseCard";
 
 export type Selection = "A" | "B" | "neither" | "too_similar" | null;
 
@@ -9,6 +9,9 @@ type Props = {
   responseB: Response;
   selected: Selection;
   onSelect: (which: Selection) => void;
+  guessA: SourceGuess;
+  guessB: SourceGuess;
+  onGuess: (which: "A" | "B", guess: SourceGuess) => void;
 };
 
 export function ResponseComparison({
@@ -16,6 +19,9 @@ export function ResponseComparison({
   responseB,
   selected,
   onSelect,
+  guessA,
+  guessB,
+  onGuess,
 }: Props) {
   return (
     <section
@@ -26,6 +32,8 @@ export function ResponseComparison({
         response={responseA}
         selected={selected === "A"}
         onSelect={() => onSelect(selected === "A" ? null : "A")}
+        guess={guessA}
+        onGuess={(g) => onGuess("A", g)}
       />
 
       <div className="flex flex-col gap-3">
@@ -51,6 +59,8 @@ export function ResponseComparison({
         response={responseB}
         selected={selected === "B"}
         onSelect={() => onSelect(selected === "B" ? null : "B")}
+        guess={guessB}
+        onGuess={(g) => onGuess("B", g)}
       />
     </section>
   );
