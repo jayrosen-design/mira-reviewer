@@ -202,7 +202,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Your pediatrician should have told you about this already. It's recommended for every child at this age.",
+      text: "That's understandable — if it didn't come up, it's reasonable to assume it wasn't urgent. The current guidance is to start the series around ages 9–12 because protection works best when given before any exposure. We can review the recommendation together and you can decide what feels right for your family.",
       source: "human",
     },
     meta: {
