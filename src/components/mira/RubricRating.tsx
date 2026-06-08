@@ -82,9 +82,12 @@ export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
                 onChange={(v) => onChange("A", c, v)}
               />
             </div>
-            <span className="order-1 text-sm font-medium text-foreground sm:order-2 sm:text-center">
-              {c}
-            </span>
+            <div className="order-1 flex items-center gap-1.5 sm:order-2 sm:justify-center">
+              <span className="text-sm font-medium text-foreground sm:text-center">
+                {c}
+              </span>
+              <CriterionInfo criterion={c} />
+            </div>
             <div className="order-3 sm:justify-self-center">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
                 Response B
