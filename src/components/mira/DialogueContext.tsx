@@ -24,7 +24,7 @@ export function DialogueContext({ parentConcern, barrierCategory, priorDialogue 
       </div>
 
       {priorDialogue && priorDialogue.length > 0 && (
-        <details className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <details open className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Prior Dialogue Context ({priorDialogue.length} turns)
           </summary>
