@@ -245,3 +245,16 @@ export function DialogueReview() {
     </div>
   );
 }
+
+const SIMULATED_PARENT_REPLIES = [
+  "Hmm, okay. That actually makes me feel a little better about it.",
+  "I see what you mean. Can you tell me more about the side effects you've actually seen?",
+  "I appreciate that. I'd still like to think about it before deciding today.",
+  "That's helpful. What would you recommend if she were your daughter?",
+  "Okay. So you're saying it's safer to do it earlier rather than later?",
+  "Alright. I think I just need a little time to talk it over with my partner.",
+];
+
+function pickParentReply(turnIndex: number): string {
+  return SIMULATED_PARENT_REPLIES[turnIndex % SIMULATED_PARENT_REPLIES.length];
+}
