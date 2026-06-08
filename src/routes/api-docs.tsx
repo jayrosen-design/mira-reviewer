@@ -2,6 +2,7 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 
 const sections = [
   { to: "/api-docs", label: "Overview", exact: true },
+  { to: "/api-docs/schema", label: "Database Schema", exact: false },
   { to: "/api-docs/auth", label: "Auth", exact: false },
   { to: "/api-docs/dialogues", label: "Dialogues", exact: false },
   { to: "/api-docs/reviews", label: "Reviews", exact: false },
