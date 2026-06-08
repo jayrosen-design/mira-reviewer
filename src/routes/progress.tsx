@@ -272,3 +272,58 @@ function Stat({ label, value }: { label: string; value: string | number }) {
     </div>
   );
 }
+
+function SourceGuessCell({
+  guessA,
+  guessB,
+  sourceA,
+  sourceB,
+}: {
+  guessA: "human" | "ai" | null;
+  guessB: "human" | "ai" | null;
+  sourceA: "human" | "ai";
+  sourceB: "human" | "ai";
+}) {
+  if (guessA == null && guessB == null)
+    return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <GuessChip label="A" guess={guessA} truth={sourceA} />
+      <GuessChip label="B" guess={guessB} truth={sourceB} />
+    </div>
+  );
+}
+
+function GuessChip({
+  label,
+  guess,
+  truth,
+}: {
+  label: string;
+  guess: "human" | "ai" | null;
+  truth: "human" | "ai";
+}) {
+  if (guess == null)
+    return (
+      <span className="rounded border border-dashed border-border px-1.5 py-0.5 text-muted-foreground">
+        {label}: —
+      </span>
+    );
+  const correct = guess === truth;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-medium ${
+        correct
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+          : "border-red-200 bg-red-50 text-red-700"
+      }`}
+    >
+      {label}: {guess === "human" ? "Human" : "AI"}
+      {correct ? (
+        <Check className="h-3 w-3" />
+      ) : (
+        <X className="h-3 w-3" />
+      )}
+    </span>
+  );
+}
