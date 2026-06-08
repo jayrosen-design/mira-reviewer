@@ -62,6 +62,7 @@ export function DialogueReview() {
   );
   const [simulatedTurns, setSimulatedTurns] = useState<DialogueTurn[]>([]);
   const [parentTyping, setParentTyping] = useState(false);
+  const [sentLabel, setSentLabel] = useState<"A" | "B" | null>(null);
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const current = DIALOGUES[index];
@@ -72,6 +73,7 @@ export function DialogueReview() {
   useEffect(() => {
     setSimulatedTurns([]);
     setParentTyping(false);
+    setSentLabel(null);
     if (typingTimeout.current) clearTimeout(typingTimeout.current);
   }, [index]);
 
@@ -84,7 +86,7 @@ export function DialogueReview() {
   const handleSendToChat = (which: "A" | "B") => {
     const clinicianText = which === "A" ? current.responseA.text : current.responseB.text;
     if (typingTimeout.current) clearTimeout(typingTimeout.current);
-    // Replace any prior simulated exchange with this new one.
+    setSentLabel(which);
     setSimulatedTurns([{ speaker: "clinician", text: clinicianText }]);
     setParentTyping(true);
     typingTimeout.current = setTimeout(() => {
@@ -95,6 +97,13 @@ export function DialogueReview() {
       ]);
       setParentTyping(false);
     }, 1800);
+  };
+
+  const handleClearPreview = () => {
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    setSimulatedTurns([]);
+    setParentTyping(false);
+    setSentLabel(null);
   };
 
   const updateReview = (patch: Partial<ReviewState>) => {
