@@ -15,7 +15,7 @@ import { useReviewerRole } from "@/lib/reviewerRole";
 import { Header } from "./Header";
 import { InstructionPanel } from "./InstructionPanel";
 import { DialogueContext } from "./DialogueContext";
-import { DialoguePreviewPanel } from "./DialoguePreviewPanel";
+
 import { ResponseComparison, PreferredResponse, type Selection } from "./ResponseComparison";
 import {
   ParentRubric,
@@ -199,6 +199,10 @@ export function DialogueReview() {
               parentConcern={current.parentConcern}
               barrierCategory={current.barrierCategory}
               priorDialogue={current.priorDialogue}
+              simulatedTurns={simulatedTurns}
+              parentTyping={parentTyping}
+              sentLabel={sentLabel}
+              onClearPreview={sentLabel ? handleClearPreview : undefined}
             />
 
             <ResponseComparison
@@ -206,13 +210,6 @@ export function DialogueReview() {
               responseB={current.responseB}
               onSend={handleSendToChat}
               sendDisabled={parentTyping}
-            />
-
-            <DialoguePreviewPanel
-              simulatedTurns={simulatedTurns}
-              parentTyping={parentTyping}
-              sentLabel={sentLabel}
-              onClear={handleClearPreview}
             />
 
             {role === "expert" ? (
