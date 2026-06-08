@@ -1,5 +1,7 @@
 import { DIALOGUES, RUBRIC_CRITERIA } from "./dialogues";
 
+export type Source = "human" | "ai";
+
 export type DialogueProgress = {
   id: string;
   reviewSet: string;
@@ -7,6 +9,12 @@ export type DialogueProgress = {
   selected: "A" | "B" | "neither" | "too_similar" | null;
   avgA: number | null;
   avgB: number | null;
+  /** Ground truth — which response was authored by a human. */
+  sourceA: Source;
+  sourceB: Source;
+  /** Reviewer's guess for each response. null if not yet guessed. */
+  guessA: Source | null;
+  guessB: Source | null;
   completed: boolean;
 };
 
@@ -61,12 +69,20 @@ export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
   const r = rand(idx + 1);
   // ~62% completed
   const completed = r < 0.62;
+  // Ground truth: roughly half human-A / half human-B
+  const sourceA: Source = rand(idx + 71) < 0.5 ? "human" : "ai";
+  const sourceB: Source = sourceA === "human" ? "ai" : "human";
+
   if (!completed) {
     return {
       ...d,
       selected: null,
       avgA: null,
       avgB: null,
+      sourceA,
+      sourceB,
+      guessA: null,
+      guessB: null,
       completed: false,
     };
   }
@@ -78,7 +94,24 @@ export const DIALOGUE_PROGRESS: DialogueProgress[] = buildExtendedScenarios(
   const baseB = 3.0 + rand(idx + 53) * 1.5;
   const avgA = Math.round(baseA * 10) / 10;
   const avgB = Math.round(baseB * 10) / 10;
-  return { ...d, selected, avgA, avgB, completed };
+
+  // Reviewers guess correctly ~68% of the time
+  const guessA: Source =
+    rand(idx + 91) < 0.68 ? sourceA : sourceA === "human" ? "ai" : "human";
+  const guessB: Source =
+    rand(idx + 113) < 0.68 ? sourceB : sourceB === "human" ? "ai" : "human";
+
+  return {
+    ...d,
+    selected,
+    avgA,
+    avgB,
+    sourceA,
+    sourceB,
+    guessA,
+    guessB,
+    completed,
+  };
 });
 
 export function summarizeProgress(items: DialogueProgress[]) {
