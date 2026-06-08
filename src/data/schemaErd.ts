@@ -58,7 +58,8 @@ export const SCHEMA_ERD = `erDiagram
     uuid review_id FK
     enum response_label
     text criterion FK
-    int score
+    int score_1_to_7
+    enum expert_answer
   }
   RUBRIC_CRITERIA {
     text name PK
