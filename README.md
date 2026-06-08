@@ -127,10 +127,10 @@ flowchart TD
 
     Reviewer -.-> Auth
     Auth -.-> API
-    ReviewPage -.->|fetch next dialogue| API
+    ReviewPage -.->|fetch next assignment| API
     API -.-> Sampler
-    Sampler -.->|unseen, balanced sample| DB
-    ReviewPage -.->|submit ratings, guess, comments| API
+    Sampler -.->|unseen, position-shuffled assignment| DB
+    ReviewPage -.->|submit ratings, preferred, comments| API
     API -.->|persist review| DB
     ProgressPage -.->|reviewer's own progress| API
     DashboardPage -.->|aggregate metrics| Aggregator
