@@ -148,7 +148,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Yes, it works really well. The studies are very clear and you should trust them.",
+      text: "That's a fair thing to want a clear answer on. The trials and follow-up studies do show meaningful drops in the infections that lead to most cervical and several other cancers, with protection holding up over many years. I can walk you through what they measured if that would help.",
       source: "human",
     },
     meta: {
