@@ -59,10 +59,38 @@ export function DialogueReview() {
   const [reviews, setReviews] = useState<ReviewState[]>(() =>
     DIALOGUES.map(() => emptyReview()),
   );
+  const [simulatedTurns, setSimulatedTurns] = useState<DialogueTurn[]>([]);
+  const [parentTyping, setParentTyping] = useState(false);
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const current = DIALOGUES[index];
   const review = reviews[index];
   const hasNext = index < DIALOGUES.length - 1;
+
+  // Reset simulated chat when dialogue changes.
+  useEffect(() => {
+    setSimulatedTurns([]);
+    setParentTyping(false);
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+  }, [index]);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    };
+  }, []);
+
+  const handleSendToChat = (which: "A" | "B") => {
+    if (parentTyping) return;
+    const clinicianText = which === "A" ? current.responseA.text : current.responseB.text;
+    setSimulatedTurns((prev) => [...prev, { speaker: "clinician", text: clinicianText }]);
+    setParentTyping(true);
+    typingTimeout.current = setTimeout(() => {
+      const reply = pickParentReply(simulatedTurns.length);
+      setSimulatedTurns((prev) => [...prev, { speaker: "parent", text: reply }]);
+      setParentTyping(false);
+    }, 1800);
+  };
 
   const updateReview = (patch: Partial<ReviewState>) => {
     setReviews((prev) => {
