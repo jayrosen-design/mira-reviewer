@@ -1,4 +1,13 @@
-import { RUBRIC_CRITERIA, type Criterion } from "@/data/dialogues";
+import { Info } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { RUBRIC_CRITERIA, RUBRIC_GUIDES, type Criterion } from "@/data/dialogues";
 
 export type Ratings = Partial<Record<Criterion, number>>;
 
