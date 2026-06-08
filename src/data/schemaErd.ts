@@ -46,10 +46,11 @@ export const SCHEMA_ERD = `erDiagram
   REVIEWS {
     uuid id PK
     uuid assignment_id FK
-    enum selected
-    enum guess_a
-    enum guess_b
+    enum role
+    enum preferred
     text comments
+    text expert_notes_a
+    text expert_notes_b
     timestamptz submitted_at
   }
   RUBRIC_SCORES {
