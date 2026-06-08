@@ -34,12 +34,11 @@ function ApiDocsOverview() {
       <section className="rounded-lg border border-border bg-card p-5">
         <h3 className="text-base font-semibold">Blinding &amp; randomization</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Production behavior: human and Mira responses are stored with hidden
-          source labels. Reviewers only see Response A and Response B. Response
-          order is randomized per assignment using a stored seed, and the system
-          records which of A or B was human-authored vs Mira-generated for
-          later analysis. Researchers can export blinded and unblinded datasets
-          separately.
+          Production behavior: human-interviewer and Mira responses are stored
+          with hidden source labels. Reviewers only see Response A and Response
+          B and are not asked to guess which is which. Response order is
+          randomized per assignment using a stored seed. Source identity is used
+          only for researcher-side post-hoc analysis and exports.
         </p>
       </section>
 
@@ -79,8 +78,8 @@ function ApiDocsOverview() {
             {
               error: {
                 code: "validation_failed",
-                message: "guess_a must be 'human' or 'ai'",
-                details: { guess_a: "invalid_enum" },
+                message: "preferred must be one of 'A', 'B', 'neither', 'too_similar'",
+                details: { preferred: "invalid_enum" },
               },
             },
             null,

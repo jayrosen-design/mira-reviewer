@@ -25,23 +25,26 @@ function MetricsDocs() {
           reviewers: 20,
           completion_rate: 0.62,
           total_reviews: 1240,
-          mean_score_human: 4.1,
-          mean_score_ai: 3.6,
-          overall_source_accuracy: 0.69,
+          mean_parent_score_human: 5.4,
+          mean_parent_score_mira: 5.1,
+          expert_safety_pass_rate_human: 0.96,
+          expert_safety_pass_rate_mira: 0.91,
         }}
         errors={[{ status: 403, meaning: "Researcher role required." }]}
       />
 
       <ApiEndpoint
         method="GET"
-        path="/v1/metrics/source-accuracy"
-        summary="Per-reviewer accuracy at identifying which response was human vs AI."
+        path="/v1/metrics/preferred-distribution"
+        summary="Distribution of preferred-response selections, optionally broken down by true source. Researcher-only post-hoc analysis."
         auth="researcher"
         responseExample={{
-          reviewers: [
-            { reviewer_id: "r_8f2a3b", display_name: "Reviewer 1", accuracy: 0.71, n: 62 },
-            { reviewer_id: "r_a14c8d", display_name: "Reviewer 2", accuracy: 0.58, n: 49 },
-          ],
+          total: 1240,
+          by_choice: { A: 612, B: 558, neither: 38, too_similar: 32 },
+          by_true_source: {
+            human: { preferred: 640 },
+            mira: { preferred: 530 },
+          },
         }}
         errors={[{ status: 403, meaning: "Researcher role required." }]}
       />
@@ -53,14 +56,15 @@ function MetricsDocs() {
         auth="researcher"
         responseExample={{
           overlap_dialogue_count: 10,
-          kappa_stronger_response: 0.64,
-          kappa_source_guess: 0.41,
+          kappa_preferred_response: 0.64,
+          kappa_expert_safety: 0.78,
           pairs: [
             { a: "r_8f2a3b", b: "r_a14c8d", kappa: 0.58 },
           ],
         }}
         errors={[{ status: 403, meaning: "Researcher role required." }]}
       />
+
 
       <ApiEndpoint
         method="GET"
@@ -72,16 +76,17 @@ function MetricsDocs() {
             {
               reviewer_id: "r_8f2a3b",
               display_name: "Reviewer 1",
-              completed: 84,
-              avg_score: 3.9,
-              source_accuracy: 0.74,
-              picked_human: 41,
-              picked_ai: 39,
+              role: "parent",
+              completed: 32,
+              avg_parent_score: 5.6,
+              preferred_a: 18,
+              preferred_b: 12,
             },
           ],
         }}
         errors={[{ status: 403, meaning: "Researcher role required." }]}
       />
+
     </div>
   );
 }

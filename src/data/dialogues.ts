@@ -148,7 +148,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Yes, it works really well. The studies are very clear and you should trust them.",
+      text: "That's a fair thing to want a clear answer on. The trials and follow-up studies do show meaningful drops in the infections that lead to most cervical and several other cancers, with protection holding up over many years. I can walk you through what they measured if that would help.",
       source: "human",
     },
     meta: {
@@ -178,7 +178,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "This vaccine is just about cancer prevention; it has nothing to do with sex. You're overthinking it.",
+      text: "Many parents have shared that same worry. The research on this vaccine has actually looked at exactly that question, and kids who get the HPV vaccine don't start sexual activity any earlier than kids who don't. It can help to frame it the same way you would any other cancer-prevention step — focused on long-term protection rather than on behavior.",
       source: "mira",
     },
     meta: {
@@ -202,7 +202,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Your pediatrician should have told you about this already. It's recommended for every child at this age.",
+      text: "That's understandable — if it didn't come up, it's reasonable to assume it wasn't urgent. The current guidance is to start the series around ages 9–12 because protection works best when given before any exposure. We can review the recommendation together and you can decide what feels right for your family.",
       source: "human",
     },
     meta: {
@@ -236,7 +236,7 @@ export const DIALOGUES: DialogueItem[] = [
     },
     responseB: {
       title: "Response B",
-      text: "Nine is the right age based on current guidelines. You should do it now while she's here.",
+      text: "That reaction makes sense — nine can feel early, and you're the one who knows your daughter best. Current guidance points to ages 9–12 because the immune response is strongest then and protection is in place before any exposure. We don't need to decide today; I'm happy to talk through whatever would help.",
       source: "mira",
     },
     meta: {

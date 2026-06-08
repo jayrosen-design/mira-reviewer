@@ -1,41 +1,35 @@
 # MIRA — Motivational Interviewing Response Assessment
 
-MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a client utterance with two candidate counselor responses (one human-authored, one AI-generated), and asked to compare, rate, and annotate them across multiple rubric criteria. The platform also provides progress tracking for individual reviewers and aggregate analytics across the full reviewer pool.
+MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a parent concern with two blinded candidate counselor responses (Response A and Response B). Source identity (human interviewer vs Mira) is hidden from reviewers during the task and stored internally for researcher-side analysis. The platform also provides progress tracking for individual reviewers and aggregate analytics across the full reviewer pool.
 
 ## Purpose
 
-The project supports a research study comparing human- and AI-generated counselor responses in motivational interviewing dialogues. The interface is designed for:
+The project supports the CTSI Mira dialogue review/evaluation workflow, comparing Mira-generated motivational interviewing responses against human-interviewer responses in a blinded study. The interface is designed for two reviewer roles:
 
-- **Reviewers** — clinicians or trained raters who score 100+ dialogue comparisons.
-- **Researchers** — study leads who monitor reviewer progress, inter-rater agreement, and human-vs-AI identification accuracy.
+- **Parent reviewers** — rate each response on a 7-point agreement scale across appropriateness, harm, clarity, sense-making, responsibility, and empathy.
+- **Expert reviewers** — answer yes / no / unsure on medical safety, accuracy, and relevance, with optional safety notes.
+- **Researchers** — monitor reviewer progress, inter-rater agreement, preferred-response distributions, and (post-hoc) source comparisons.
+
+Reviewers are **not** asked to guess which response is human vs Mira. Source identification is an optional researcher-only analysis, not a reviewer task.
 
 ## Pages
 
 ### `/` — Review
-The main scoring screen for a single dialogue comparison.
-- Conversation context with the prompting client utterance.
-- Two side-by-side response cards (Response A / Response B):
-  - "Select stronger response" button.
-  - Human / AI source-guess buttons (reviewer guesses which response is human-authored).
-- Rubric ratings for each response across multiple MI criteria.
+The main scoring screen for a single review item.
+- Parent Concern + barrier category badge.
+- Prior Dialogue Context (expanded by default).
+- Side-by-side blinded Response A / Response B cards.
+- Role-appropriate rubric (parent 7-point or expert yes/no/unsure + safety notes).
+- Preferred response selection (A, B, neither, too similar).
 - Free-text reviewer comments.
-- Submit / navigate between dialogues.
+- Optional Dialogue Preview panel: a "Preview in dialogue context" affordance on each response shows how the response might land with a simulated parent reply. This preview is clearly separated from the review stimulus, is not scored, and uses no live AI.
+- Save draft / Submit.
 
 ### `/progress` — Progress Tracker
-Personal progress view for an individual reviewer.
-- Overall progress bar and summary stats (completed count, average grades, Human-vs-AI identification accuracy, picked-Human vs picked-AI ratio).
-- Paged table of 10 dialogue scenarios per page showing:
-  - Completion status (green check vs grey checkbox).
-  - Which response was selected as stronger (A/B).
-  - Average grades for A and B.
-  - Source-guess correctness chips for A and B.
-- Completed scenarios are surfaced first. Rows are clickable and route to the Review page.
+Personal progress view for an individual reviewer across the 35-item review set, grouped by HPV barrier category, with completion status and per-item ratings summary.
 
 ### `/dashboard` — Research Dashboard
-Aggregate metrics across all reviewers (e.g. 20 reviewers × 100 comparisons).
-- KPI cards: total reviewers, completion rate, mean rubric scores, Human-vs-AI identification accuracy.
-- Charts: per-reviewer completion, per-reviewer source-identification accuracy, distribution of stronger-response selections by true source.
-- Reviewer leaderboard with anonymized reviewer names, completion, average scores, source accuracy, and Human/AI pick counts.
+Aggregate metrics across all parent and expert reviewers: completion, preferred-response distribution, parent rubric means, expert safety/accuracy/relevance pass rates, barrier-category summaries, and export mockups.
 
 ## Tech Stack
 
@@ -62,7 +56,8 @@ src/
       DialogueContext.tsx     # Client utterance context block
       DialogueReview.tsx      # Review page container + state
       ResponseComparison.tsx  # Side-by-side response cards
-      ResponseCard.tsx        # Single response card + Human/AI guess
+      ResponseCard.tsx           # Single response card + "Preview in dialogue context"
+      DialoguePreviewPanel.tsx   # Optional separated preview area (not scored)
       RubricRating.tsx        # Per-criterion rating controls
       ReviewerComments.tsx    # Free-text comments
       ReviewActions.tsx       # Submit / navigation actions
@@ -132,10 +127,10 @@ flowchart TD
 
     Reviewer -.-> Auth
     Auth -.-> API
-    ReviewPage -.->|fetch next dialogue| API
+    ReviewPage -.->|fetch next assignment| API
     API -.-> Sampler
-    Sampler -.->|unseen, balanced sample| DB
-    ReviewPage -.->|submit ratings, guess, comments| API
+    Sampler -.->|unseen, position-shuffled assignment| DB
+    ReviewPage -.->|submit ratings, preferred, comments| API
     API -.->|persist review| DB
     ProgressPage -.->|reviewer's own progress| API
     DashboardPage -.->|aggregate metrics| Aggregator
@@ -148,8 +143,8 @@ flowchart TD
 - **Dialogues** — replace `src/data/dialogues.ts` with a `dialogues` + `responses` table; the Review page fetches the next assignment via a server function instead of indexing a static array.
 - **Randomization** — a sampler assigns each reviewer an unseen, order-randomized pair (Response A/B shuffled per view) so source position can't bias ratings.
 - **Users** — add authentication so each reviewer has an identity; reviews are written with `reviewer_id` and progress/dashboard queries scope to the logged-in user (or aggregate across all reviewers for researchers).
-- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (ratings, stronger-response choice, source guess, comments) instead of local component state.
-- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, source-ID accuracy, stronger-response distribution, inter-rater agreement) instead of `summarizeProgress` over mock arrays.
+- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (rubric ratings, preferred-response choice, comments) instead of local component state. Reviewers do not submit source guesses.
+- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, preferred-response distribution, parent rubric means, expert pass rates, inter-rater agreement) instead of `summarizeProgress` over mock arrays. Source comparisons are computed post-hoc from the hidden `responses.source` column.
 
 ## Data Model (proposed real backend)
 
@@ -206,10 +201,11 @@ erDiagram
     REVIEWS {
         uuid id PK
         uuid assignment_id FK
-        enum selected
-        enum guess_a
-        enum guess_b
+        enum role
+        enum preferred
         text comments
+        text expert_notes_a
+        text expert_notes_b
         timestamptz submitted_at
     }
     RUBRIC_SCORES {
@@ -217,7 +213,8 @@ erDiagram
         uuid review_id FK
         enum response_label
         text criterion FK
-        int score
+        int score_1_to_7
+        enum expert_answer
     }
     RUBRIC_CRITERIA {
         text name PK
@@ -287,12 +284,12 @@ Two candidate counselor responses per dialogue. `source` is ground truth; never 
 | `dialogue_id` | fk → dialogues | |
 | `title` | text | "Response 1" |
 | `text` | text | response body |
-| `source` | enum(`human`,`ai`) | hidden from reviewers |
-| `model_name` | text null | e.g. `gpt-5`, null if human |
-| `author_id` | uuid null | fk → clinicians, null if AI |
+| `source` | enum(`human`,`mira`) | hidden from reviewers; researcher-only |
+| `model_name` | text null | e.g. `mira-v0.4.1`, null if human |
+| `author_id` | uuid null | fk → clinicians, null if Mira-generated |
 ```json
-{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response 1",
-  "text": "It sounds like…", "source": "ai", "model_name": "gpt-5" }
+{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response A",
+  "text": "It sounds like…", "source": "mira", "model_name": "mira-v0.4.1" }
 ```
 
 ### `assignments`
@@ -311,33 +308,36 @@ Which dialogues are queued for which reviewer, and how A/B were shuffled.
 ```
 
 ### `reviews`
-One row per submitted review. Rubric scores live in a child table.
+One row per submitted review. Rubric scores live in a child table. Reviewers do not submit source guesses.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `assignment_id` | fk unique | |
-| `selected` | enum(`A`,`B`,`neither`,`too_similar`) | stronger response |
-| `guess_a` | enum(`human`,`ai`) null | reviewer's source guess |
-| `guess_b` | enum(`human`,`ai`) null | |
+| `role` | enum(`parent`,`expert`) | which rubric was used |
+| `preferred` | enum(`A`,`B`,`neither`,`too_similar`) | preferred response |
 | `comments` | text | free-text |
+| `expert_notes_a` | text null | safety notes for A (expert role only) |
+| `expert_notes_b` | text null | safety notes for B (expert role only) |
 | `submitted_at` | timestamptz | |
 ```json
-{ "id": "rev_…", "assignment_id": "asg_…", "selected": "A",
-  "guess_a": "human", "guess_b": "ai", "comments": "A reflects feeling better.",
+{ "id": "rev_…", "assignment_id": "asg_…", "role": "parent",
+  "preferred": "A", "comments": "A reflects feeling better.",
   "submitted_at": "2026-06-02T17:23:09Z" }
 ```
 
 ### `rubric_scores`
-Per-criterion 1–5 score for each response within a review.
+Per-criterion score for each response within a review. Parent rows use `score_1_to_7`; expert rows use `expert_answer`.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `review_id` | fk | |
 | `response_label` | enum(`A`,`B`) | |
 | `criterion` | text | fk → rubric_criteria.name |
-| `score` | int (1–5) | |
+| `score_1_to_7` | int (1–7) null | parent agreement score |
+| `expert_answer` | enum(`yes`,`no`,`unsure`) null | expert binary judgment |
 ```json
-{ "review_id": "rev_…", "response_label": "A", "criterion": "Empathy", "score": 5 }
+{ "review_id": "rev_…", "response_label": "A",
+  "criterion": "This response shows empathy.", "score_1_to_7": 6 }
 ```
 
 ### `rubric_criteria`
@@ -356,16 +356,16 @@ Append-only trail of edits (re-opening reviews, admin overrides).
 ```
 
 ### `simulated_exchanges`
-Optional record of the in-app "Send to dialogue" simulator. When a reviewer clicks **Send to dialogue** on Response A or B, the chosen response is appended to the visible conversation and a simulated parent reply is generated. Only the most recent exchange per (reviewer, dialogue) is kept, so a new send overwrites the previous row.
+Optional record of the in-app **Optional Dialogue Preview** ("Preview in dialogue context"). When a reviewer previews a response, the chosen response is shown in a separate preview panel with a simulated parent reply. Only the most recent preview per (reviewer, dialogue) is kept, so a new preview overwrites the previous row. This table is research-only and is **not** part of the formal review.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `reviewer_id` | fk → reviewers | |
 | `dialogue_id` | fk → dialogues | |
-| `sent_response_id` | fk → responses | which candidate was sent |
+| `sent_response_id` | fk → responses | which candidate was previewed |
 | `sent_label` | enum(`A`,`B`) | label as shown to this reviewer (post-shuffle) |
-| `simulated_parent_reply` | text | model- or template-generated parent turn |
-| `generator` | text | e.g. `template-v1`, `gpt-5-sim` |
+| `simulated_parent_reply` | text | template- or model-generated parent turn (no live AI in the prototype) |
+| `generator` | text | e.g. `template-v1` |
 | `created_at` | timestamptz | |
 ```json
 { "id": "sim_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
@@ -378,9 +378,13 @@ Optional record of the in-app "Send to dialogue" simulator. When a reviewer clic
 
 - **Unseen sampling**: each reviewer only ever gets dialogues they haven't reviewed.
 - **A/B position shuffle**: `assignments.position_shuffle` randomizes which response appears as A vs B so source position can't bias ratings.
-- **Balanced human/AI**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue.
-- **Overlap dialogues**: a configurable subset (e.g. 10 of 100) is assigned to every reviewer so inter-rater agreement can be computed.
-- **Simulated exchanges**: not part of the formal review record — they exist only to let reviewers see how a parent might respond. They are excluded from rubric scoring and aggregate metrics.
+- **Balanced source mix**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue. Source identity is hidden from reviewers.
+- **Overlap dialogues**: a configurable subset is assigned to every reviewer so inter-rater agreement can be computed.
+- **Optional dialogue previews**: not part of the formal review record. They are excluded from rubric scoring and aggregate review metrics.
+
+### Prototype boundary
+
+This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, authentication, or production data storage. The Optional Dialogue Preview uses canned parent replies and is purely illustrative.
 
 See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
 

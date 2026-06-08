@@ -35,7 +35,7 @@ export function ResponseCard({ response, preferred, onSend, sendDisabled }: Prop
             className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Send className="h-3.5 w-3.5" />
-            Send to dialogue
+            Preview in dialogue context
           </button>
         </div>
       )}
