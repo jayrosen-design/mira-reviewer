@@ -78,8 +78,8 @@ function ApiDocsOverview() {
             {
               error: {
                 code: "validation_failed",
-                message: "guess_a must be 'human' or 'ai'",
-                details: { guess_a: "invalid_enum" },
+                message: "preferred must be one of 'A', 'B', 'neither', 'too_similar'",
+                details: { preferred: "invalid_enum" },
               },
             },
             null,
