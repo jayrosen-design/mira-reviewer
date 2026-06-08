@@ -8,7 +8,7 @@ import { ResponseComparison, type Selection } from "./ResponseComparison";
 import { RubricRating, type Ratings } from "./RubricRating";
 import { ReviewerComments } from "./ReviewerComments";
 import { ReviewActions } from "./ReviewActions";
-import { ResearchMetadata } from "./ResearchMetadata";
+
 import { SubmittedState } from "./SubmittedState";
 
 type ReviewState = {
