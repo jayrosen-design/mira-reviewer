@@ -131,6 +131,30 @@ export function summarizeProgress(items: DialogueProgress[]) {
     ratedB.length === 0
       ? 0
       : ratedB.reduce((s, i) => s + (i.avgB ?? 0), 0) / ratedB.length;
+  // Source-identification accuracy
+  const guessed = items.filter((i) => i.guessA != null && i.guessB != null);
+  let correct = 0;
+  let total2 = 0;
+  for (const i of guessed) {
+    total2 += 2;
+    if (i.guessA === i.sourceA) correct++;
+    if (i.guessB === i.sourceB) correct++;
+  }
+  const sourceAccuracy =
+    total2 === 0 ? 0 : Math.round((correct / total2) * 100);
+
+  // Picked the human-authored response when choosing A or B
+  const pickedHuman = items.filter(
+    (i) =>
+      (i.selected === "A" && i.sourceA === "human") ||
+      (i.selected === "B" && i.sourceB === "human"),
+  ).length;
+  const pickedAi = items.filter(
+    (i) =>
+      (i.selected === "A" && i.sourceA === "ai") ||
+      (i.selected === "B" && i.sourceB === "ai"),
+  ).length;
+
   return {
     completed,
     total,
@@ -140,6 +164,9 @@ export function summarizeProgress(items: DialogueProgress[]) {
     tooSim,
     avgA: Math.round(avgA * 10) / 10,
     avgB: Math.round(avgB * 10) / 10,
+    sourceAccuracy,
+    pickedHuman,
+    pickedAi,
   };
 }
 
