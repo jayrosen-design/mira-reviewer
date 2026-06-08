@@ -15,17 +15,12 @@ export function ResponseComparison({ responseA, responseB, selected, onSelect }:
   return (
     <section
       aria-label="Response comparison"
-      className="grid gap-4 md:grid-cols-[1fr_1fr_180px]"
+      className="grid gap-4 md:grid-cols-[1fr_180px_1fr]"
     >
       <ResponseCard
         response={responseA}
         selected={selected === "A"}
         onSelect={() => onSelect(selected === "A" ? null : "A")}
-      />
-      <ResponseCard
-        response={responseB}
-        selected={selected === "B"}
-        onSelect={() => onSelect(selected === "B" ? null : "B")}
       />
 
       <div className="flex flex-col gap-3">
@@ -46,7 +41,14 @@ export function ResponseComparison({ responseA, responseB, selected, onSelect }:
           onClick={() => onSelect(selected === "neither" ? null : "neither")}
         />
       </div>
+
+      <ResponseCard
+        response={responseB}
+        selected={selected === "B"}
+        onSelect={() => onSelect(selected === "B" ? null : "B")}
+      />
     </section>
+
   );
 }
 
