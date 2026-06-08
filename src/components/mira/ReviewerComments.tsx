@@ -15,17 +15,17 @@ export function ReviewerComments({ value, onChange }: Props) {
         htmlFor="reviewer-comments"
         className="text-sm font-semibold text-foreground"
       >
-        Reviewer comments
+        Why did you prefer this response?
       </label>
       <p className="mb-3 mt-1 text-xs text-muted-foreground">
-        Optional. Used by the research team to interpret your ratings.
+        Optional. A short explanation helps the research team interpret your choice.
       </p>
       <Textarea
         id="reviewer-comments"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Add notes about strengths, concerns, or why one response was stronger."
-        className="min-h-32 resize-y"
+        placeholder="What stood out? What felt stronger or weaker?"
+        className="min-h-28 resize-y"
       />
     </section>
   );

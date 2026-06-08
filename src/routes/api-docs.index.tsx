@@ -7,6 +7,16 @@ export const Route = createFileRoute("/api-docs/")({
 function ApiDocsOverview() {
   return (
     <div className="space-y-6">
+      <section className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
+        <p className="font-semibold">Prototype boundary</p>
+        <p className="mt-1 text-amber-900/80">
+          This prototype demonstrates the MIRA dialogue review workflow only.
+          It does not include live AI generation, chatbot interaction, real
+          transcripts, authentication, or production data storage. All data on
+          this site is mocked in the frontend.
+        </p>
+      </section>
+
       <section className="rounded-lg border border-border bg-card p-5">
         <h2 className="text-lg font-semibold">Overview</h2>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -14,7 +24,25 @@ function ApiDocsOverview() {
           <code className="font-mono">/v1</code> on the same origin as the app, and
           would be implemented as TanStack Start server functions and server routes.
         </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The future backend supports reviewer login, role-based access (parent / expert /
+          researcher), review-item assignment, response randomization, review submission,
+          draft saving, progress tracking, dashboard aggregation, and data export.
+        </p>
       </section>
+
+      <section className="rounded-lg border border-border bg-card p-5">
+        <h3 className="text-base font-semibold">Blinding &amp; randomization</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Production behavior: human and Mira responses are stored with hidden
+          source labels. Reviewers only see Response A and Response B. Response
+          order is randomized per assignment using a stored seed, and the system
+          records which of A or B was human-authored vs Mira-generated for
+          later analysis. Researchers can export blinded and unblinded datasets
+          separately.
+        </p>
+      </section>
+
 
       <section className="rounded-lg border border-border bg-card p-5">
         <h3 className="text-base font-semibold">Base URL</h3>

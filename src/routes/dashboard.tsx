@@ -13,6 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Download, FileText, FileJson, Lock } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,20 +23,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import {
-  CRITERION_AVERAGES,
+  CONSTRUCT_MEANS,
+  SOURCE_MEANS,
+  PREFERENCE_DISTRIBUTION,
+  CATEGORY_RESULTS,
   REVIEWERS,
-  reviewerAverages,
+  reviewerSummary,
 } from "@/data/mockProgress";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Research Dashboard — MIRA" },
+      { title: "Research Dashboard — MIRA Reviewer" },
       {
         name: "description",
         content:
-          "Overview of reviewer progress and assessment metrics across the MIRA study.",
+          "Aggregate review metrics and source comparison summary for the MIRA study.",
       },
     ],
   }),
@@ -43,183 +50,103 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function ResearchDashboardPage() {
-  const summary = useMemo(() => reviewerAverages(REVIEWERS), []);
+  const summary = useMemo(() => reviewerSummary(REVIEWERS), []);
 
-  const completionData = useMemo(
-    () =>
-      [...REVIEWERS]
-        .sort((a, b) => b.completed - a.completed)
-        .map((r) => ({
-          name: r.name.replace("Anon ", ""),
-          completed: r.completed,
-          remaining: r.total - r.completed,
-        })),
-    [],
-  );
-
-  const selectionData = [
-    { name: "Response A", value: summary.aPicks, color: "var(--primary)" },
-    { name: "Response B", value: summary.bPicks, color: "var(--accent)" },
-    { name: "Neither", value: summary.neither, color: "var(--muted-foreground)" },
-    { name: "Too similar", value: summary.tooSim, color: "oklch(0.78 0.15 80)" },
-  ];
-
-  const criterionData = CRITERION_AVERAGES.map((c) => ({
-    name: c.criterion.length > 18 ? c.criterion.slice(0, 16) + "…" : c.criterion,
-    full: c.criterion,
+  const constructData = CONSTRUCT_MEANS.map((c) => ({
+    name: c.statement.replace("This response ", "").replace(".", ""),
+    full: c.statement,
     "Response A": c.responseA,
     "Response B": c.responseB,
   }));
 
-  const accuracyData = [...REVIEWERS]
-    .sort((a, b) => b.sourceAccuracy - a.sourceAccuracy)
-    .map((r) => ({
-      name: r.name.replace("Anon ", ""),
-      accuracy: r.sourceAccuracy,
-    }));
+  const sourceData = SOURCE_MEANS.map((s) => ({
+    name: s.label,
+    mean: s.mean,
+  }));
 
-  const sourcePickData = [
-    {
-      name: "Picked Human",
-      value: summary.pickedHuman,
-      color: "var(--primary)",
-    },
-    {
-      name: "Picked AI",
-      value: summary.pickedAi,
-      color: "var(--accent)",
-    },
-  ];
+  const preferenceData = PREFERENCE_DISTRIBUTION;
+
+  const handleExport = (kind: string) => {
+    toast.success(`${kind} export queued`, {
+      description: "In production, this would download the requested CSV / JSON file.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Research Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Aggregate metrics across all reviewers participating in the MIRA study.
-          </p>
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                Research Dashboard
+              </h1>
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                <Lock className="h-3 w-3" /> Researcher / admin
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Aggregate review metrics across all participating reviewers.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleExport("Parent reviewer ratings (CSV)")}>
+              <Download className="h-4 w-4" /> Parent ratings CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleExport("Expert safety review (CSV)")}>
+              <FileText className="h-4 w-4" /> Expert review CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleExport("Preferred response summary (CSV)")}>
+              <FileText className="h-4 w-4" /> Preferences CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleExport("Qualitative comments (CSV)")}>
+              <FileText className="h-4 w-4" /> Comments CSV
+            </Button>
+            <Button size="sm" onClick={() => handleExport("Full study export (JSON)")}>
+              <FileJson className="h-4 w-4" /> Export study data
+            </Button>
+          </div>
         </header>
 
         <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <KpiCard label="Reviewers" value={summary.reviewers} />
+          <KpiCard label="Assigned reviewers" value={summary.reviewers} sub={`${summary.parents} parents · ${summary.experts} experts`} />
           <KpiCard
             label="Reviews completed"
-            value={`${summary.totalCompleted.toLocaleString()} / ${summary.totalPossible.toLocaleString()}`}
-            sub={`${summary.avgCompletionPct}% of target`}
+            value={`${summary.totalCompleted.toLocaleString()} / ${summary.totalAssigned.toLocaleString()}`}
+            sub={`${summary.completionRate}% completion rate`}
           />
           <KpiCard
-            label="Avg score (A / B)"
-            value={`${summary.meanA.toFixed(1)} / ${summary.meanB.toFixed(1)}`}
+            label="Mean parent score"
+            value={summary.meanParentScore.toFixed(1)}
+            sub="across 6 constructs"
           />
           <KpiCard
-            label="Human vs AI accuracy"
-            value={`${summary.meanSourceAccuracy}%`}
-            sub="mean across reviewers"
+            label="Expert 'Yes' rate"
+            value={`${summary.expertYesRate}%`}
+            sub="safe · accurate · relevant"
           />
-          <KpiCard
-            label="Median time / review"
-            value={`${summary.medianMinutes.toFixed(1)} min`}
-          />
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <Card title="Reviewer completion">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={completionData}
-                  margin={{ top: 8, right: 8, left: 0, bottom: 30 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis
-                    dataKey="name"
-                    interval={0}
-                    angle={-35}
-                    textAnchor="end"
-                    height={50}
-                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                  />
-                  <YAxis tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
-                  <Tooltip
-                    cursor={{ fill: "var(--muted)" }}
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar
-                    dataKey="completed"
-                    stackId="a"
-                    fill="var(--primary)"
-                    name="Completed"
-                  />
-                  <Bar
-                    dataKey="remaining"
-                    stackId="a"
-                    fill="var(--muted)"
-                    name="Remaining"
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-
-          <Card title="Aggregate response selection">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={selectionData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={55}
-                    outerRadius={95}
-                    paddingAngle={2}
-                  >
-                    {selectionData.map((entry) => (
-                      <Cell key={entry.name} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          <KpiCard label="Items in study" value={CATEGORY_RESULTS.reduce((s, c) => s + c.reviewsCompleted, 0)} sub="completed across all reviewers" />
         </section>
 
         <section>
-          <Card title="Average rubric scores by criterion">
+          <Card title="Average parent rating by construct (1–7)">
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart
-                  data={criterionData}
+                  data={constructData}
                   margin={{ top: 8, right: 8, left: 0, bottom: 50 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="name"
                     interval={0}
-                    angle={-25}
+                    angle={-20}
                     textAnchor="end"
                     height={70}
                     tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <YAxis
-                    domain={[0, 5]}
+                    domain={[0, 7]}
                     tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <Tooltip
@@ -241,26 +168,18 @@ function ResearchDashboardPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <Card title="Source-identification accuracy per reviewer">
+          <Card title="Source comparison summary (researcher view only)">
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={accuracyData}
-                  margin={{ top: 8, right: 8, left: 0, bottom: 30 }}
-                >
+                <BarChart data={sourceData} margin={{ top: 8, right: 8, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                   <XAxis
                     dataKey="name"
-                    interval={0}
-                    angle={-35}
-                    textAnchor="end"
-                    height={50}
                     tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
                   />
                   <YAxis
-                    domain={[0, 100]}
+                    domain={[0, 7]}
                     tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                    tickFormatter={(v) => `${v}%`}
                   />
                   <Tooltip
                     cursor={{ fill: "var(--muted)" }}
@@ -270,36 +189,30 @@ function ResearchDashboardPage() {
                       borderRadius: 6,
                       fontSize: 12,
                     }}
-                    formatter={(v: number) => `${v}%`}
                   />
-                  <Bar
-                    dataKey="accuracy"
-                    name="Accuracy"
-                    fill="var(--primary)"
-                  />
+                  <Bar dataKey="mean" name="Mean parent score" fill="var(--primary)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Percent of Human / AI source guesses each reviewer got correct.
-              Chance is 50%.
+              Hidden from participants. Compares blinded responses by true authorship source.
             </p>
           </Card>
 
-          <Card title="Stronger response by true source">
+          <Card title="Preferred response distribution">
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={sourcePickData}
+                    data={preferenceData}
                     dataKey="value"
-                    nameKey="name"
+                    nameKey="label"
                     innerRadius={55}
                     outerRadius={95}
                     paddingAngle={2}
                   >
-                    {sourcePickData.map((e) => (
-                      <Cell key={e.name} fill={e.color} />
+                    {preferenceData.map((entry) => (
+                      <Cell key={entry.label} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
@@ -314,17 +227,58 @@ function ResearchDashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Of the A/B picks across all reviewers, share that landed on the
-              human-authored vs. AI-authored response.
-            </p>
           </Card>
         </section>
 
         <section className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-5 py-3">
             <h2 className="text-sm font-semibold text-foreground">
-              Reviewer leaderboard
+              Results by barrier category
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Aggregate parent score, safety flags, and review volume per category.
+            </p>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Barrier category</TableHead>
+                <TableHead className="text-right">Mean parent score</TableHead>
+                <TableHead className="text-right">Safety flags</TableHead>
+                <TableHead className="text-right">Reviews completed</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {CATEGORY_RESULTS.map((c) => (
+                <TableRow key={c.category}>
+                  <TableCell className="font-medium text-foreground">
+                    {c.category}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {c.meanScore.toFixed(1)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {c.safetyFlags > 0 ? (
+                      <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                        {c.safetyFlags}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">0</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {c.reviewsCompleted}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
+
+        <section className="rounded-lg border border-border bg-card">
+          <div className="border-b border-border px-5 py-3">
+            <h2 className="text-sm font-semibold text-foreground">
+              Reviewer completion summary
             </h2>
             <p className="text-xs text-muted-foreground">
               Anonymous identifiers used to protect reviewer privacy.
@@ -334,21 +288,17 @@ function ResearchDashboardPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Reviewer</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead className="w-64">Completion</TableHead>
-                <TableHead className="text-right">Picked A</TableHead>
-                <TableHead className="text-right">Picked B</TableHead>
-                <TableHead className="text-right">Avg A</TableHead>
-                <TableHead className="text-right">Avg B</TableHead>
-                <TableHead className="text-right">Source acc.</TableHead>
-                <TableHead className="text-right">Human / AI picks</TableHead>
-                <TableHead className="text-right">Median time</TableHead>
+                <TableHead className="text-right">Mean parent score</TableHead>
+                <TableHead className="text-right">Expert 'Yes' rate</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {[...REVIEWERS]
                 .sort((a, b) => b.completed - a.completed)
                 .map((r) => {
-                  const pct = Math.round((r.completed / r.total) * 100);
+                  const pct = Math.round((r.completed / r.assigned) * 100);
                   return (
                     <TableRow key={r.id}>
                       <TableCell>
@@ -358,29 +308,29 @@ function ResearchDashboardPage() {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            r.type === "expert"
+                              ? "bg-primary-soft text-primary"
+                              : "bg-accent-soft text-accent-foreground"
+                          }`}
+                        >
+                          {r.type === "expert" ? "Expert" : "Parent"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
                         <div className="flex items-center gap-3">
                           <Progress value={pct} className="h-2 flex-1" />
-                          <span className="w-20 text-right text-xs tabular-nums text-muted-foreground">
-                            {r.completed}/{r.total} ({pct}%)
+                          <span className="w-24 text-right text-xs tabular-nums text-muted-foreground">
+                            {r.completed}/{r.assigned} ({pct}%)
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right tabular-nums">{r.aPicks}</TableCell>
-                      <TableCell className="text-right tabular-nums">{r.bPicks}</TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {r.avgA.toFixed(1)}
+                        {r.type === "parent" ? r.meanParentScore.toFixed(1) : "—"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {r.avgB.toFixed(1)}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {r.sourceAccuracy}%
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {r.pickedHuman} / {r.pickedAi}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {r.medianMinutes.toFixed(1)} min
+                        {r.type === "expert" ? `${r.expertYesRate}%` : "—"}
                       </TableCell>
                     </TableRow>
                   );
@@ -389,6 +339,7 @@ function ResearchDashboardPage() {
           </Table>
         </section>
       </main>
+      <Toaster />
     </div>
   );
 }

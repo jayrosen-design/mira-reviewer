@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -16,11 +17,14 @@ export function SubmittedState({ onNext, hasNext }: Props) {
         Review submitted. Thank you.
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Your responses have been recorded for this dialogue.
+        Your response has been saved.
       </p>
-      <div className="mt-6">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={onNext} disabled={!hasNext}>
-          {hasNext ? "Next dialogue" : "All reviews complete"}
+          {hasNext ? "Next Review Item" : "No more assigned reviews"}
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="/progress">Return to Progress</Link>
         </Button>
       </div>
     </div>

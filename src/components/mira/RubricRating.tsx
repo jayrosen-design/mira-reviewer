@@ -1,39 +1,43 @@
-import { Info } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { RUBRIC_CRITERIA, RUBRIC_GUIDES, type Criterion } from "@/data/dialogues";
+  PARENT_STATEMENTS,
+  AGREEMENT_LABELS,
+  EXPERT_QUESTIONS,
+  type ParentStatement,
+  type ExpertQuestion,
+  type ExpertAnswer,
+} from "@/data/dialogues";
 
-export type Ratings = Partial<Record<Criterion, number>>;
+export type ParentRatings = Partial<Record<ParentStatement, number>>;
+export type ExpertRatings = Partial<Record<ExpertQuestion, ExpertAnswer>>;
 
-type Props = {
-  ratingsA: Ratings;
-  ratingsB: Ratings;
-  onChange: (which: "A" | "B", criterion: Criterion, value: number | null) => void;
+// ---------- Parent (7-point agreement) ----------
+
+type ParentProps = {
+  ratingsA: ParentRatings;
+  ratingsB: ParentRatings;
+  onChange: (which: "A" | "B", statement: ParentStatement, value: number | null) => void;
 };
 
-function RatingRow({
+function AgreementRow({
   value,
   onChange,
+  ariaLabelPrefix,
 }: {
   value: number | undefined;
   onChange: (v: number | null) => void;
+  ariaLabelPrefix: string;
 }) {
   return (
-    <div className="flex gap-1.5">
-      {[1, 2, 3, 4, 5].map((n) => {
+    <div className="flex flex-wrap gap-1">
+      {[1, 2, 3, 4, 5, 6, 7].map((n) => {
         const active = value === n;
         return (
           <button
             key={n}
             type="button"
             onClick={() => onChange(active ? null : n)}
-            aria-label={active ? `Clear rating ${n}` : `Rate ${n}`}
+            title={AGREEMENT_LABELS[n]}
+            aria-label={`${ariaLabelPrefix}: ${AGREEMENT_LABELS[n]}`}
             aria-pressed={active}
             className={`h-8 w-8 rounded-md border text-xs font-medium transition ${
               active
@@ -49,94 +53,55 @@ function RatingRow({
   );
 }
 
-function CriterionInfo({ criterion }: { criterion: Criterion }) {
-  const guide = RUBRIC_GUIDES[criterion];
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label={`About ${criterion}`}
-          className="inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
-        >
-          <Info className="h-3.5 w-3.5" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{criterion}</DialogTitle>
-          <DialogDescription>{guide.description}</DialogDescription>
-        </DialogHeader>
-        <div className="mt-2 space-y-3">
-          {guide.examples.map((ex) => (
-            <div
-              key={ex.score}
-              className="rounded-lg border border-border bg-muted/40 p-3"
-            >
-              <div className="mb-1 flex items-center gap-2">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary text-xs font-semibold text-primary-foreground">
-                  {ex.score}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {ex.label}
-                </span>
-              </div>
-              <p className="text-sm text-foreground">{ex.example}</p>
-            </div>
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
+export function ParentRubric({ ratingsA, ratingsB, onChange }: ParentProps) {
   return (
     <section
-      aria-label="Rating rubric"
+      aria-label="Parent reviewer rubric"
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-foreground">Rating rubric</h2>
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-foreground">Rate each response</h2>
         <p className="text-sm text-muted-foreground">
-          Rate each response from 1 (low) to 5 (high).
+          Rate your agreement with each statement on a 7-point scale.
+          <span className="ml-1 text-xs">
+            (1 = Strongly Disagree, 4 = Neutral, 7 = Strongly Agree)
+          </span>
         </p>
       </div>
 
-      <div className="hidden grid-cols-3 items-center gap-6 border-b border-border pb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground sm:grid">
+      <div className="hidden grid-cols-[1fr_auto_1fr] items-center gap-6 border-b border-border pb-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground sm:grid">
         <span className="justify-self-center">Response A</span>
-        <span className="text-center">Criterion</span>
+        <span className="text-center">Statement</span>
         <span className="justify-self-center">Response B</span>
       </div>
 
       <ul className="divide-y divide-border">
-        {RUBRIC_CRITERIA.map((c) => (
+        {PARENT_STATEMENTS.map((s) => (
           <li
-            key={c}
-            className="grid gap-3 py-4 sm:grid-cols-3 sm:items-center sm:gap-6"
+            key={s}
+            className="grid gap-3 py-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6"
           >
             <div className="order-2 sm:order-1 sm:justify-self-center">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
                 Response A
               </div>
-              <RatingRow
-                value={ratingsA[c]}
-                onChange={(v) => onChange("A", c, v)}
+              <AgreementRow
+                value={ratingsA[s]}
+                onChange={(v) => onChange("A", s, v)}
+                ariaLabelPrefix={`A — ${s}`}
               />
             </div>
-            <div className="order-1 flex items-center gap-1.5 sm:order-2 sm:justify-center">
-              <span className="text-sm font-medium text-foreground sm:text-center">
-                {c}
-              </span>
-              <CriterionInfo criterion={c} />
+            <div className="order-1 max-w-xs text-sm text-foreground sm:order-2 sm:text-center">
+              {s}
             </div>
             <div className="order-3 sm:justify-self-center">
               <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
                 Response B
               </div>
-              <RatingRow
-                value={ratingsB[c]}
-                onChange={(v) => onChange("B", c, v)}
+              <AgreementRow
+                value={ratingsB[s]}
+                onChange={(v) => onChange("B", s, v)}
+                ariaLabelPrefix={`B — ${s}`}
               />
             </div>
           </li>
@@ -146,3 +111,111 @@ export function RubricRating({ ratingsA, ratingsB, onChange }: Props) {
   );
 }
 
+// ---------- Expert (Yes / No / Unsure) ----------
+
+type ExpertProps = {
+  ratingsA: ExpertRatings;
+  ratingsB: ExpertRatings;
+  onChange: (which: "A" | "B", question: ExpertQuestion, value: ExpertAnswer) => void;
+  notesA: string;
+  notesB: string;
+  onNotes: (which: "A" | "B", value: string) => void;
+};
+
+function YesNoUnsure({
+  value,
+  onChange,
+}: {
+  value: ExpertAnswer;
+  onChange: (v: ExpertAnswer) => void;
+}) {
+  const opts: { id: NonNullable<ExpertAnswer>; label: string }[] = [
+    { id: "yes", label: "Yes" },
+    { id: "no", label: "No" },
+    { id: "unsure", label: "Unsure" },
+  ];
+  return (
+    <div className="flex gap-1.5">
+      {opts.map(({ id, label }) => {
+        const active = value === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => onChange(active ? null : id)}
+            aria-pressed={active}
+            className={`rounded-md border px-3 py-1.5 text-xs font-medium transition ${
+              active
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+            }`}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function ExpertRubric({
+  ratingsA,
+  ratingsB,
+  onChange,
+  notesA,
+  notesB,
+  onNotes,
+}: ExpertProps) {
+  return (
+    <section
+      aria-label="Expert reviewer rubric"
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-foreground">Expert safety review</h2>
+        <p className="text-sm text-muted-foreground">
+          For each response, indicate whether it is medically safe, accurate, and relevant.
+        </p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {(["A", "B"] as const).map((which) => {
+          const ratings = which === "A" ? ratingsA : ratingsB;
+          const notes = which === "A" ? notesA : notesB;
+          return (
+            <div
+              key={which}
+              className="rounded-xl border border-border bg-muted/30 p-4"
+            >
+              <h3 className="mb-3 text-sm font-semibold text-primary">
+                Response {which}
+              </h3>
+              <ul className="space-y-3">
+                {EXPERT_QUESTIONS.map((q) => (
+                  <li key={q} className="space-y-1.5">
+                    <div className="text-sm text-foreground">{q}</div>
+                    <YesNoUnsure
+                      value={ratings[q] ?? null}
+                      onChange={(v) => onChange(which, q, v)}
+                    />
+                  </li>
+                ))}
+              </ul>
+              <label className="mt-4 block">
+                <span className="mb-1 block text-xs font-medium text-foreground">
+                  Optional expert notes
+                </span>
+                <textarea
+                  value={notes}
+                  onChange={(e) => onNotes(which, e.target.value)}
+                  placeholder="Clinical notes, caveats, or suggested edits."
+                  className="min-h-20 w-full resize-y rounded-md border border-border bg-background p-2 text-sm"
+                />
+              </label>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

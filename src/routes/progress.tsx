@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CheckCircle2, Square, Equal, Ban, Check, X } from "lucide-react";
+import { CheckCircle2, FileEdit, Circle, Ban, Equal } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,18 +20,18 @@ import {
 } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import {
-  DIALOGUE_PROGRESS,
+  REVIEW_ITEMS,
   summarizeProgress,
-  type DialogueProgress,
+  type ReviewItemProgress,
 } from "@/data/mockProgress";
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
-      { title: "Progress Tracker — MIRA" },
+      { title: "My Progress — MIRA Reviewer" },
       {
         name: "description",
-        content: "Track your dialogue review progress across the assessment set.",
+        content: "Track your review progress across the assigned MIRA review items.",
       },
     ],
   }),
@@ -40,7 +40,30 @@ export const Route = createFileRoute("/progress")({
 
 const PAGE_SIZE = 10;
 
-function SelectedCell({ value }: { value: DialogueProgress["selected"] }) {
+function StatusCell({ status }: { status: ReviewItemProgress["status"] }) {
+  if (status === "completed")
+    return (
+      <span className="inline-flex items-center gap-1 text-emerald-700">
+        <CheckCircle2 className="h-4 w-4" />
+        <span className="text-xs font-medium">Submitted</span>
+      </span>
+    );
+  if (status === "draft")
+    return (
+      <span className="inline-flex items-center gap-1 text-amber-700">
+        <FileEdit className="h-4 w-4" />
+        <span className="text-xs font-medium">Draft saved</span>
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-1 text-muted-foreground">
+      <Circle className="h-4 w-4" />
+      <span className="text-xs font-medium">Not started</span>
+    </span>
+  );
+}
+
+function PreferenceCell({ value }: { value: ReviewItemProgress["preferred"] }) {
   if (value === "A")
     return (
       <Badge className="bg-primary-soft text-primary hover:bg-primary-soft">
@@ -56,46 +79,29 @@ function SelectedCell({ value }: { value: DialogueProgress["selected"] }) {
   if (value === "neither")
     return (
       <Badge variant="outline" className="gap-1">
-        <Ban className="h-3 w-3" />
-        Neither
+        <Ban className="h-3 w-3" /> Neither
       </Badge>
     );
   if (value === "too_similar")
     return (
       <Badge variant="outline" className="gap-1">
-        <Equal className="h-3 w-3" />
-        Too similar
+        <Equal className="h-3 w-3" /> Too similar
       </Badge>
     );
   return <span className="text-xs text-muted-foreground">—</span>;
 }
 
-function Grade({ value }: { value: number | null }) {
-  if (value == null) return <span className="text-xs text-muted-foreground">—</span>;
-  return (
-    <span className="tabular-nums text-sm font-medium text-foreground">
-      {value.toFixed(1)}
-      <span className="text-xs text-muted-foreground"> / 5</span>
-    </span>
-  );
-}
-
 function ProgressTrackerPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
-  const summary = useMemo(() => summarizeProgress(DIALOGUE_PROGRESS), []);
-  const totalPages = Math.ceil(DIALOGUE_PROGRESS.length / PAGE_SIZE);
-  const pageItems = DIALOGUE_PROGRESS.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
+  const summary = useMemo(() => summarizeProgress(REVIEW_ITEMS), []);
+  const totalPages = Math.ceil(REVIEW_ITEMS.length / PAGE_SIZE);
+  const pageItems = REVIEW_ITEMS.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const pct = Math.round((summary.completed / summary.total) * 100);
 
   const pageNumbers = useMemo(() => {
     const set = new Set<number>([1, totalPages, page, page - 1, page + 1]);
-    return [...set]
-      .filter((n) => n >= 1 && n <= totalPages)
-      .sort((a, b) => a - b);
+    return [...set].filter((n) => n >= 1 && n <= totalPages).sort((a, b) => a - b);
   }, [page, totalPages]);
 
   return (
@@ -103,10 +109,10 @@ function ProgressTrackerPage() {
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         <header>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Progress Tracker
+            My Progress
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your scoring progress across the full review set.
+            Your review progress across the assigned set of {summary.total} items.
           </p>
         </header>
 
@@ -120,33 +126,42 @@ function ProgressTrackerPage() {
                 {summary.completed}
                 <span className="text-base font-normal text-muted-foreground">
                   {" "}
-                  / {summary.total} dialogues
+                  of {summary.total} reviews submitted
                 </span>
               </p>
             </div>
             <div className="flex flex-wrap gap-6 text-sm">
-              <Stat label="Picked A" value={summary.aPicks} />
-              <Stat label="Picked B" value={summary.bPicks} />
-              <Stat label="Neither" value={summary.neither} />
-              <Stat label="Too similar" value={summary.tooSim} />
-              <Stat label="Avg A" value={summary.avgA.toFixed(1)} />
-              <Stat label="Avg B" value={summary.avgB.toFixed(1)} />
-              <Stat
-                label="Human vs AI accuracy"
-                value={`${summary.sourceAccuracy}%`}
-              />
-              <Stat
-                label="Picked Human / AI"
-                value={`${summary.pickedHuman} / ${summary.pickedAi}`}
-              />
+              <Stat label="Submitted" value={summary.completed} />
+              <Stat label="Drafts saved" value={summary.draft} />
+              <Stat label="Remaining" value={summary.remaining} />
             </div>
           </div>
           <div className="mt-4">
             <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
               <span>{pct}% complete</span>
-              <span>{summary.total - summary.completed} remaining</span>
+              <span>{summary.remaining} remaining</span>
             </div>
             <Progress value={pct} />
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-border bg-card p-5">
+          <h2 className="text-sm font-semibold text-foreground">
+            Items by barrier category
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {Object.entries(summary.byCategory).map(([cat, v]) => (
+              <div key={cat} className="rounded-lg border border-border bg-background p-3">
+                <p className="text-[11px] font-medium text-muted-foreground">{cat}</p>
+                <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">
+                  {v.completed}
+                  <span className="text-xs font-normal text-muted-foreground">
+                    {" "}
+                    / {v.total}
+                  </span>
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -154,13 +169,11 @@ function ProgressTrackerPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-12 text-center">Done</TableHead>
                 <TableHead className="w-28">ID</TableHead>
-                <TableHead>Scenario</TableHead>
-                <TableHead className="w-36">Selected</TableHead>
-                <TableHead className="w-24 text-right">Avg A</TableHead>
-                <TableHead className="w-24 text-right">Avg B</TableHead>
-                <TableHead className="w-44">Source guess (A / B)</TableHead>
+                <TableHead className="w-40">Barrier</TableHead>
+                <TableHead>Parent concern</TableHead>
+                <TableHead className="w-36">Preferred</TableHead>
+                <TableHead className="w-36">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -170,45 +183,25 @@ function ProgressTrackerPage() {
                   onClick={() => navigate({ to: "/" })}
                   className="cursor-pointer transition hover:bg-muted/60"
                 >
-
-                  <TableCell className="text-center">
-                    {item.completed ? (
-                      <CheckCircle2
-                        className="mx-auto h-5 w-5 text-emerald-600"
-                        aria-label="Completed"
-                      />
-                    ) : (
-                      <Square
-                        className="mx-auto h-5 w-5 text-muted-foreground/60"
-                        aria-label="Not yet completed"
-                      />
-                    )}
-                  </TableCell>
                   <TableCell className="font-mono text-xs text-muted-foreground">
                     {item.id}
                   </TableCell>
+                  <TableCell>
+                    <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
+                      {item.barrierCategory}
+                    </span>
+                  </TableCell>
                   <TableCell className="max-w-md">
                     <p className="line-clamp-2 text-sm text-foreground">
-                      {item.scenario}
+                      “{item.parentConcern}”
                     </p>
                     <p className="text-xs text-muted-foreground">{item.reviewSet}</p>
                   </TableCell>
                   <TableCell>
-                    <SelectedCell value={item.selected} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Grade value={item.avgA} />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Grade value={item.avgB} />
+                    <PreferenceCell value={item.preferred} />
                   </TableCell>
                   <TableCell>
-                    <SourceGuessCell
-                      guessA={item.guessA}
-                      guessB={item.guessB}
-                      sourceA={item.sourceA}
-                      sourceB={item.sourceB}
-                    />
+                    <StatusCell status={item.status} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -276,60 +269,5 @@ function Stat({ label, value }: { label: string; value: string | number }) {
         {value}
       </span>
     </div>
-  );
-}
-
-function SourceGuessCell({
-  guessA,
-  guessB,
-  sourceA,
-  sourceB,
-}: {
-  guessA: "human" | "ai" | null;
-  guessB: "human" | "ai" | null;
-  sourceA: "human" | "ai";
-  sourceB: "human" | "ai";
-}) {
-  if (guessA == null && guessB == null)
-    return <span className="text-xs text-muted-foreground">—</span>;
-  return (
-    <div className="flex items-center gap-2 text-xs">
-      <GuessChip label="A" guess={guessA} truth={sourceA} />
-      <GuessChip label="B" guess={guessB} truth={sourceB} />
-    </div>
-  );
-}
-
-function GuessChip({
-  label,
-  guess,
-  truth,
-}: {
-  label: string;
-  guess: "human" | "ai" | null;
-  truth: "human" | "ai";
-}) {
-  if (guess == null)
-    return (
-      <span className="rounded border border-dashed border-border px-1.5 py-0.5 text-muted-foreground">
-        {label}: —
-      </span>
-    );
-  const correct = guess === truth;
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 font-medium ${
-        correct
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-          : "border-red-200 bg-red-50 text-red-700"
-      }`}
-    >
-      {label}: {guess === "human" ? "Human" : "AI"}
-      {correct ? (
-        <Check className="h-3 w-3" />
-      ) : (
-        <X className="h-3 w-3" />
-      )}
-    </span>
   );
 }
