@@ -308,33 +308,36 @@ Which dialogues are queued for which reviewer, and how A/B were shuffled.
 ```
 
 ### `reviews`
-One row per submitted review. Rubric scores live in a child table.
+One row per submitted review. Rubric scores live in a child table. Reviewers do not submit source guesses.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `assignment_id` | fk unique | |
-| `selected` | enum(`A`,`B`,`neither`,`too_similar`) | stronger response |
-| `guess_a` | enum(`human`,`ai`) null | reviewer's source guess |
-| `guess_b` | enum(`human`,`ai`) null | |
+| `role` | enum(`parent`,`expert`) | which rubric was used |
+| `preferred` | enum(`A`,`B`,`neither`,`too_similar`) | preferred response |
 | `comments` | text | free-text |
+| `expert_notes_a` | text null | safety notes for A (expert role only) |
+| `expert_notes_b` | text null | safety notes for B (expert role only) |
 | `submitted_at` | timestamptz | |
 ```json
-{ "id": "rev_…", "assignment_id": "asg_…", "selected": "A",
-  "guess_a": "human", "guess_b": "ai", "comments": "A reflects feeling better.",
+{ "id": "rev_…", "assignment_id": "asg_…", "role": "parent",
+  "preferred": "A", "comments": "A reflects feeling better.",
   "submitted_at": "2026-06-02T17:23:09Z" }
 ```
 
 ### `rubric_scores`
-Per-criterion 1–5 score for each response within a review.
+Per-criterion score for each response within a review. Parent rows use `score_1_to_7`; expert rows use `expert_answer`.
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `review_id` | fk | |
 | `response_label` | enum(`A`,`B`) | |
 | `criterion` | text | fk → rubric_criteria.name |
-| `score` | int (1–5) | |
+| `score_1_to_7` | int (1–7) null | parent agreement score |
+| `expert_answer` | enum(`yes`,`no`,`unsure`) null | expert binary judgment |
 ```json
-{ "review_id": "rev_…", "response_label": "A", "criterion": "Empathy", "score": 5 }
+{ "review_id": "rev_…", "response_label": "A",
+  "criterion": "This response shows empathy.", "score_1_to_7": 6 }
 ```
 
 ### `rubric_criteria`
