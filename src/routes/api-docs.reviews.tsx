@@ -84,12 +84,12 @@ function ReviewsDocs() {
         summary="Edit a review before the assignment's due_at. Only the reviewer who submitted it may edit."
         auth="reviewer"
         requestExample={{
-          selected: "B",
+          preferred: "B",
           comments: "Reconsidered after re-reading — B feels stronger.",
         }}
         responseExample={{
           id: "rev_4c2",
-          selected: "B",
+          preferred: "B",
           comments: "Reconsidered after re-reading — B feels stronger.",
           submitted_at: "2026-06-02T17:23:09Z",
           updated_at: "2026-06-02T18:10:44Z",
