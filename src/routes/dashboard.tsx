@@ -83,7 +83,7 @@ function ResearchDashboardPage() {
           </p>
         </header>
 
-        <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
           <KpiCard label="Reviewers" value={summary.reviewers} />
           <KpiCard
             label="Reviews completed"
@@ -93,6 +93,11 @@ function ResearchDashboardPage() {
           <KpiCard
             label="Avg score (A / B)"
             value={`${summary.meanA.toFixed(1)} / ${summary.meanB.toFixed(1)}`}
+          />
+          <KpiCard
+            label="Human vs AI accuracy"
+            value={`${summary.meanSourceAccuracy}%`}
+            sub="mean across reviewers"
           />
           <KpiCard
             label="Median time / review"
