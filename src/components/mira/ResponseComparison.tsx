@@ -11,14 +11,33 @@ type Props = {
   onSelect: (which: Selection) => void;
 };
 
-export function ResponseComparison({ responseA, responseB }: Pick<Props, "responseA" | "responseB"> & { selected?: Selection }) {
+export function ResponseComparison({
+  responseA,
+  responseB,
+  onSend,
+  sendDisabled,
+}: Pick<Props, "responseA" | "responseB"> & {
+  selected?: Selection;
+  onSend?: (which: "A" | "B") => void;
+  sendDisabled?: boolean;
+}) {
   return (
     <section
       aria-label="Response comparison"
       className="grid gap-4 md:grid-cols-2"
     >
-      <ResponseCard response={responseA} preferred={false} />
-      <ResponseCard response={responseB} preferred={false} />
+      <ResponseCard
+        response={responseA}
+        preferred={false}
+        onSend={onSend ? () => onSend("A") : undefined}
+        sendDisabled={sendDisabled}
+      />
+      <ResponseCard
+        response={responseB}
+        preferred={false}
+        onSend={onSend ? () => onSend("B") : undefined}
+        sendDisabled={sendDisabled}
+      />
     </section>
   );
 }

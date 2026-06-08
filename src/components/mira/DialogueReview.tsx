@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { DialogueTurn } from "@/data/dialogues";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import {
@@ -58,10 +59,38 @@ export function DialogueReview() {
   const [reviews, setReviews] = useState<ReviewState[]>(() =>
     DIALOGUES.map(() => emptyReview()),
   );
+  const [simulatedTurns, setSimulatedTurns] = useState<DialogueTurn[]>([]);
+  const [parentTyping, setParentTyping] = useState(false);
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const current = DIALOGUES[index];
   const review = reviews[index];
   const hasNext = index < DIALOGUES.length - 1;
+
+  // Reset simulated chat when dialogue changes.
+  useEffect(() => {
+    setSimulatedTurns([]);
+    setParentTyping(false);
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+  }, [index]);
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeout.current) clearTimeout(typingTimeout.current);
+    };
+  }, []);
+
+  const handleSendToChat = (which: "A" | "B") => {
+    if (parentTyping) return;
+    const clinicianText = which === "A" ? current.responseA.text : current.responseB.text;
+    setSimulatedTurns((prev) => [...prev, { speaker: "clinician", text: clinicianText }]);
+    setParentTyping(true);
+    typingTimeout.current = setTimeout(() => {
+      const reply = pickParentReply(simulatedTurns.length);
+      setSimulatedTurns((prev) => [...prev, { speaker: "parent", text: reply }]);
+      setParentTyping(false);
+    }, 1800);
+  };
 
   const updateReview = (patch: Partial<ReviewState>) => {
     setReviews((prev) => {
@@ -156,11 +185,15 @@ export function DialogueReview() {
               parentConcern={current.parentConcern}
               barrierCategory={current.barrierCategory}
               priorDialogue={current.priorDialogue}
+              simulatedTurns={simulatedTurns}
+              parentTyping={parentTyping}
             />
 
             <ResponseComparison
               responseA={current.responseA}
               responseB={current.responseB}
+              onSend={handleSendToChat}
+              sendDisabled={parentTyping}
             />
 
             {role === "expert" ? (
@@ -211,4 +244,17 @@ export function DialogueReview() {
       <Toaster />
     </div>
   );
+}
+
+const SIMULATED_PARENT_REPLIES = [
+  "Hmm, okay. That actually makes me feel a little better about it.",
+  "I see what you mean. Can you tell me more about the side effects you've actually seen?",
+  "I appreciate that. I'd still like to think about it before deciding today.",
+  "That's helpful. What would you recommend if she were your daughter?",
+  "Okay. So you're saying it's safer to do it earlier rather than later?",
+  "Alright. I think I just need a little time to talk it over with my partner.",
+];
+
+function pickParentReply(turnIndex: number): string {
+  return SIMULATED_PARENT_REPLIES[turnIndex % SIMULATED_PARENT_REPLIES.length];
 }
