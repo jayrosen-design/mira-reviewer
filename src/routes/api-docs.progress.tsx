@@ -22,28 +22,24 @@ function ProgressDocs() {
         auth="reviewer"
         responseExample={{
           summary: {
-            completed: 62,
-            total: 100,
-            avg_grade_a: 3.8,
-            avg_grade_b: 3.4,
-            source_accuracy: 0.71,
-            picked_human: 34,
-            picked_ai: 26,
-            picked_neither: 2,
+            completed: 22,
+            total: 35,
+            avg_parent_score_a: 5.4,
+            avg_parent_score_b: 5.1,
+            preferred_a: 12,
+            preferred_b: 8,
+            preferred_neither: 1,
+            preferred_too_similar: 1,
           },
           items: [
             {
               dialogue_id: "MIRA-014",
               review_set: "Pilot Set B",
-              scenario: "Parent uncertain about ADHD medication.",
+              barrier_category: "Safety or side effects",
               completed: true,
-              selected: "A",
-              avg_a: 4.2,
-              avg_b: 3.1,
-              guess_a: "human",
-              guess_b: "ai",
-              correct_a: true,
-              correct_b: true,
+              preferred: "A",
+              avg_parent_a: 5.8,
+              avg_parent_b: 5.0,
             },
           ],
         }}
@@ -56,8 +52,8 @@ function ProgressDocs() {
         summary="Same shape as /me/progress for any reviewer. Researcher/admin only."
         auth="researcher"
         responseExample={{
-          reviewer: { id: "r_8f2a3b", display_name: "J. Doe" },
-          summary: { completed: 62, total: 100, source_accuracy: 0.71 },
+          reviewer: { id: "r_8f2a3b", display_name: "J. Doe", role: "parent" },
+          summary: { completed: 22, total: 35 },
           items: ["…"],
         }}
         errors={[
