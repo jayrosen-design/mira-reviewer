@@ -24,7 +24,7 @@ function ReviewsDocs() {
       <ApiEndpoint
         method="POST"
         path="/v1/reviews"
-        summary="Submit a review for an assignment."
+        summary="Submit a review for an assignment. The payload shape depends on the reviewer's role — parent reviewers send 7-point Likert scores; expert reviewers send yes/no/unsure judgments plus optional per-response safety notes."
         auth="reviewer"
         requestExample={{
           assignment_id: "asg_91f0",
@@ -43,6 +43,7 @@ function ReviewsDocs() {
           assignment_id: "asg_91f0",
           role: "parent",
           preferred: "A",
+          status: "submitted",
           submitted_at: "2026-06-02T17:23:09Z",
         }}
         errors={[
@@ -54,15 +55,75 @@ function ReviewsDocs() {
       />
 
       <ApiEndpoint
+        method="POST"
+        path="/v1/reviews (expert payload)"
+        summary="Same endpoint, expert variant. Expert reviewers score each response on medical safety, accuracy, and relevance, and may attach optional free-text safety notes per response."
+        auth="reviewer"
+        requestExample={{
+          assignment_id: "asg_a4b1",
+          role: "expert",
+          preferred: "B",
+          comments: "B is more medically precise on side-effect framing.",
+          expert_ratings: [
+            { response_label: "A", question: "Is this response medically safe?", answer: "yes" },
+            { response_label: "A", question: "Is this response accurate?", answer: "unsure" },
+            { response_label: "A", question: "Is this response relevant to the parent concern?", answer: "yes" },
+            { response_label: "B", question: "Is this response medically safe?", answer: "yes" },
+            { response_label: "B", question: "Is this response accurate?", answer: "yes" },
+            { response_label: "B", question: "Is this response relevant to the parent concern?", answer: "yes" },
+          ],
+          expert_notes_a: "Downplays HPV persistence risk slightly.",
+          expert_notes_b: "",
+        }}
+        responseExample={{
+          id: "rev_9a1",
+          assignment_id: "asg_a4b1",
+          role: "expert",
+          preferred: "B",
+          status: "submitted",
+          submitted_at: "2026-06-02T17:41:02Z",
+        }}
+        errors={[
+          { status: 422, meaning: "Missing expert answers for one or more (response, question) pairs." },
+        ]}
+      />
+
+      <ApiEndpoint
+        method="POST"
+        path="/v1/reviews/draft"
+        summary="Save an in-progress review as a draft. Same payload as POST /v1/reviews but partial rubric scores are allowed and the review is stored with status='draft' instead of 'submitted'. Backs the 'Save Draft' button on the review screen."
+        auth="reviewer"
+        requestExample={{
+          assignment_id: "asg_91f0",
+          role: "parent",
+          preferred: null,
+          comments: "Coming back to this — need to re-read B.",
+          parent_ratings: [
+            { response_label: "A", statement: "This response is appropriate.", score: 6 },
+          ],
+        }}
+        responseExample={{
+          id: "rev_4c2",
+          status: "draft",
+          updated_at: "2026-06-02T17:05:00Z",
+        }}
+        errors={[
+          { status: 403, meaning: "Assignment belongs to another reviewer." },
+          { status: 409, meaning: "Review already submitted." },
+        ]}
+      />
+
+      <ApiEndpoint
         method="GET"
         path="/v1/reviews/:id"
-        summary="Fetch a single review with its rubric scores."
+        summary="Fetch a single review with its rubric scores. Researchers may fetch any review; reviewers may only fetch their own."
         auth="reviewer"
         responseExample={{
           id: "rev_4c2",
           assignment_id: "asg_91f0",
           role: "parent",
           preferred: "A",
+          status: "submitted",
           comments: "…",
           submitted_at: "2026-06-02T17:23:09Z",
           parent_ratings: [
@@ -76,6 +137,8 @@ function ReviewsDocs() {
           { status: 404, meaning: "Review not found." },
         ]}
       />
+
+
 
 
       <ApiEndpoint
