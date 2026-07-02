@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown, Users } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown, Users, UserCog } from "lucide-react";
 import { logout, useAuth } from "@/lib/auth";
 import type { ReviewerRole } from "@/lib/reviewerRole";
 import { ROLE_LABEL } from "@/lib/reviewerRole";
@@ -11,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditAccountDialog } from "./EditAccountDialog";
+import { Toaster } from "@/components/ui/sonner";
 
 const ALL_LINKS = [
   { to: "/", label: "Review", icon: MessagesSquare, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
