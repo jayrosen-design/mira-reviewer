@@ -66,14 +66,14 @@ function UsersDocs() {
           page_size: 20,
           total: 3,
         }}
-        errors={[{ status: 403, meaning: "Caller is not researcher/admin." }]}
+        errors={[{ status: 403, meaning: "Caller is not a researcher." }]}
       />
 
       <ApiEndpoint
         method="PATCH"
         path="/v1/users/:id"
         summary="Update a user's display name and/or account type. Backs the Manage User modal's save action."
-        auth="admin"
+        auth="researcher"
         requestExample={{
           display_name: "Parent 01 (renamed)",
           role: "expert",
@@ -85,7 +85,7 @@ function UsersDocs() {
           updated_at: "2026-07-02T14:02:11Z",
         }}
         errors={[
-          { status: 403, meaning: "Caller is not admin." },
+          { status: 403, meaning: "Caller is not a researcher." },
           { status: 404, meaning: "User not found." },
           { status: 422, meaning: "Invalid role value." },
         ]}
@@ -95,14 +95,14 @@ function UsersDocs() {
         method="POST"
         path="/v1/users/:id/reset-reviews"
         summary="Clear the user's submitted reviews and drafts so their assigned dialogues are reviewable again from scratch. Assignments themselves are preserved."
-        auth="admin"
+        auth="researcher"
         responseExample={{
           ok: true,
           reviews_deleted: 8,
           drafts_deleted: 2,
         }}
         errors={[
-          { status: 403, meaning: "Caller is not admin." },
+          { status: 403, meaning: "Caller is not a researcher." },
           { status: 404, meaning: "User not found." },
         ]}
       />
@@ -111,10 +111,10 @@ function UsersDocs() {
         method="POST"
         path="/v1/users/:id/password-reset"
         summary="Email a password-reset link to the user."
-        auth="admin"
+        auth="researcher"
         responseExample={{ ok: true, sent_to: "parent01@example.org" }}
         errors={[
-          { status: 403, meaning: "Caller is not admin." },
+          { status: 403, meaning: "Caller is not a researcher." },
           { status: 404, meaning: "User not found." },
         ]}
       />
@@ -123,12 +123,12 @@ function UsersDocs() {
         method="DELETE"
         path="/v1/users/:id"
         summary="Permanently delete a user account along with their assignments, reviews, and audit trail entries."
-        auth="admin"
+        auth="researcher"
         responseExample={{ ok: true, deleted_id: "r_8f2a3b" }}
         errors={[
-          { status: 403, meaning: "Caller is not admin." },
+          { status: 403, meaning: "Caller is not a researcher." },
           { status: 404, meaning: "User not found." },
-          { status: 409, meaning: "Cannot delete the last remaining admin." },
+          { status: 409, meaning: "Cannot delete the last remaining researcher." },
         ]}
       />
     </div>
