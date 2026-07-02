@@ -134,6 +134,21 @@ function ResearchDashboardPage() {
           <KpiCard label="Items in study" value={CATEGORY_RESULTS.reduce((s, c) => s + c.reviewsCompleted, 0)} sub="completed across all reviewers" />
         </section>
 
+        <section className="grid gap-4 lg:grid-cols-2">
+          <RadarCard
+            title="Human-authored — mean parent rating by construct"
+            color="var(--primary)"
+            seriesName="Human"
+            dataKey="human"
+          />
+          <RadarCard
+            title="MIRA-generated — mean parent rating by construct"
+            color="var(--accent)"
+            seriesName="MIRA"
+            dataKey="mira"
+          />
+        </section>
+
         <section>
           <Card title="Average parent rating by construct (1–7)">
             <div className="h-80">
