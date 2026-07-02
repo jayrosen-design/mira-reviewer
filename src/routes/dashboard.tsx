@@ -393,3 +393,52 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     </div>
   );
 }
+
+function RadarCard({
+  title,
+  color,
+  seriesName,
+  dataKey,
+}: {
+  title: string;
+  color: string;
+  seriesName: string;
+  dataKey: "human" | "mira";
+}) {
+  return (
+    <Card title={title}>
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <RadarChart data={CONSTRUCT_MEANS_BY_SOURCE} outerRadius="75%">
+            <PolarGrid stroke="var(--border)" />
+            <PolarAngleAxis
+              dataKey="short"
+              tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+            />
+            <PolarRadiusAxis
+              angle={90}
+              domain={[0, 7]}
+              tickCount={8}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+            />
+            <Radar
+              name={seriesName}
+              dataKey={dataKey}
+              stroke={color}
+              fill={color}
+              fillOpacity={0.35}
+            />
+            <Tooltip
+              contentStyle={{
+                background: "var(--card)",
+                border: "1px solid var(--border)",
+                borderRadius: 6,
+                fontSize: 12,
+              }}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
+}
