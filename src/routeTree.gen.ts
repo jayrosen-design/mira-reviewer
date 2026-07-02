@@ -14,13 +14,13 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
+import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
 import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
 import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
 import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
 import { Route as ApiDocsMetricsRouteImport } from './routes/api-docs.metrics'
 import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogues'
 import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
-import { Route as DashboardReviewersReviewerIdRouteImport } from './routes/dashboard.reviewers.$reviewerId'
 
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
@@ -46,6 +46,11 @@ const ApiDocsIndexRoute = ApiDocsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ApiDocsRoute,
+} as any)
+const ReviewersReviewerIdRoute = ReviewersReviewerIdRouteImport.update({
+  id: '/reviewers/$reviewerId',
+  path: '/reviewers/$reviewerId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
   id: '/schema',
@@ -77,17 +82,11 @@ const ApiDocsAuthRoute = ApiDocsAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => ApiDocsRoute,
 } as any)
-const DashboardReviewersReviewerIdRoute =
-  DashboardReviewersReviewerIdRouteImport.update({
-    id: '/reviewers/$reviewerId',
-    path: '/reviewers/$reviewerId',
-    getParentRoute: () => DashboardRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
-  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -95,12 +94,12 @@ export interface FileRoutesByFullPath {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
-  '/dashboard/reviewers/$reviewerId': typeof DashboardReviewersReviewerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -108,14 +107,14 @@ export interface FileRoutesByTo {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs': typeof ApiDocsIndexRoute
-  '/dashboard/reviewers/$reviewerId': typeof DashboardReviewersReviewerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
-  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard': typeof DashboardRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -123,8 +122,8 @@ export interface FileRoutesById {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
-  '/dashboard/reviewers/$reviewerId': typeof DashboardReviewersReviewerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,8 +138,8 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/reviewers/$reviewerId'
     | '/api-docs/'
-    | '/dashboard/reviewers/$reviewerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,8 +151,8 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/reviewers/$reviewerId'
     | '/api-docs'
-    | '/dashboard/reviewers/$reviewerId'
   id:
     | '__root__'
     | '/'
@@ -166,15 +165,16 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/reviewers/$reviewerId'
     | '/api-docs/'
-    | '/dashboard/reviewers/$reviewerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
-  DashboardRoute: typeof DashboardRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
   ProgressRoute: typeof ProgressRoute
+  ReviewersReviewerIdRoute: typeof ReviewersReviewerIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -213,6 +213,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api-docs/'
       preLoaderRoute: typeof ApiDocsIndexRouteImport
       parentRoute: typeof ApiDocsRoute
+    }
+    '/reviewers/$reviewerId': {
+      id: '/reviewers/$reviewerId'
+      path: '/reviewers/$reviewerId'
+      fullPath: '/reviewers/$reviewerId'
+      preLoaderRoute: typeof ReviewersReviewerIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api-docs/schema': {
       id: '/api-docs/schema'
@@ -256,13 +263,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsAuthRouteImport
       parentRoute: typeof ApiDocsRoute
     }
-    '/dashboard/reviewers/$reviewerId': {
-      id: '/dashboard/reviewers/$reviewerId'
-      path: '/reviewers/$reviewerId'
-      fullPath: '/dashboard/reviewers/$reviewerId'
-      preLoaderRoute: typeof DashboardReviewersReviewerIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
   }
 }
 
@@ -289,23 +289,12 @@ const ApiDocsRouteChildren: ApiDocsRouteChildren = {
 const ApiDocsRouteWithChildren =
   ApiDocsRoute._addFileChildren(ApiDocsRouteChildren)
 
-interface DashboardRouteChildren {
-  DashboardReviewersReviewerIdRoute: typeof DashboardReviewersReviewerIdRoute
-}
-
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardReviewersReviewerIdRoute: DashboardReviewersReviewerIdRoute,
-}
-
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
-  DashboardRoute: DashboardRouteWithChildren,
+  DashboardRoute: DashboardRoute,
   ProgressRoute: ProgressRoute,
+  ReviewersReviewerIdRoute: ReviewersReviewerIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
