@@ -248,11 +248,12 @@ export const SOURCE_MEANS = [
 
 // Preferred response distribution across all completed reviews.
 export const PREFERENCE_DISTRIBUTION = [
-  { label: "Response A", value: 38, color: "var(--primary)" },
-  { label: "Response B", value: 31, color: "var(--accent)" },
+  { label: "Human", value: 38, color: "var(--primary)" },
+  { label: "MIRA agent", value: 31, color: "var(--accent)" },
   { label: "Too similar", value: 12, color: "oklch(0.78 0.04 250)" },
   { label: "Neither acceptable", value: 6, color: "var(--muted-foreground)" },
 ];
+
 
 // Aggregate results broken down by barrier category.
 export const CATEGORY_RESULTS = BARRIER_CATEGORIES.map((c, idx) => ({
@@ -311,17 +312,37 @@ export function getConstructBarData(
     return {
       name: r.short,
       full: r.statement,
-      "Response A": avg(humanValues),
-      "Response B": avg(miraValues),
+      Human: avg(humanValues),
+      "MIRA agent": avg(miraValues),
     };
   });
 }
 
+export function getItemResponses(itemId: string) {
+  const dlg = DIALOGUES.find((d) => d.id === itemId);
+  if (dlg) {
+    const a = dlg.responseA;
+    const b = dlg.responseB;
+    const human = a.source === "human" ? a : b;
+    const mira = a.source === "mira" ? a : b;
+    return { human: human.text, mira: mira.text };
+  }
+  const item = REVIEW_ITEMS.find((i) => i.id === itemId);
+  const concern = item?.parentConcern ?? "your concern";
+  return {
+    human:
+      `That's a really understandable worry. A lot of parents feel the same way about "${concern.toLowerCase()}", and it makes sense to want more information before deciding. Can I share what we typically see and then hear what would help you feel more comfortable?`,
+    mira:
+      `Thank you for sharing that concern. Many parents have questions about "${concern.toLowerCase()}", and it's completely reasonable to want clear information. I can walk through what the current research shows and answer any specific questions you have.`,
+  };
+}
+
+
 export function getPreferenceForItem(itemId: string, group: Group) {
   const seed = hashId(itemId) + (group === "expert" ? 11 : group === "parent" ? 7 : 3);
   return [
-    { label: "Response A", color: "var(--primary)", base: 34 },
-    { label: "Response B", color: "var(--accent)", base: 30 },
+    { label: "Human", color: "var(--primary)", base: 34 },
+    { label: "MIRA agent", color: "var(--accent)", base: 30 },
     { label: "Too similar", color: "oklch(0.78 0.04 250)", base: 14 },
     { label: "Neither acceptable", color: "var(--muted-foreground)", base: 6 },
   ].map((r, i) => ({
@@ -330,6 +351,7 @@ export function getPreferenceForItem(itemId: string, group: Group) {
     value: Math.max(1, Math.round(r.base + (rand(seed + i * 5) - 0.5) * 18)),
   }));
 }
+
 
 export function getSourceMeansForItem(itemId: string, group: Group) {
   const seed = hashId(itemId);

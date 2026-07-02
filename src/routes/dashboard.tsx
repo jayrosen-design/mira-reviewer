@@ -52,10 +52,12 @@ import {
   getSourceMeansForItem,
   getItemSummary,
   getItemReviewCounts,
+  getItemResponses,
   getAggregatePreference,
   getAggregateSourceMeans,
   type Group,
 } from "@/data/mockProgress";
+
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -253,12 +255,13 @@ function OverallView({
           arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
         return {
           name: r.short,
-          "Response A": avg(humanValues),
-          "Response B": avg(miraValues),
+          Human: avg(humanValues),
+          "MIRA agent": avg(miraValues),
         };
       }),
     [constructRows, group],
   );
+
   const preferenceData = getAggregatePreference(group);
   const sourceData = getAggregateSourceMeans(group);
 
@@ -410,6 +413,12 @@ function ByItemView({
     [item.id, group],
   );
   const summary = getItemSummary(item.id, group);
+  const responses = useMemo(() => getItemResponses(item.id), [item.id]);
+  const preferredSource: "Human" | "MIRA agent" | null =
+    summary.preferred === "Human" || summary.preferred === "MIRA agent"
+      ? summary.preferred
+      : null;
+
 
   return (
     <>
@@ -438,8 +447,24 @@ function ByItemView({
         </div>
       </section>
 
+      <section className="grid gap-4 lg:grid-cols-2">
+        <ResponseTextCard
+          label="Human interviewer"
+          text={responses.human}
+          isPreferred={preferredSource === "Human"}
+          accent="var(--primary)"
+        />
+        <ResponseTextCard
+          label="MIRA agent"
+          text={responses.mira}
+          isPreferred={preferredSource === "MIRA agent"}
+          accent="var(--accent)"
+        />
+      </section>
+
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <KpiCard label="Reviews (filtered)" value={summary.reviews} sub={`of ${getItemReviewCounts(item.id).total} total`} />
+
         {group !== "expert" && (
           <KpiCard label="Mean parent score" value={summary.meanParent.toFixed(1)} sub="1–7 scale" />
         )}
@@ -558,23 +583,60 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
+function ResponseTextCard({
+  label,
+  text,
+  isPreferred,
+  accent,
+}: {
+  label: string;
+  text: string;
+  isPreferred: boolean;
+  accent: string;
+}) {
+  return (
+    <div
+      className="flex h-full flex-col rounded-lg border bg-card p-5"
+      style={{
+        borderColor: isPreferred ? accent : "var(--border)",
+        boxShadow: isPreferred ? `0 0 0 1px ${accent}` : undefined,
+      }}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+        {isPreferred && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white"
+            style={{ backgroundColor: accent }}
+          >
+            ★ Preferred
+          </span>
+        )}
+      </div>
+      <p className="text-sm leading-relaxed text-foreground">{text}</p>
+    </div>
+  );
+}
+
 function RadarCard({
+
   title,
   data,
   parentKey,
   expertKey,
-  color,
   group,
 }: {
   title: string;
   data: ReturnType<typeof getConstructMeansForItem>;
   parentKey: "humanParent" | "miraParent";
   expertKey: "humanExpert" | "miraExpert";
-  color: string;
+  color?: string;
   group: Group;
 }) {
   const showParent = group !== "expert";
   const showExpert = group !== "parent";
+  const parentColor = "oklch(0.62 0.17 250)"; // blue
+  const expertColor = "oklch(0.68 0.17 45)"; // orange
   return (
     <Card title={title}>
       <div className="h-80">
@@ -595,19 +657,18 @@ function RadarCard({
               <Radar
                 name="Parent"
                 dataKey={parentKey}
-                stroke={color}
-                fill={color}
-                fillOpacity={0.35}
+                stroke={parentColor}
+                fill={parentColor}
+                fillOpacity={0.3}
               />
             )}
             {showExpert && (
               <Radar
                 name="Expert"
                 dataKey={expertKey}
-                stroke={color}
-                strokeDasharray="4 4"
-                fill={color}
-                fillOpacity={0.15}
+                stroke={expertColor}
+                fill={expertColor}
+                fillOpacity={0.3}
               />
             )}
             <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -629,7 +690,7 @@ function RadarCard({
 function ConstructBar({
   data,
 }: {
-  data: Array<{ name: string; "Response A": number; "Response B": number }>;
+  data: Array<{ name: string; Human: number; "MIRA agent": number }>;
 }) {
   return (
     <div className="h-80">
@@ -658,13 +719,14 @@ function ConstructBar({
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Response A" fill="var(--primary)" />
-          <Bar dataKey="Response B" fill="var(--accent)" />
+          <Bar dataKey="Human" fill="var(--primary)" />
+          <Bar dataKey="MIRA agent" fill="var(--accent)" />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
 
 function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
   return (
