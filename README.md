@@ -197,6 +197,190 @@ flowchart TD
     API -.-> DB
 ```
 
+### Sign-in & role routing
+
+Sequence of events from opening the app to landing on the first role-appropriate page.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant Root as __root.tsx AuthGate
+    participant Login as /login
+    participant Auth as lib/auth.ts (localStorage)
+    participant Router as TanStack Router
+
+    U->>Root: GET any route
+    Root->>Auth: useAuth()
+    alt not logged in
+        Root->>Router: redirect to /login
+        U->>Login: pick role (Parent / Expert / Researcher)
+        Login->>Auth: loginAs(role)
+        Auth-->>Auth: set mira:loggedIn, mira:reviewerRole
+        Auth-->>Root: dispatch mira:auth-change
+        Login->>Router: preloadRoute(/about) + preloadRoute(/dashboard)
+        Login->>Router: navigate researcher to /dashboard else /about
+    else already logged in
+        Root->>Root: enforce role-based access
+        alt wrong role for path
+            Root->>Router: redirect to allowed home
+        else allowed
+            Root-->>U: render page
+        end
+    end
+```
+
+### Review submission flow
+
+What happens when a Parent or Expert reviewer opens `/`, rates a dialogue, and submits.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor R as Reviewer
+    participant Page as DialogueReview
+    participant Data as data/dialogues.ts (mock)
+    participant Rubric as RubricRating
+    participant Pref as PreferredResponse
+    participant Actions as ReviewActions
+    participant State as React state (future POST /v1/reviews)
+    participant Done as SubmittedState
+
+    R->>Page: navigate to /
+    Page->>Data: read DialogueItem at currentIndex
+    Page->>Rubric: render role-appropriate criteria
+    Page->>Pref: render A / B / neither / too_similar
+    R->>Rubric: score each criterion per response
+    R->>Pref: pick preferred response
+    R->>Actions: click Save Draft
+    Actions->>State: status = draft (in-memory)
+    Note over State: Future: POST /v1/reviews/draft
+    R->>Actions: click Submit
+    Actions->>Actions: validate rubric complete and preferred set
+    alt incomplete
+        Actions-->>R: toast validation error
+    else complete
+        Actions->>State: status = submitted, submitted_at = now
+        Note over State: Future: POST /v1/reviews
+        State-->>Done: show SubmittedState + Next
+        R->>Page: click Next item, currentIndex + 1
+    end
+```
+
+### Researcher dashboard data flow
+
+How aggregate views assemble from the mock data (and where a real API would slot in).
+
+```mermaid
+flowchart LR
+    subgraph Sources["Data sources (mock today)"]
+        D[dialogues.ts]
+        P[mockProgress.ts]
+        U[users.tsx RESEARCHERS]
+    end
+
+    subgraph Helpers["Aggregation helpers"]
+        SP[summarizeProgress]
+        RS[reviewerSummary]
+        CM[CONSTRUCT_MEANS_BY_SOURCE]
+        SM[SOURCE_MEANS]
+        PD[PREFERENCE_DISTRIBUTION]
+        CR[CATEGORY_RESULTS]
+    end
+
+    subgraph Views["Researcher pages"]
+        DB["/dashboard radar bar pie table"]
+        US["/users roster + Manage dialog"]
+        RD["/reviewers/:id per-reviewer progress"]
+        RV["/reviews/:rid/:iid unblinded review"]
+    end
+
+    D --> SP
+    P --> SP
+    P --> RS
+    D --> CM
+    P --> CM
+    CM --> SM
+    P --> PD
+    P --> CR
+
+    SP --> RD
+    RS --> US
+    U --> US
+    CM --> DB
+    SM --> DB
+    PD --> DB
+    CR --> DB
+    D --> RV
+    P --> RV
+
+    DB -. future .-> API1[/v1/metrics/*]
+    US -. future .-> API2[/v1/users/*]
+    RD -. future .-> API3[/v1/reviewers/:id/progress]
+```
+
+### Role-based navigation state
+
+Which routes each role can reach after auth. AuthGate redirects any disallowed access.
+
+```mermaid
+stateDiagram-v2
+    [*] --> LoggedOut
+    LoggedOut --> Login: any route
+    Login --> Parent: loginAs parent
+    Login --> Expert: loginAs expert
+    Login --> Researcher: loginAs researcher
+
+    state Parent {
+        [*] --> About_P
+        About_P --> Review_P: /
+        Review_P --> Progress_P: /progress
+        Progress_P --> Review_P
+    }
+
+    state Expert {
+        [*] --> About_E
+        About_E --> Review_E: /
+        Review_E --> Progress_E: /progress
+        Progress_E --> Review_E
+    }
+
+    state Researcher {
+        [*] --> Dashboard
+        Dashboard --> Users: /users
+        Users --> ReviewerDetail: /reviewers/:id
+        ReviewerDetail --> ReviewDetail: /reviews/:rid/:iid
+        Dashboard --> ApiDocs: /api-docs/*
+    }
+
+    Parent --> LoggedOut: logout
+    Expert --> LoggedOut: logout
+    Researcher --> LoggedOut: logout
+```
+
+### Review page component tree
+
+Composition of `DialogueReview` on `/` — where reviewer state lives and how sub-components fit together.
+
+```mermaid
+flowchart TD
+    DR[DialogueReview owns: currentIndex, scores, preferred, comments, status]
+    DR --> HDR[Header - Item X of 35, prev/next]
+    DR --> IP[InstructionPanel - role-sensitive]
+    DR --> DC[DialogueContext - prior turns]
+    DR --> RC[ResponseComparison]
+    RC --> CA[ResponseCard A]
+    RC --> CB[ResponseCard B]
+    CA --> PV1[Preview in dialogue context]
+    CB --> PV2[Preview in dialogue context]
+    DR --> RR[RubricRating - ParentRubric or ExpertRubric]
+    DR --> PR[PreferredResponse]
+    DR --> RCM[ReviewerComments]
+    DR --> RA[ReviewActions - Save Draft, Submit]
+    DR --> SS[SubmittedState - after submit]
+    DR -. researcher view only .-> RM[ResearchMetadata - unblinded source + meta]
+```
+
 ### From mock to real
 
 - **Auth** — replace `src/lib/auth.ts` with real login: `POST /v1/auth/login` returns a bearer JWT; `useAuth()` reads it from a secure store; `AuthGate` reads role from the token claims.
