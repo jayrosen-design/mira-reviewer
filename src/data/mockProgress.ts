@@ -212,6 +212,42 @@ export function reviewerSummary(rs: Reviewer[]) {
   };
 }
 
+export function getReviewerById(id: string): Reviewer | undefined {
+  return REVIEWERS.find((r) => r.id === id);
+}
+
+/** Deterministic per-reviewer view of REVIEW_ITEMS with completion re-derived
+ *  from the reviewer's completed count. Purely presentational mock. */
+export function getReviewerItems(reviewerId: string): ReviewItemProgress[] {
+  const reviewer = getReviewerById(reviewerId);
+  if (!reviewer) return [];
+  const seed = hashId(reviewerId);
+  const shuffled = [...REVIEW_ITEMS]
+    .map((it, i) => ({ it, k: rand(seed + i * 3) }))
+    .sort((a, b) => a.k - b.k)
+    .map(({ it }) => it);
+
+  return shuffled.map((it, i) => {
+    const r = rand(seed + i * 7 + 1);
+    if (i < reviewer.completed) {
+      const pick = rand(seed + i * 11 + 5);
+      const preferred: Selection =
+        pick < 0.5 ? "A" : pick < 0.85 ? "B" : pick < 0.93 ? "neither" : "too_similar";
+      const avgA = Math.round((4.2 + rand(seed + i + 31) * 2.2) * 10) / 10;
+      const avgB = Math.round((4.0 + rand(seed + i + 53) * 2.4) * 10) / 10;
+      return { ...it, status: "completed", preferred, avgA, avgB };
+    }
+    const draft = r < 0.15;
+    return {
+      ...it,
+      status: draft ? "draft" : "not_started",
+      preferred: null,
+      avgA: null,
+      avgB: null,
+    };
+  });
+
+
 // Mean parent scores per construct (the 6 statements) by response.
 import { PARENT_STATEMENTS } from "./dialogues";
 
