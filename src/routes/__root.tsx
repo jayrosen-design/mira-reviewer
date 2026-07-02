@@ -155,10 +155,15 @@ function AuthGate() {
   }
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       {!isLogin && <NavBar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-    </>
+      <div className="flex-1">
+        <Outlet />
+      </div>
+      <footer className="border-t border-border bg-card py-4 text-center text-xs text-muted-foreground">
+        © 2026 University of Florida
+      </footer>
+    </div>
   );
 }
