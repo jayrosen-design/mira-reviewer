@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -24,6 +25,11 @@ import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogue
 import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
 import { Route as ReviewsReviewerIdItemIdRouteImport } from './routes/reviews.$reviewerId.$itemId'
 
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
+  '/users': typeof UsersRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
+  '/users': typeof UsersRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
+  '/users': typeof UsersRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/progress'
+    | '/users'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/progress'
+    | '/users'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/progress'
+    | '/users'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -199,12 +211,20 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   ProgressRoute: typeof ProgressRoute
+  UsersRoute: typeof UsersRoute
   ReviewersReviewerIdRoute: typeof ReviewersReviewerIdRoute
   ReviewsReviewerIdItemIdRoute: typeof ReviewsReviewerIdItemIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progress': {
       id: '/progress'
       path: '/progress'
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ProgressRoute: ProgressRoute,
+  UsersRoute: UsersRoute,
   ReviewersReviewerIdRoute: ReviewersReviewerIdRoute,
   ReviewsReviewerIdItemIdRoute: ReviewsReviewerIdItemIdRoute,
 }
