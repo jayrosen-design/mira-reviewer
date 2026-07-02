@@ -418,6 +418,28 @@ function ByItemView({
       ? summary.preferred
       : null;
 
+  const counts = getItemReviewCounts(item.id);
+  const parentPref = useMemo(() => getPreferenceForItem(item.id, "parent"), [item.id]);
+  const expertPref = useMemo(() => getPreferenceForItem(item.id, "expert"), [item.id]);
+  const share = (arr: typeof parentPref, label: string) => {
+    const total = arr.reduce((s, r) => s + r.value, 0) || 1;
+    return (arr.find((r) => r.label === label)?.value ?? 0) / total;
+  };
+  const votes = {
+    human: {
+      parent: Math.round(counts.parents * share(parentPref, "Human")),
+      expert: Math.round(counts.experts * share(expertPref, "Human")),
+    },
+    mira: {
+      parent: Math.round(counts.parents * share(parentPref, "MIRA agent")),
+      expert: Math.round(counts.experts * share(expertPref, "MIRA agent")),
+    },
+  };
+  const maxVotes = Math.max(
+    votes.human.parent + votes.human.expert,
+    votes.mira.parent + votes.mira.expert,
+    1,
+  );
 
   return (
     <>
@@ -452,14 +474,25 @@ function ByItemView({
           text={responses.human}
           isPreferred={preferredSource === "Human"}
           accent="var(--primary)"
+          parentVotes={votes.human.parent}
+          expertVotes={votes.human.expert}
+          parentTotal={counts.parents}
+          expertTotal={counts.experts}
+          maxVotes={maxVotes}
         />
         <ResponseTextCard
           label="MIRA agent"
           text={responses.mira}
           isPreferred={preferredSource === "MIRA agent"}
           accent="var(--accent)"
+          parentVotes={votes.mira.parent}
+          expertVotes={votes.mira.expert}
+          parentTotal={counts.parents}
+          expertTotal={counts.experts}
+          maxVotes={maxVotes}
         />
       </section>
+
 
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <KpiCard label="Reviews (filtered)" value={summary.reviews} sub={`of ${getItemReviewCounts(item.id).total} total`} />
