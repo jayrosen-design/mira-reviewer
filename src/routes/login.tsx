@@ -62,13 +62,13 @@ function LoginPage() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-primary">
+          <h1 className="text-5xl font-bold tracking-tight text-primary">
             MIRA
           </h1>
-          <p className="mt-1 text-sm font-medium text-foreground">
+          <p className="mt-2 text-lg font-semibold text-foreground">
             Motivational Interviewing Response Assessment
           </p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <span className="rounded-full border border-primary/30 bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-primary">
               Research Preview
             </span>
@@ -76,7 +76,7 @@ function LoginPage() {
               Version 0.0.1
             </span>
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">
+          <p className="mt-8 text-base font-semibold text-foreground">
             Select an account to continue
           </p>
         </div>
