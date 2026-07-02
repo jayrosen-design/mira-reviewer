@@ -31,6 +31,7 @@ const ROLE_ICON: Record<ReviewerRole, React.ComponentType<{ className?: string }
 export function NavBar() {
   const { isLoggedIn, role } = useAuth();
   const navigate = useNavigate();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (!isLoggedIn || !role) return null;
 
@@ -82,6 +83,10 @@ export function NavBar() {
               {ROLE_LABEL[role]}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+              <UserCog className="mr-2 h-4 w-4" />
+              Edit account
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Log out
@@ -89,6 +94,8 @@ export function NavBar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <EditAccountDialog open={editOpen} onOpenChange={setEditOpen} role={role} />
     </nav>
   );
 }
