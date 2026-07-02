@@ -1,85 +1,130 @@
 # MIRA — Motivational Interviewing Response Assessment
 
-MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a parent concern with two blinded candidate counselor responses (Response A and Response B). Source identity (human interviewer vs Mira) is hidden from reviewers during the task and stored internally for researcher-side analysis. The platform also provides progress tracking for individual reviewers and aggregate analytics across the full reviewer pool.
+MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a parent concern with two blinded candidate counselor responses (Response A and Response B). Source identity (human interviewer vs Mira) is hidden from reviewers during the task and stored internally for researcher-side analysis. The platform also provides progress tracking for individual reviewers, aggregate analytics across the full reviewer pool, and researcher-side administration of user accounts.
 
 ## Purpose
 
-The project supports the CTSI Mira dialogue review/evaluation workflow, comparing Mira-generated motivational interviewing responses against human-interviewer responses in a blinded study. The interface is designed for two reviewer roles:
+The project supports the CTSI Mira dialogue review/evaluation workflow, comparing Mira-generated motivational interviewing responses against human-interviewer responses in a blinded study. The interface has three roles:
 
-- **Parent reviewers** — rate each response on a 7-point agreement scale across appropriateness, harm, clarity, sense-making, responsibility, and empathy.
-- **Expert reviewers** — answer yes / no / unsure on medical safety, accuracy, and relevance, with optional safety notes.
-- **Researchers** — monitor reviewer progress, inter-rater agreement, preferred-response distributions, and (post-hoc) source comparisons.
+- **Parent reviewers** — rate each response on a 7-point agreement scale across appropriateness, harm, sense-making, clarity, responsibility, and empathy.
+- **Expert reviewers** — answer yes / no / unsure on medical safety, accuracy, and relevance, with optional per-response safety notes.
+- **Researchers** — monitor reviewer progress, inter-rater agreement, preferred-response distributions, parent-vs-expert breakdowns, and (post-hoc) source comparisons; administer user accounts.
 
-Reviewers are **not** asked to guess which response is human vs Mira. Source identification is an optional researcher-only analysis, not a reviewer task.
+Reviewers are **not** asked to guess which response is human vs Mira. Source identification is a researcher-only post-hoc analysis, not a reviewer task.
 
 ## Pages
 
-### `/` — Review
-The main scoring screen for a single review item.
-- Parent Concern + barrier category badge.
-- Prior Dialogue Context (expanded by default).
-- Side-by-side blinded Response A / Response B cards.
-- Role-appropriate rubric (parent 7-point or expert yes/no/unsure + safety notes).
-- Preferred response selection (A, B, neither, too similar).
-- Free-text reviewer comments.
-- Optional Dialogue Preview panel: a "Preview in dialogue context" affordance on each response shows how the response might land with a simulated parent reply. This preview is clearly separated from the review stimulus, is not scored, and uses no live AI.
-- Save draft / Submit.
+Routes are file-based under `src/routes/`. Access is enforced in `AuthGate` (`src/routes/__root.tsx`).
 
-### `/progress` — Progress Tracker
-Personal progress view for an individual reviewer across the 35-item review set, grouped by HPV barrier category, with completion status and per-item ratings summary.
+### Public / auth
 
-### `/dashboard` — Research Dashboard
-Aggregate metrics across all parent and expert reviewers: completion, preferred-response distribution, parent rubric means, expert safety/accuracy/relevance pass rates, barrier-category summaries, and export mockups.
+- **`/login`** — role-picker sign-in. User selects Parent Reviewer, Expert Reviewer, or Researcher/Admin. Mock auth: no password; sets `mira:loggedIn` and `mira:reviewerRole` in localStorage. Redirects to `/about` (parent/expert) or `/dashboard` (researcher).
+
+### Parent / Expert reviewer
+
+- **`/about`** — landing/onboarding page. Explains the 3-step review process, role-specific rubric summary, and embeds an overview video. First page shown post-login for parent/expert reviewers.
+- **`/`** — Review screen (`DialogueReview`). One item at a time: parent concern + barrier category, prior dialogue context, side-by-side blinded Response A / Response B, role-appropriate rubric, preferred-response picker, free-text comments, optional "Preview in dialogue context" simulated exchange, Save Draft, Submit.
+- **`/progress`** — reviewer's own progress across the 35-item review set: completion count, drafts saved, items grouped by HPV barrier category, paginated item table with status and preferred-response selection.
+
+### Researcher / Admin
+
+- **`/dashboard`** — aggregate research dashboard. Two tabs (Overall Summary, By Parent Concern), reviewer-group filter (All / Parents / Experts), radar and bar charts of construct means by source × reviewer type, preference distribution pie, category results table, mock CSV/JSON exports.
+- **`/users`** — full user roster (reviewers + researchers) with filter toggle. Each row has a Manage gear that opens the **Manage User** dialog (edit name, change account type, reset reviews, send password reset, delete account).
+- **`/reviewers/$reviewerId`** — per-reviewer progress detail (same shape as `/progress` but for a chosen reviewer).
+- **`/reviews/$reviewerId/$itemId`** — researcher view of a single submitted review. Response cards are unblinded (true source visible), full rubric table, reviewer comments, collapsible research metadata (transcript id, turn number, model version, seed).
+- **`/api-docs/*`** — in-app REST API documentation with sidebar: Overview, Database Schema (Mermaid ERD), Auth, Account (self-service), Users (admin), Dialogues, Reviews, Progress, Metrics.
+
+### Global (all roles)
+
+- **Edit Account dialog** — accessible from the role badge in the top NavBar. Self-service edit display name, send password reset, reset reviews. Does not expose account deletion (that lives in the researcher-only Manage User dialog).
 
 ## Tech Stack
 
-- **Framework**: TanStack Start (v1) with React 19 and Vite 7.
-- **Routing**: File-based routing in `src/routes/` (`__root.tsx`, `index.tsx`, `progress.tsx`, `dashboard.tsx`).
-- **Styling**: Tailwind CSS v4 with semantic design tokens defined in `src/styles.css`.
+- **Framework**: TanStack Start v1 with React 19 and Vite 7.
+- **Routing**: File-based routing in `src/routes/`. Route tree auto-generated to `src/routeTree.gen.ts` — do not edit by hand.
+- **Styling**: Tailwind CSS v4 with semantic design tokens in `src/styles.css`.
 - **UI**: shadcn/ui components (Radix primitives) under `src/components/ui/`.
 - **Charts**: Recharts (used on the dashboard).
-- **State**: Local React state; mock data only — no backend.
+- **Diagrams**: Mermaid (rendered in the API Docs schema page).
+- **State**: Local React state + localStorage for the mock auth session. All domain data is mocked in `src/data/` — no backend.
 
 ## Project Structure
 
 ```
 src/
   routes/
-    __root.tsx          # Root layout, includes top NavBar + Outlet
-    index.tsx           # Review page (/)
-    progress.tsx        # Progress Tracker (/progress)
-    dashboard.tsx       # Research Dashboard (/dashboard)
+    __root.tsx                              # Root layout, AuthGate, NavBar, footer
+    login.tsx                               # /login
+    about.tsx                               # /about
+    index.tsx                               # / (Review)
+    progress.tsx                            # /progress
+    dashboard.tsx                           # /dashboard
+    users.tsx                               # /users (+ ManageUserDialog)
+    reviewers.$reviewerId.tsx               # /reviewers/:id
+    reviews.$reviewerId.$itemId.tsx         # /reviews/:reviewerId/:itemId
+    api-docs.tsx                            # /api-docs shell + sidebar
+    api-docs.index.tsx                      # /api-docs (Overview)
+    api-docs.schema.tsx                     # /api-docs/schema
+    api-docs.auth.tsx                       # /api-docs/auth
+    api-docs.account.tsx                    # /api-docs/account
+    api-docs.users.tsx                      # /api-docs/users
+    api-docs.dialogues.tsx                  # /api-docs/dialogues
+    api-docs.reviews.tsx                    # /api-docs/reviews
+    api-docs.progress.tsx                   # /api-docs/progress
+    api-docs.metrics.tsx                    # /api-docs/metrics
   components/
-    mira/               # Domain components
-      NavBar.tsx              # Top navigation across the three pages
-      Header.tsx              # Review page header
-      DialogueContext.tsx     # Client utterance context block
-      DialogueReview.tsx      # Review page container + state
-      ResponseComparison.tsx  # Side-by-side response cards
-      ResponseCard.tsx           # Single response card + "Preview in dialogue context"
-      DialoguePreviewPanel.tsx   # Optional separated preview area (not scored)
-      RubricRating.tsx        # Per-criterion rating controls
-      ReviewerComments.tsx    # Free-text comments
-      ReviewActions.tsx       # Submit / navigation actions
-      ResearchMetadata.tsx
-      SubmittedState.tsx
-    ui/                 # shadcn/ui primitives
+    mira/                                   # Domain components
+      NavBar.tsx                            # Top navigation, role-filtered links, account dropdown
+      EditAccountDialog.tsx                 # Self-service edit account modal
+      Header.tsx                            # Review page header (Item X of 35, prev/next)
+      InstructionPanel.tsx                  # Role-sensitive collapsible instructions
+      DialogueContext.tsx                   # Prior dialogue turns + simulated exchange preview
+      DialogueReview.tsx                    # Review page container + state machine
+      ResponseComparison.tsx                # Side-by-side response cards
+      ResponseCard.tsx                      # Single response card + "Preview in dialogue context"
+      RubricRating.tsx                      # ParentRubric (7-pt Likert) + ExpertRubric (yes/no/unsure + notes)
+      PreferredResponse.tsx                 # A / B / neither / too_similar picker
+      ReviewerComments.tsx                  # Free-text comments
+      ReviewActions.tsx                     # Save Draft / Submit
+      SubmittedState.tsx                    # Post-submit confirmation + Next item
+      ResearchMetadata.tsx                  # Researcher-only collapsible meta block
+      ApiEndpoint.tsx                       # Reusable endpoint doc card
+      Mermaid.tsx                           # Client-side Mermaid renderer
+    ui/                                     # shadcn/ui primitives
   data/
-    dialogues.ts        # Mock dialogue scenarios + rubric criteria
-    mockProgress.ts     # Mock per-reviewer progress + aggregate data
-  styles.css            # Tailwind v4 + design tokens
-  router.tsx            # Router setup
+    dialogues.ts                            # DialogueItem type, 5 authored items, rubric criteria, TOTAL_REVIEW_ITEMS=35
+    mockProgress.ts                         # ReviewItemProgress, Reviewer, 16 reviewers, 35 items, aggregate data helpers
+    schemaErd.ts                            # Mermaid ERD string for the proposed backend schema
+  lib/
+    auth.ts                                 # Mock auth (localStorage + event bus), useAuth()
+    reviewerRole.ts                         # ReviewerRole type, ROLE_LABEL, useReviewerRole()
+  styles.css                                # Tailwind v4 + design tokens
+  router.tsx                                # Router setup
 ```
+
+## Auth Model (mock)
+
+Auth is fully mocked with no network call.
+
+- `loginAs(role)` writes `mira:loggedIn = "1"` and `mira:reviewerRole = <role>` to localStorage and dispatches a `mira:auth-change` event.
+- `useAuth()` (`src/lib/auth.ts`) returns `{ isLoggedIn, role }` and subscribes to both the custom event and the browser `storage` event so multi-tab sign-in stays in sync.
+- `AuthGate` in `src/routes/__root.tsx` runs on every navigation and enforces role-based access: parent/expert are redirected off researcher-only pages; researchers are redirected off reviewer-only pages; unauthenticated users are always sent to `/login`.
+
+Roles: `parent`, `expert`, `researcher`. There is no separate `admin` role — researcher covers admin actions.
 
 ## Data Model (mock)
 
-All data is currently mocked in `src/data/`. Key shapes:
+All domain data lives in `src/data/`.
 
-- **Dialogue** — client utterance + two candidate responses (A/B) + rubric criteria.
-- **DialogueProgress** — per-dialogue review state: completion, selected stronger response, average grades, true source (A/B = human/ai), and reviewer source guesses.
-- **Reviewer** — anonymized reviewer with derived metrics: completion %, average grade, source-identification accuracy, picked-human / picked-ai counts.
+- **`DialogueItem`** (`dialogues.ts`) — `{ id, reviewSet, barrierCategory, parentConcern, priorDialogue?, responseA, responseB, meta }`. `responseA.source` / `responseB.source` are `"human" | "mira"` and are never rendered in the reviewer UI. `meta` carries `transcriptId`, `turnNumber`, `miraModelVersion`, `generationDate`, `randomizationSeed` — shown to researchers in `ResearchMetadata`.
+- **`PARENT_STATEMENTS`** (6 items, 7-point Likert) and **`EXPERT_QUESTIONS`** (3 items, yes/no/unsure) — the two rubric sets.
+- **`TOTAL_REVIEW_ITEMS = 35`** — 5 fully authored + 30 procedurally generated in `mockProgress.ts`.
+- **`ReviewItemProgress`** (`mockProgress.ts`) — per-item state: `preferred`, `avgA`, `avgB`, `sourceA`, `sourceB`, `status: "completed" | "draft" | "not_started"`.
+- **`Reviewer`** — `{ id, name, type: "parent" | "expert", assigned, completed, meanParentScore, expertYesRate }`. 16 reviewers seeded with animal names for anonymity.
+- Researcher accounts are declared inline in `src/routes/users.tsx` (`RESEARCHERS`).
+- Dashboard aggregates: `CONSTRUCT_MEANS_BY_SOURCE`, `SOURCE_MEANS`, `PREFERENCE_DISTRIBUTION`, `CATEGORY_RESULTS`, plus helpers `summarizeProgress` and `reviewerSummary`.
 
-Helpers `summarizeProgress` and `reviewerAverages` compute the aggregates rendered on the Progress Tracker and Research Dashboard.
+The in-app **Save Draft** and **Submit** buttons update React state only — nothing persists across a page refresh.
 
 ## Development
 
@@ -92,208 +137,133 @@ bun run lint     # eslint
 
 ## How it works
 
-The diagram below shows the current mock-data flow (solid lines) alongside how the same flow would operate when wired to a real backend with authenticated users and a randomized dialogue queue (dashed lines).
-
 ```mermaid
 flowchart TD
-    Reviewer([Reviewer])
+    User([User])
 
     subgraph Client["Client (TanStack Start app)"]
-        ReviewPage["/ Review page"]
-        ProgressPage["/progress Tracker"]
-        DashboardPage["/dashboard Research Dashboard"]
+        Login["/login"]
+        About["/about"]
+        Review["/ Review"]
+        Progress["/progress"]
+        Dashboard["/dashboard"]
+        Users["/users"]
+        ReviewerDetail["/reviewers/:id"]
+        ReviewDetail["/reviews/:id/:itemId"]
+        ApiDocs["/api-docs/*"]
     end
 
     subgraph Mock["Current: mock data"]
+        AuthLib["src/lib/auth.ts<br/>localStorage session"]
         Dialogues["src/data/dialogues.ts"]
         ProgressData["src/data/mockProgress.ts"]
     end
 
     subgraph Real["Future: real backend"]
-        Auth["Auth (reviewer login)"]
+        Auth["Auth (login + JWT)"]
         API["Server functions / API"]
-        DB[("Database<br/>dialogues • responses<br/>reviews • reviewers")]
+        DB[("Database<br/>reviewers • dialogues • responses<br/>assignments • reviews • rubric_scores<br/>audit_log • simulated_exchanges")]
         Sampler["Randomized dialogue<br/>sampler / assignment"]
-        Aggregator["Aggregation jobs<br/>(KPIs, accuracy, agreement)"]
+        Aggregator["Aggregation jobs<br/>(KPIs, agreement, exports)"]
     end
 
-    Reviewer --> ReviewPage
-    Reviewer --> ProgressPage
-    Reviewer --> DashboardPage
+    User --> Login
+    Login --> About
+    Login --> Dashboard
+    About --> Review
+    Review --> Progress
+    Dashboard --> Users
+    Dashboard --> ReviewerDetail
+    ReviewerDetail --> ReviewDetail
+    Dashboard --> ApiDocs
 
-    ReviewPage --> Dialogues
-    ProgressPage --> ProgressData
-    DashboardPage --> ProgressData
+    Login --> AuthLib
+    Review --> Dialogues
+    Progress --> ProgressData
+    Dashboard --> ProgressData
+    Users --> ProgressData
 
-    Reviewer -.-> Auth
+    User -.-> Auth
     Auth -.-> API
-    ReviewPage -.->|fetch next assignment| API
+    Review -.->|fetch next assignment| API
     API -.-> Sampler
     Sampler -.->|unseen, position-shuffled assignment| DB
-    ReviewPage -.->|submit ratings, preferred, comments| API
+    Review -.->|submit ratings, preferred, comments| API
     API -.->|persist review| DB
-    ProgressPage -.->|reviewer's own progress| API
-    DashboardPage -.->|aggregate metrics| Aggregator
+    Progress -.->|reviewer's own progress| API
+    Dashboard -.->|aggregate metrics| Aggregator
+    Users -.->|admin actions| API
     Aggregator -.-> DB
     API -.-> DB
 ```
 
 ### From mock to real
 
-- **Dialogues** — replace `src/data/dialogues.ts` with a `dialogues` + `responses` table; the Review page fetches the next assignment via a server function instead of indexing a static array.
-- **Randomization** — a sampler assigns each reviewer an unseen, order-randomized pair (Response A/B shuffled per view) so source position can't bias ratings.
-- **Users** — add authentication so each reviewer has an identity; reviews are written with `reviewer_id` and progress/dashboard queries scope to the logged-in user (or aggregate across all reviewers for researchers).
-- **Submissions** — `ReviewActions` "Submit" calls a server function that writes a `reviews` row (rubric ratings, preferred-response choice, comments) instead of local component state. Reviewers do not submit source guesses.
-- **Analytics** — the Research Dashboard reads from aggregation queries/materialized views (completion %, preferred-response distribution, parent rubric means, expert pass rates, inter-rater agreement) instead of `summarizeProgress` over mock arrays. Source comparisons are computed post-hoc from the hidden `responses.source` column.
+- **Auth** — replace `src/lib/auth.ts` with real login: `POST /v1/auth/login` returns a bearer JWT; `useAuth()` reads it from a secure store; `AuthGate` reads role from the token claims.
+- **Dialogues** — replace `src/data/dialogues.ts` with a `dialogues` + `responses` table; the Review page fetches the next assignment (`GET /v1/dialogues/next`) instead of indexing a static array.
+- **Randomization** — a sampler assigns each reviewer an unseen, order-randomized pair (`assignments.position_shuffle`) so source position can't bias ratings.
+- **Draft + submit** — Save Draft POSTs to `/v1/reviews/draft`; Submit POSTs to `/v1/reviews`. Both write to the same `reviews` row, differentiated by `status`.
+- **Progress** — `/progress` and `/reviewers/:id` read from `GET /v1/me/progress` and `GET /v1/reviewers/:id/progress`.
+- **Dashboard** — reads from `/v1/metrics/*` (overview, preferred-distribution, by-category, by-item, inter-rater-agreement, export) computed from aggregation queries / materialized views. Source comparisons are computed post-hoc from the hidden `responses.source` column.
+- **Users admin** — the Manage User dialog on `/users` maps to `PATCH /v1/users/:id`, `POST /v1/users/:id/reset-reviews`, `POST /v1/users/:id/password-reset`, `DELETE /v1/users/:id`.
+- **Edit Account** — the self-service dialog in the top nav maps to `PATCH /v1/me/account`, `POST /v1/me/password-reset`, `POST /v1/me/reset-reviews`.
 
 ## Data Model (proposed real backend)
 
-The tables below are what a real backend would persist. Sample rows are illustrative JSON, not literal SQL.
-
-### Schema diagram
-
-```mermaid
-erDiagram
-    REVIEWERS ||--o{ ASSIGNMENTS : "is assigned"
-    REVIEWERS ||--o{ AUDIT_LOG : "acts in"
-    REVIEWERS ||--o{ SIMULATED_EXCHANGES : "triggers"
-    DIALOGUES ||--o{ RESPONSES : "has 2"
-    DIALOGUES ||--o{ ASSIGNMENTS : "appears in"
-    DIALOGUES ||--o{ SIMULATED_EXCHANGES : "simulated in"
-    RESPONSES ||--o{ SIMULATED_EXCHANGES : "sent as"
-    ASSIGNMENTS ||--o| REVIEWS : "produces"
-    REVIEWS ||--o{ RUBRIC_SCORES : "contains"
-    RUBRIC_CRITERIA ||--o{ RUBRIC_SCORES : "scored by"
-
-    REVIEWERS {
-        uuid id PK
-        text email
-        text display_name
-        enum role
-        text credentials
-        timestamptz created_at
-        timestamptz last_active_at
-    }
-    DIALOGUES {
-        text id PK
-        text review_set
-        text scenario
-        jsonb turns
-        timestamptz created_at
-    }
-    RESPONSES {
-        uuid id PK
-        text dialogue_id FK
-        text title
-        text body
-        enum source
-        text model_name
-        uuid author_id FK
-    }
-    ASSIGNMENTS {
-        uuid id PK
-        uuid reviewer_id FK
-        text dialogue_id FK
-        bool position_shuffle
-        timestamptz assigned_at
-        timestamptz due_at
-    }
-    REVIEWS {
-        uuid id PK
-        uuid assignment_id FK
-        enum role
-        enum preferred
-        text comments
-        text expert_notes_a
-        text expert_notes_b
-        timestamptz submitted_at
-    }
-    RUBRIC_SCORES {
-        uuid id PK
-        uuid review_id FK
-        enum response_label
-        text criterion FK
-        int score_1_to_7
-        enum expert_answer
-    }
-    RUBRIC_CRITERIA {
-        text name PK
-        text description
-        int display_order
-        bool active
-    }
-    AUDIT_LOG {
-        uuid id PK
-        uuid actor_id FK
-        text action
-        text entity
-        text entity_id
-        timestamptz at
-        jsonb meta
-    }
-    SIMULATED_EXCHANGES {
-        uuid id PK
-        uuid reviewer_id FK
-        text dialogue_id FK
-        uuid sent_response_id FK
-        enum sent_label
-        text simulated_parent_reply
-        text generator
-        timestamptz created_at
-    }
-```
-
-
+The tables below are what a real backend would persist. Sample rows are illustrative JSON, not literal SQL. The authoritative Mermaid ERD lives in `src/data/schemaErd.ts` and is rendered in the app at `/api-docs/schema`.
 
 ### `reviewers`
 Authenticated raters and researchers. One row per user account.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `email` | text unique | login identity |
-| `display_name` | text | shown in researcher views |
-| `role` | enum(`reviewer`,`researcher`,`admin`) | RBAC |
+| `display_name` | text | shown in researcher views and Edit Account |
+| `role` | enum(`parent`,`expert`,`researcher`) | drives route access and rubric type |
 | `credentials` | text | e.g. "LCSW, 8 yrs MI" |
 | `created_at` | timestamptz | |
 | `last_active_at` | timestamptz | |
+
 ```json
 { "id": "r_8f2…", "email": "j.doe@uni.edu", "display_name": "J. Doe",
-  "role": "reviewer", "credentials": "LCSW", "last_active_at": "2026-06-08T14:02:11Z" }
+  "role": "expert", "credentials": "LCSW", "last_active_at": "2026-06-08T14:02:11Z" }
 ```
 
 ### `dialogues`
-A client utterance scenario. Turns are stored inline as JSON since they're read together.
+A parent-concern scenario in a specific HPV barrier category. Turns are stored inline as JSON since they're read together.
+
 | column | type | notes |
 |---|---|---|
 | `id` | text (pk) | e.g. `MIRA-014` |
-| `review_set` | text | "Pilot Set B" |
-| `scenario` | text | one-line summary |
-| `turns` | jsonb | `[{ "speaker": "parent", "text": "…" }]` |
+| `review_set` | text | "Pilot Set A" |
+| `barrier_category` | enum | one of the 5 HPV barrier categories |
+| `parent_concern` | text | the parent's stated concern |
+| `turns` | jsonb | `[{ "speaker": "parent" \| "clinician", "text": "…" }]` |
+| `transcript_id` | text | source transcript reference |
+| `turn_number` | int | which turn in the source transcript |
+| `mira_model_version` | text | e.g. `mira-v0.4.1` |
+| `generation_date` | date | when the MIRA response was generated |
+| `randomization_seed` | int | seed used for A/B shuffle |
 | `created_at` | timestamptz | |
-```json
-{ "id": "MIRA-014", "review_set": "Pilot Set B",
-  "scenario": "Parent uncertain about ADHD medication.",
-  "turns": [{ "speaker": "parent", "text": "I just don't know…" }] }
-```
 
 ### `responses`
 Two candidate counselor responses per dialogue. `source` is ground truth; never returned to reviewers.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `dialogue_id` | fk → dialogues | |
-| `title` | text | "Response 1" |
-| `text` | text | response body |
+| `body` | text | response body |
 | `source` | enum(`human`,`mira`) | hidden from reviewers; researcher-only |
 | `model_name` | text null | e.g. `mira-v0.4.1`, null if human |
 | `author_id` | uuid null | fk → clinicians, null if Mira-generated |
-```json
-{ "id": "rsp_…", "dialogue_id": "MIRA-014", "title": "Response A",
-  "text": "It sounds like…", "source": "mira", "model_name": "mira-v0.4.1" }
-```
+
+The A/B *label* shown to a reviewer is derived per assignment from `assignments.position_shuffle`, not stored on the response.
 
 ### `assignments`
 Which dialogues are queued for which reviewer, and how A/B were shuffled.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
@@ -302,61 +272,58 @@ Which dialogues are queued for which reviewer, and how A/B were shuffled.
 | `position_shuffle` | bool | `true` = response B shown as A |
 | `assigned_at` | timestamptz | |
 | `due_at` | timestamptz null | |
-```json
-{ "id": "asg_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
-  "position_shuffle": true, "assigned_at": "2026-06-01T09:00:00Z" }
-```
 
 ### `reviews`
-One row per submitted review. Rubric scores live in a child table. Reviewers do not submit source guesses.
+One row per assignment. Rubric scores live in a child table. Reviewers do not submit source guesses.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `assignment_id` | fk unique | |
 | `role` | enum(`parent`,`expert`) | which rubric was used |
-| `preferred` | enum(`A`,`B`,`neither`,`too_similar`) | preferred response |
+| `status` | enum(`draft`,`submitted`) | Save Draft writes `draft`; Submit writes `submitted` |
+| `preferred` | enum(`A`,`B`,`neither`,`too_similar`) null | required on submit, optional on draft |
 | `comments` | text | free-text |
 | `expert_notes_a` | text null | safety notes for A (expert role only) |
 | `expert_notes_b` | text null | safety notes for B (expert role only) |
-| `submitted_at` | timestamptz | |
-```json
-{ "id": "rev_…", "assignment_id": "asg_…", "role": "parent",
-  "preferred": "A", "comments": "A reflects feeling better.",
-  "submitted_at": "2026-06-02T17:23:09Z" }
-```
+| `submitted_at` | timestamptz null | set when status transitions to `submitted` |
+| `updated_at` | timestamptz | last modification |
 
 ### `rubric_scores`
 Per-criterion score for each response within a review. Parent rows use `score_1_to_7`; expert rows use `expert_answer`.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
 | `review_id` | fk | |
-| `response_label` | enum(`A`,`B`) | |
+| `response_label` | enum(`A`,`B`) | label as shown to this reviewer |
 | `criterion` | text | fk → rubric_criteria.name |
 | `score_1_to_7` | int (1–7) null | parent agreement score |
 | `expert_answer` | enum(`yes`,`no`,`unsure`) null | expert binary judgment |
-```json
-{ "review_id": "rev_…", "response_label": "A",
-  "criterion": "This response shows empathy.", "score_1_to_7": 6 }
-```
 
 ### `rubric_criteria`
-Editable list of rubric items so researchers can revise without a deploy.
-```json
-{ "id": "c_emp", "name": "Empathy", "description": "…",
-  "display_order": 1, "active": true }
-```
+Editable list of rubric items so researchers can revise without a deploy. The `type` column enforces that parent statements are only scored by parents and expert questions only by experts.
+
+| column | type | notes |
+|---|---|---|
+| `name` | text (pk) | e.g. "This response shows empathy." |
+| `type` | enum(`parent`,`expert`) | which rubric this criterion belongs to |
+| `description` | text | |
+| `display_order` | int | |
+| `active` | bool | |
 
 ### `audit_log`
-Append-only trail of edits (re-opening reviews, admin overrides).
+Append-only trail of admin actions (rename, role change, password reset, review reset, account deletion) and review re-opens. Powered by the Manage User dialog on `/users` and the Edit Account dialog in the top nav.
+
 ```json
-{ "actor_id": "r_admin", "action": "review.reopen",
-  "entity": "reviews", "entity_id": "rev_…", "at": "2026-06-03T10:00:00Z",
-  "meta": { "reason": "Reviewer flagged misclick." } }
+{ "actor_id": "r_admin", "action": "user.reset_reviews",
+  "entity": "reviewers", "entity_id": "r_8f2…", "at": "2026-06-03T10:00:00Z",
+  "meta": { "reviews_deleted": 8, "drafts_deleted": 2 } }
 ```
 
 ### `simulated_exchanges`
-Optional record of the in-app **Optional Dialogue Preview** ("Preview in dialogue context"). When a reviewer previews a response, the chosen response is shown in a separate preview panel with a simulated parent reply. Only the most recent preview per (reviewer, dialogue) is kept, so a new preview overwrites the previous row. This table is research-only and is **not** part of the formal review.
+Optional record of the in-app **"Preview in dialogue context"** action. When a reviewer previews a response, the chosen response is shown alongside a simulated parent reply. Only the most recent preview per (reviewer, dialogue) is kept. Research-only; **not** part of the formal review.
+
 | column | type | notes |
 |---|---|---|
 | `id` | uuid (pk) | |
@@ -367,12 +334,6 @@ Optional record of the in-app **Optional Dialogue Preview** ("Preview in dialogu
 | `simulated_parent_reply` | text | template- or model-generated parent turn (no live AI in the prototype) |
 | `generator` | text | e.g. `template-v1` |
 | `created_at` | timestamptz | |
-```json
-{ "id": "sim_…", "reviewer_id": "r_8f2…", "dialogue_id": "MIRA-014",
-  "sent_response_id": "rsp_7710", "sent_label": "A",
-  "simulated_parent_reply": "Hmm, that actually makes me feel a little better.",
-  "generator": "template-v1", "created_at": "2026-06-08T14:05:22Z" }
-```
 
 ### Randomization & assignment rules
 
@@ -380,11 +341,11 @@ Optional record of the in-app **Optional Dialogue Preview** ("Preview in dialogu
 - **A/B position shuffle**: `assignments.position_shuffle` randomizes which response appears as A vs B so source position can't bias ratings.
 - **Balanced source mix**: the sampler tries to keep ~50/50 human-A vs human-B across each reviewer's queue. Source identity is hidden from reviewers.
 - **Overlap dialogues**: a configurable subset is assigned to every reviewer so inter-rater agreement can be computed.
-- **Optional dialogue previews**: not part of the formal review record. They are excluded from rubric scoring and aggregate review metrics.
+- **Simulated exchanges**: excluded from rubric scoring and aggregate review metrics.
 
 ### Prototype boundary
 
-This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, authentication, or production data storage. The Optional Dialogue Preview uses canned parent replies and is purely illustrative.
+This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, real authentication, or production data storage. The "Preview in dialogue context" panel uses canned parent replies and is purely illustrative. Password reset, review reset, and account deletion in both the Edit Account and Manage User dialogs show a toast but do not persist any change.
 
 See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
 
@@ -393,5 +354,3 @@ See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface 
 - No backend is wired up; all reviewer/dialogue data is mock data for design and prototyping.
 - Routes are auto-registered by the TanStack Router Vite plugin — do not edit `src/routeTree.gen.ts` by hand.
 - The Progress Tracker intentionally surfaces completed rows first so the design team can preview the populated state.
-
-

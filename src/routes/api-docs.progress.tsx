@@ -49,7 +49,7 @@ function ProgressDocs() {
       <ApiEndpoint
         method="GET"
         path="/v1/reviewers/:id/progress"
-        summary="Same shape as /me/progress for any reviewer. Researcher/admin only."
+        summary="Same shape as /me/progress for any reviewer. Researcher only."
         auth="researcher"
         responseExample={{
           reviewer: { id: "r_8f2a3b", display_name: "J. Doe", role: "parent" },

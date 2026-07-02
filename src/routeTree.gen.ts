@@ -25,6 +25,7 @@ import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
 import { Route as ApiDocsMetricsRouteImport } from './routes/api-docs.metrics'
 import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogues'
 import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
+import { Route as ApiDocsAccountRouteImport } from './routes/api-docs.account'
 import { Route as ReviewsReviewerIdItemIdRouteImport } from './routes/reviews.$reviewerId.$itemId'
 
 const UsersRoute = UsersRouteImport.update({
@@ -107,6 +108,11 @@ const ApiDocsAuthRoute = ApiDocsAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => ApiDocsRoute,
 } as any)
+const ApiDocsAccountRoute = ApiDocsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
 const ReviewsReviewerIdItemIdRoute = ReviewsReviewerIdItemIdRouteImport.update({
   id: '/reviews/$reviewerId/$itemId',
   path: '/reviews/$reviewerId/$itemId',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
+  '/api-docs/account': typeof ApiDocsAccountRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
+  '/api-docs/account': typeof ApiDocsAccountRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
+  '/api-docs/account': typeof ApiDocsAccountRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
   '/api-docs/metrics': typeof ApiDocsMetricsRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/progress'
     | '/users'
+    | '/api-docs/account'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/progress'
     | '/users'
+    | '/api-docs/account'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/progress'
     | '/users'
+    | '/api-docs/account'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
     | '/api-docs/metrics'
@@ -355,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsAuthRouteImport
       parentRoute: typeof ApiDocsRoute
     }
+    '/api-docs/account': {
+      id: '/api-docs/account'
+      path: '/account'
+      fullPath: '/api-docs/account'
+      preLoaderRoute: typeof ApiDocsAccountRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
     '/reviews/$reviewerId/$itemId': {
       id: '/reviews/$reviewerId/$itemId'
       path: '/reviews/$reviewerId/$itemId'
@@ -366,6 +385,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface ApiDocsRouteChildren {
+  ApiDocsAccountRoute: typeof ApiDocsAccountRoute
   ApiDocsAuthRoute: typeof ApiDocsAuthRoute
   ApiDocsDialoguesRoute: typeof ApiDocsDialoguesRoute
   ApiDocsMetricsRoute: typeof ApiDocsMetricsRoute
@@ -377,6 +397,7 @@ interface ApiDocsRouteChildren {
 }
 
 const ApiDocsRouteChildren: ApiDocsRouteChildren = {
+  ApiDocsAccountRoute: ApiDocsAccountRoute,
   ApiDocsAuthRoute: ApiDocsAuthRoute,
   ApiDocsDialoguesRoute: ApiDocsDialoguesRoute,
   ApiDocsMetricsRoute: ApiDocsMetricsRoute,

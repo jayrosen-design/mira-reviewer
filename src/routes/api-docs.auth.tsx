@@ -18,7 +18,7 @@ function AuthDocs() {
       <ApiEndpoint
         method="POST"
         path="/v1/auth/login"
-        summary="Exchange email + password for a bearer JWT."
+        summary="Exchange email + password for a bearer JWT. The reviewer's role determines which pages and endpoints they can access."
         auth="public"
         requestExample={{ email: "j.doe@uni.edu", password: "•••••••••" }}
         responseExample={{
@@ -28,7 +28,7 @@ function AuthDocs() {
             id: "r_8f2a3b",
             email: "j.doe@uni.edu",
             display_name: "J. Doe",
-            role: "reviewer",
+            role: "parent",
           },
         }}
         errors={[
@@ -49,13 +49,13 @@ function AuthDocs() {
       <ApiEndpoint
         method="GET"
         path="/v1/auth/me"
-        summary="Return the authenticated reviewer."
+        summary="Return the authenticated reviewer, including their role (parent, expert, or researcher)."
         auth="reviewer"
         responseExample={{
           id: "r_8f2a3b",
           email: "j.doe@uni.edu",
           display_name: "J. Doe",
-          role: "reviewer",
+          role: "expert",
           credentials: "LCSW, 8 yrs MI",
           created_at: "2026-05-10T12:00:00Z",
         }}
