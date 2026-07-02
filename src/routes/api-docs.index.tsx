@@ -25,10 +25,31 @@ function ApiDocsOverview() {
           would be implemented as TanStack Start server functions and server routes.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          The future backend supports reviewer login, role-based access (parent / expert /
-          researcher), review-item assignment, response randomization, review submission,
-          draft saving, progress tracking, dashboard aggregation, and data export.
+          The future backend supports reviewer login with three distinct roles
+          (<code className="font-mono">parent</code>,{" "}
+          <code className="font-mono">expert</code>,{" "}
+          <code className="font-mono">researcher</code>), role-based route
+          access, review-item assignment, response randomization and blinding,
+          draft saving and review submission, per-reviewer progress tracking,
+          dashboard aggregation with parent-vs-expert breakdowns, researcher
+          administration of user accounts (rename, change role, reset reviews,
+          send password reset, delete account), and self-service account
+          management for every reviewer.
         </p>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card p-5">
+        <h3 className="text-base font-semibold">App surface these endpoints back</h3>
+        <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+          <li><strong className="text-foreground">/login</strong> — role-picker sign-in (Auth).</li>
+          <li><strong className="text-foreground">/about</strong> — onboarding for parent and expert reviewers (static, no API).</li>
+          <li><strong className="text-foreground">/</strong> — Review screen (Dialogues + Reviews).</li>
+          <li><strong className="text-foreground">/progress</strong> — reviewer's own progress (Progress).</li>
+          <li><strong className="text-foreground">/dashboard</strong> — aggregate research dashboard (Metrics).</li>
+          <li><strong className="text-foreground">/users</strong> — researcher user roster and Manage User dialog (Users).</li>
+          <li><strong className="text-foreground">/reviewers/:id</strong> and <strong className="text-foreground">/reviews/:reviewerId/:itemId</strong> — researcher drilldown into a reviewer and one of their reviews (Progress + Reviews).</li>
+          <li><strong className="text-foreground">Edit Account dialog</strong> (top nav) — self-service name change, password reset, review reset (Account).</li>
+        </ul>
       </section>
 
       <section className="rounded-lg border border-border bg-card p-5">
