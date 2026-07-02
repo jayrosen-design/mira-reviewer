@@ -42,26 +42,6 @@ export function NavBar() {
   return (
     <nav className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
-            <RoleIcon className="h-4 w-4" />
-            {ROLE_LABEL[role]}
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
-            <DropdownMenuItem disabled className="opacity-100">
-              <RoleIcon className="mr-2 h-4 w-4" />
-              {ROLE_LABEL[role]}
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         <Link to={role === "researcher" ? "/dashboard" : "/"} className="text-base font-semibold tracking-tight text-primary">
           MIRA Reviewer
         </Link>
@@ -85,6 +65,26 @@ export function NavBar() {
             </li>
           ))}
         </ul>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+            <RoleIcon className="h-4 w-4" />
+            {ROLE_LABEL[role]}
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Signed in as</DropdownMenuLabel>
+            <DropdownMenuItem disabled className="opacity-100">
+              <RoleIcon className="mr-2 h-4 w-4" />
+              {ROLE_LABEL[role]}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </nav>
   );
