@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as IndexRouteImport } from './routes/index'
@@ -26,6 +27,11 @@ import { Route as ReviewsReviewerIdItemIdRouteImport } from './routes/reviews.$r
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/api-docs/auth': typeof ApiDocsAuthRoute
   '/api-docs/dialogues': typeof ApiDocsDialoguesRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api-docs'
     | '/dashboard'
+    | '/login'
     | '/progress'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/login'
     | '/progress'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/'
     | '/api-docs'
     | '/dashboard'
+    | '/login'
     | '/progress'
     | '/api-docs/auth'
     | '/api-docs/dialogues'
@@ -185,6 +197,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  LoginRoute: typeof LoginRoute
   ProgressRoute: typeof ProgressRoute
   ReviewersReviewerIdRoute: typeof ReviewersReviewerIdRoute
   ReviewsReviewerIdItemIdRoute: typeof ReviewsReviewerIdItemIdRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -313,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  LoginRoute: LoginRoute,
   ProgressRoute: ProgressRoute,
   ReviewersReviewerIdRoute: ReviewersReviewerIdRoute,
   ReviewsReviewerIdItemIdRoute: ReviewsReviewerIdItemIdRoute,

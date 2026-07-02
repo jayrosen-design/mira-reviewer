@@ -2,8 +2,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
+  Navigate,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { NavBar } from "@/components/mira/NavBar";
+import { useAuth } from "@/lib/auth";
 
 function NotFoundComponent() {
   return (
@@ -123,9 +126,39 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavBar />
+      <AuthGate />
+    </QueryClientProvider>
+  );
+}
+
+
+function AuthGate() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isLoggedIn, role } = useAuth();
+  const isLogin = pathname === "/login";
+
+  if (!isLoggedIn && !isLogin) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Role-based route access: parents/experts blocked from researcher-only pages.
+  if (isLoggedIn && role && role !== "researcher") {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/api-docs") || pathname.startsWith("/reviewers") || pathname.startsWith("/reviews/")) {
+      return <Navigate to="/" replace />;
+    }
+  }
+  // Researcher blocked from reviewer pages.
+  if (isLoggedIn && role === "researcher") {
+    if (pathname === "/" || pathname === "/progress") {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  return (
+    <>
+      {!isLogin && <NavBar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-    </QueryClientProvider>
+    </>
   );
 }
