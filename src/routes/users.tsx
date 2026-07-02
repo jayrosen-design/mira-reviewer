@@ -233,8 +233,7 @@ function ManageUserDialog({
   const [name, setName] = useState("");
   const [type, setType] = useState<UserType>("parent");
 
-  // Sync form when user changes
-  useMemo(() => {
+  useEffect(() => {
     if (user) {
       setName(user.name);
       setType(user.type);
