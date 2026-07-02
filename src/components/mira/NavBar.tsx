@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditAccountDialog } from "./EditAccountDialog";
-import { Toaster } from "@/components/ui/sonner";
 
 const ALL_LINKS = [
   { to: "/", label: "Review", icon: MessagesSquare, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
