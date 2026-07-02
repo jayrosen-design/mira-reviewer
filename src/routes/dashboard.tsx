@@ -242,25 +242,16 @@ function OverallView({
   const constructRows = CONSTRUCT_MEANS_BY_SOURCE;
   const barData = useMemo(
     () =>
-      constructRows.map((r) => {
-        const humanValues = [
-          group !== "expert" ? r.humanParent : null,
-          group !== "parent" ? r.humanExpert : null,
-        ].filter((v): v is number => v !== null);
-        const miraValues = [
-          group !== "expert" ? r.miraParent : null,
-          group !== "parent" ? r.miraExpert : null,
-        ].filter((v): v is number => v !== null);
-        const avg = (arr: number[]) =>
-          arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
-        return {
-          name: r.short,
-          Human: avg(humanValues),
-          "MIRA agent": avg(miraValues),
-        };
-      }),
-    [constructRows, group],
+      constructRows.map((r) => ({
+        name: r.short,
+        humanParent: r.humanParent,
+        humanExpert: r.humanExpert,
+        miraParent: r.miraParent,
+        miraExpert: r.miraExpert,
+      })),
+    [constructRows],
   );
+
 
   const preferenceData = getAggregatePreference(group);
   const sourceData = getAggregateSourceMeans(group);
@@ -320,7 +311,7 @@ function OverallView({
 
       <section>
         <Card title="Average rating by construct (1–7)">
-          <ConstructBar data={barData} />
+          <ConstructBar data={barData} group={group} />
         </Card>
       </section>
 
@@ -401,9 +392,17 @@ function ByItemView({
 
   const constructRows = useMemo(() => getConstructMeansForItem(item.id), [item.id]);
   const barData = useMemo(
-    () => getConstructBarData(constructRows, group),
-    [constructRows, group],
+    () =>
+      constructRows.map((r) => ({
+        name: r.short,
+        humanParent: r.humanParent,
+        humanExpert: r.humanExpert,
+        miraParent: r.miraParent,
+        miraExpert: r.miraExpert,
+      })),
+    [constructRows],
   );
+
   const preferenceData = useMemo(
     () => getPreferenceForItem(item.id, group),
     [item.id, group],
@@ -495,7 +494,7 @@ function ByItemView({
 
       <section>
         <Card title="Average rating by construct (1–7)">
-          <ConstructBar data={barData} />
+          <ConstructBar data={barData} group={group} />
         </Card>
       </section>
 
@@ -689,9 +688,19 @@ function RadarCard({
 
 function ConstructBar({
   data,
+  group,
 }: {
-  data: Array<{ name: string; Human: number; "MIRA agent": number }>;
+  data: Array<{
+    name: string;
+    humanParent: number;
+    humanExpert: number;
+    miraParent: number;
+    miraExpert: number;
+  }>;
+  group: Group;
 }) {
+  const showParent = group !== "expert";
+  const showExpert = group !== "parent";
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -719,13 +728,32 @@ function ConstructBar({
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Human" fill="var(--primary)" />
-          <Bar dataKey="MIRA agent" fill="var(--accent)" />
+          {showParent && (
+            <Bar dataKey="humanParent" name="Human · Parent" fill="var(--primary)" />
+          )}
+          {showExpert && (
+            <Bar
+              dataKey="humanExpert"
+              name="Human · Expert"
+              fill="oklch(0.72 0.14 250)"
+            />
+          )}
+          {showParent && (
+            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--accent)" />
+          )}
+          {showExpert && (
+            <Bar
+              dataKey="miraExpert"
+              name="MIRA · Expert"
+              fill="oklch(0.78 0.14 45)"
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
 
 
 function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
