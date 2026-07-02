@@ -26,7 +26,7 @@ import {
 import { ReviewerComments } from "./ReviewerComments";
 import { ReviewActions } from "./ReviewActions";
 import { SubmittedState } from "./SubmittedState";
-import { ResearchMetadata } from "./ResearchMetadata";
+
 
 type ReviewState = {
   preferred: Selection;
