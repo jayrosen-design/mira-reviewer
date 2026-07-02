@@ -5,7 +5,7 @@ type Props = {
 
 export function Header({ current, total }: Props) {
   return (
-    <header className="mx-auto max-w-6xl px-6 pt-8">
+    <header className="mx-auto max-w-6xl px-6 pt-8 pb-2">
       <div className="flex items-center gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Dialogue Review
