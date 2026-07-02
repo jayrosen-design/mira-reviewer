@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -10,7 +11,7 @@ type Props = {
   hasNext: boolean;
   itemId?: string;
   barrierCategory?: string;
-  parentConcern?: string;
+  beforeNav?: ReactNode;
 };
 
 export function Header({
@@ -22,7 +23,7 @@ export function Header({
   hasNext,
   itemId,
   barrierCategory,
-  parentConcern,
+  beforeNav,
 }: Props) {
   return (
     <header className="mx-auto max-w-6xl space-y-4 px-6 pt-8 pb-2">
@@ -34,6 +35,8 @@ export function Header({
           Mira Dialogue Review System · Review Item {current} of {total}
         </p>
       </div>
+
+      {beforeNav}
 
       <section className="rounded-lg border border-border bg-card p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -59,3 +62,4 @@ export function Header({
     </header>
   );
 }
+
