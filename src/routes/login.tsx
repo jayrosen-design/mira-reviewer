@@ -43,8 +43,10 @@ const OPTIONS: {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const router = useRouter();
   const { isLoggedIn, role } = useAuth();
   const [selected, setSelected] = useState<ReviewerRole | null>(null);
+  const [signingIn, setSigningIn] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn && role) {
@@ -52,11 +54,28 @@ function LoginPage() {
     }
   }, [isLoggedIn, role, navigate]);
 
-  const handleSignIn = () => {
-    if (!selected) return;
+  // Warm the likely destinations so the target page is ready to paint together
+  // with the navbar the instant we navigate.
+  useEffect(() => {
+    router.preloadRoute({ to: "/" }).catch(() => {});
+    router.preloadRoute({ to: "/dashboard" }).catch(() => {});
+  }, [router]);
+
+  const handleSignIn = async () => {
+    if (!selected || signingIn) return;
+    setSigningIn(true);
+    const to = selected === "researcher" ? "/dashboard" : "/";
+    // Preload the destination route chunk + loader BEFORE flipping auth so the
+    // navbar and the page appear in the same paint.
+    try {
+      await router.preloadRoute({ to });
+    } catch {
+      /* ignore preload errors — we'll still navigate */
+    }
     loginAs(selected);
-    navigate({ to: selected === "researcher" ? "/dashboard" : "/", replace: true });
+    navigate({ to, replace: true });
   };
+
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-4 py-12">
