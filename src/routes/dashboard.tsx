@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -18,7 +18,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Download, FileText, FileJson, Lock } from "lucide-react";
+import {
+  Download,
+  FileText,
+  FileJson,
+  Lock,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -29,16 +36,25 @@ import {
 } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import {
-  CONSTRUCT_MEANS,
   CONSTRUCT_MEANS_BY_SOURCE,
-  SOURCE_MEANS,
-  PREFERENCE_DISTRIBUTION,
   CATEGORY_RESULTS,
   REVIEWERS,
+  REVIEW_ITEMS,
   reviewerSummary,
+  getConstructMeansForItem,
+  getConstructBarData,
+  getPreferenceForItem,
+  getSourceMeansForItem,
+  getItemSummary,
+  getItemReviewCounts,
+  getAggregatePreference,
+  getAggregateSourceMeans,
+  type Group,
 } from "@/data/mockProgress";
 
 export const Route = createFileRoute("/dashboard")({
@@ -48,29 +64,28 @@ export const Route = createFileRoute("/dashboard")({
       {
         name: "description",
         content:
-          "Aggregate review metrics and source comparison summary for the MIRA study.",
+          "Aggregate review metrics and per-item drilldown for the MIRA study.",
       },
     ],
   }),
   component: ResearchDashboardPage,
 });
 
+type View = "overall" | "byItem";
+
 function ResearchDashboardPage() {
-  const summary = useMemo(() => reviewerSummary(REVIEWERS), []);
+  const [group, setGroup] = useState<Group>("all");
+  const [view, setView] = useState<View>("overall");
+  const [selectedItemId, setSelectedItemId] = useState<string>(REVIEW_ITEMS[0].id);
 
-  const constructData = CONSTRUCT_MEANS.map((c) => ({
-    name: c.statement.replace("This response ", "").replace(".", ""),
-    full: c.statement,
-    "Response A": c.responseA,
-    "Response B": c.responseB,
-  }));
-
-  const sourceData = SOURCE_MEANS.map((s) => ({
-    name: s.label,
-    mean: s.mean,
-  }));
-
-  const preferenceData = PREFERENCE_DISTRIBUTION;
+  const filteredReviewers = useMemo(
+    () =>
+      REVIEWERS.filter((r) =>
+        group === "all" ? true : group === "parent" ? r.type === "parent" : r.type === "expert",
+      ),
+    [group],
+  );
+  const summary = useMemo(() => reviewerSummary(filteredReviewers), [filteredReviewers]);
 
   const handleExport = (kind: string) => {
     toast.success(`${kind} export queued`, {
@@ -114,187 +129,37 @@ function ResearchDashboardPage() {
           </div>
         </header>
 
-        <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
-          <KpiCard label="Assigned reviewers" value={summary.reviewers} sub={`${summary.parents} parents · ${summary.experts} experts`} />
-          <KpiCard
-            label="Reviews completed"
-            value={`${summary.totalCompleted.toLocaleString()} / ${summary.totalAssigned.toLocaleString()}`}
-            sub={`${summary.completionRate}% completion rate`}
-          />
-          <KpiCard
-            label="Mean parent score"
-            value={summary.meanParentScore.toFixed(1)}
-            sub="across 6 constructs"
-          />
-          <KpiCard
-            label="Expert 'Yes' rate"
-            value={`${summary.expertYesRate}%`}
-            sub="safe · accurate · relevant"
-          />
-          <KpiCard label="Items in study" value={CATEGORY_RESULTS.reduce((s, c) => s + c.reviewsCompleted, 0)} sub="completed across all reviewers" />
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <RadarCard
-            title="Human-authored — mean parent rating by construct"
-            color="var(--primary)"
-            seriesName="Human"
-            dataKey="human"
-          />
-          <RadarCard
-            title="MIRA-generated — mean parent rating by construct"
-            color="var(--accent)"
-            seriesName="MIRA"
-            dataKey="mira"
-          />
-        </section>
-
-        <section>
-          <Card title="Average parent rating by construct (1–7)">
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={constructData}
-                  margin={{ top: 8, right: 8, left: 0, bottom: 50 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis
-                    dataKey="name"
-                    interval={0}
-                    angle={-20}
-                    textAnchor="end"
-                    height={70}
-                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                  />
-                  <YAxis
-                    domain={[0, 7]}
-                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "var(--muted)" }}
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="Response A" fill="var(--primary)" />
-                  <Bar dataKey="Response B" fill="var(--accent)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-2">
-          <Card title="Source comparison summary (researcher view only)">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={sourceData} margin={{ top: 8, right: 8, left: 0, bottom: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                  />
-                  <YAxis
-                    domain={[0, 7]}
-                    tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "var(--muted)" }}
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar dataKey="mean" name="Mean parent score" fill="var(--primary)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Hidden from participants. Compares blinded responses by true authorship source.
-            </p>
-          </Card>
-
-          <Card title="Preferred response distribution">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={preferenceData}
-                    dataKey="value"
-                    nameKey="label"
-                    innerRadius={55}
-                    outerRadius={95}
-                    paddingAngle={2}
-                  >
-                    {preferenceData.map((entry) => (
-                      <Cell key={entry.label} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: "var(--card)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 6,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </section>
-
-        <section className="rounded-lg border border-border bg-card">
-          <div className="border-b border-border px-5 py-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Results by barrier category
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Aggregate parent score, safety flags, and review volume per category.
-            </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
+          <Tabs value={view} onValueChange={(v) => setView(v as View)}>
+            <TabsList>
+              <TabsTrigger value="overall">Overall Summary</TabsTrigger>
+              <TabsTrigger value="byItem">By Parent Concern</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">Reviewer group</span>
+            <ToggleGroup
+              type="single"
+              size="sm"
+              value={group}
+              onValueChange={(v) => v && setGroup(v as Group)}
+            >
+              <ToggleGroupItem value="all">All</ToggleGroupItem>
+              <ToggleGroupItem value="parent">Parents</ToggleGroupItem>
+              <ToggleGroupItem value="expert">Experts</ToggleGroupItem>
+            </ToggleGroup>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Barrier category</TableHead>
-                <TableHead className="text-right">Mean parent score</TableHead>
-                <TableHead className="text-right">Safety flags</TableHead>
-                <TableHead className="text-right">Reviews completed</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {CATEGORY_RESULTS.map((c) => (
-                <TableRow key={c.category}>
-                  <TableCell className="font-medium text-foreground">
-                    {c.category}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {c.meanScore.toFixed(1)}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {c.safetyFlags > 0 ? (
-                      <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
-                        {c.safetyFlags}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {c.reviewsCompleted}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </section>
+        </div>
+
+        {view === "overall" ? (
+          <OverallView group={group} summary={summary} />
+        ) : (
+          <ByItemView
+            group={group}
+            selectedItemId={selectedItemId}
+            onSelect={setSelectedItemId}
+          />
+        )}
 
         <section className="rounded-lg border border-border bg-card">
           <div className="border-b border-border px-5 py-3">
@@ -316,7 +181,7 @@ function ResearchDashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[...REVIEWERS]
+              {[...filteredReviewers]
                 .sort((a, b) => b.completed - a.completed)
                 .map((r) => {
                   const pct = Math.round((r.completed / r.assigned) * 100);
@@ -365,6 +230,307 @@ function ResearchDashboardPage() {
   );
 }
 
+function OverallView({
+  group,
+  summary,
+}: {
+  group: Group;
+  summary: ReturnType<typeof reviewerSummary>;
+}) {
+  const constructRows = CONSTRUCT_MEANS_BY_SOURCE;
+  const barData = useMemo(
+    () =>
+      constructRows.map((r) => {
+        const humanValues = [
+          group !== "expert" ? r.humanParent : null,
+          group !== "parent" ? r.humanExpert : null,
+        ].filter((v): v is number => v !== null);
+        const miraValues = [
+          group !== "expert" ? r.miraParent : null,
+          group !== "parent" ? r.miraExpert : null,
+        ].filter((v): v is number => v !== null);
+        const avg = (arr: number[]) =>
+          arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
+        return {
+          name: r.short,
+          "Response A": avg(humanValues),
+          "Response B": avg(miraValues),
+        };
+      }),
+    [constructRows, group],
+  );
+  const preferenceData = getAggregatePreference(group);
+  const sourceData = getAggregateSourceMeans(group);
+
+  return (
+    <>
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-5">
+        <KpiCard
+          label="Assigned reviewers"
+          value={summary.reviewers}
+          sub={`${summary.parents} parents · ${summary.experts} experts`}
+        />
+        <KpiCard
+          label="Reviews completed"
+          value={`${summary.totalCompleted.toLocaleString()} / ${summary.totalAssigned.toLocaleString()}`}
+          sub={`${summary.completionRate}% completion rate`}
+        />
+        {group !== "expert" && (
+          <KpiCard
+            label="Mean parent score"
+            value={summary.meanParentScore.toFixed(1)}
+            sub="across 6 constructs"
+          />
+        )}
+        {group !== "parent" && (
+          <KpiCard
+            label="Expert 'Yes' rate"
+            value={`${summary.expertYesRate}%`}
+            sub="safe · accurate · relevant"
+          />
+        )}
+        <KpiCard
+          label="Items in study"
+          value={CATEGORY_RESULTS.reduce((s, c) => s + c.reviewsCompleted, 0)}
+          sub="completed across all reviewers"
+        />
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <RadarCard
+          title="Human-authored — mean rating by construct"
+          data={constructRows}
+          parentKey="humanParent"
+          expertKey="humanExpert"
+          color="var(--primary)"
+          group={group}
+        />
+        <RadarCard
+          title="MIRA-generated — mean rating by construct"
+          data={constructRows}
+          parentKey="miraParent"
+          expertKey="miraExpert"
+          color="var(--accent)"
+          group={group}
+        />
+      </section>
+
+      <section>
+        <Card title="Average rating by construct (1–7)">
+          <ConstructBar data={barData} />
+        </Card>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <Card title="Source comparison summary (researcher view only)">
+          <SourceBar data={sourceData} />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Hidden from participants. Compares blinded responses by true authorship source.
+          </p>
+        </Card>
+        <Card title="Preferred response distribution">
+          <PreferencePie data={preferenceData} />
+        </Card>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card">
+        <div className="border-b border-border px-5 py-3">
+          <h2 className="text-sm font-semibold text-foreground">
+            Results by barrier category
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Aggregate parent score, safety flags, and review volume per category.
+          </p>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Barrier category</TableHead>
+              <TableHead className="text-right">Mean parent score</TableHead>
+              <TableHead className="text-right">Safety flags</TableHead>
+              <TableHead className="text-right">Reviews completed</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {CATEGORY_RESULTS.map((c) => (
+              <TableRow key={c.category}>
+                <TableCell className="font-medium text-foreground">
+                  {c.category}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {c.meanScore.toFixed(1)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {c.safetyFlags > 0 ? (
+                    <span className="rounded bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
+                      {c.safetyFlags}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">0</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {c.reviewsCompleted}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </section>
+    </>
+  );
+}
+
+function ByItemView({
+  group,
+  selectedItemId,
+  onSelect,
+}: {
+  group: Group;
+  selectedItemId: string;
+  onSelect: (id: string) => void;
+}) {
+  const idx = REVIEW_ITEMS.findIndex((it) => it.id === selectedItemId);
+  const item = REVIEW_ITEMS[idx] ?? REVIEW_ITEMS[0];
+  const prev = () =>
+    onSelect(REVIEW_ITEMS[(idx - 1 + REVIEW_ITEMS.length) % REVIEW_ITEMS.length].id);
+  const next = () => onSelect(REVIEW_ITEMS[(idx + 1) % REVIEW_ITEMS.length].id);
+
+  const constructRows = useMemo(() => getConstructMeansForItem(item.id), [item.id]);
+  const barData = useMemo(
+    () => getConstructBarData(constructRows, group),
+    [constructRows, group],
+  );
+  const preferenceData = useMemo(
+    () => getPreferenceForItem(item.id, group),
+    [item.id, group],
+  );
+  const sourceData = useMemo(
+    () => getSourceMeansForItem(item.id, group),
+    [item.id, group],
+  );
+  const summary = getItemSummary(item.id, group);
+
+  return (
+    <>
+      <section className="rounded-lg border border-border bg-card p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Button variant="outline" size="sm" onClick={prev}>
+            <ChevronLeft className="h-4 w-4" /> Prev
+          </Button>
+          <div className="min-w-0 flex-1 text-center">
+            <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <span className="font-mono">{item.id}</span>
+              <span>·</span>
+              <span>{item.barrierCategory}</span>
+              <span>·</span>
+              <span>
+                {summary.parents} parents / {summary.experts} experts
+              </span>
+            </div>
+            <p className="mt-1 truncate text-sm font-medium text-foreground">
+              "{item.parentConcern}"
+            </p>
+          </div>
+          <Button variant="outline" size="sm" onClick={next}>
+            Next <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </section>
+
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <KpiCard label="Reviews (filtered)" value={summary.reviews} sub={`of ${getItemReviewCounts(item.id).total} total`} />
+        {group !== "expert" && (
+          <KpiCard label="Mean parent score" value={summary.meanParent.toFixed(1)} sub="1–7 scale" />
+        )}
+        {group !== "parent" && (
+          <KpiCard label="Expert 'Yes' rate" value={`${summary.yesRate}%`} sub="safe · accurate · relevant" />
+        )}
+        <KpiCard label="Preferred response" value={summary.preferred} sub="most-picked option" />
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <RadarCard
+          title="Human-authored — mean rating by construct"
+          data={constructRows}
+          parentKey="humanParent"
+          expertKey="humanExpert"
+          color="var(--primary)"
+          group={group}
+        />
+        <RadarCard
+          title="MIRA-generated — mean rating by construct"
+          data={constructRows}
+          parentKey="miraParent"
+          expertKey="miraExpert"
+          color="var(--accent)"
+          group={group}
+        />
+      </section>
+
+      <section>
+        <Card title="Average rating by construct (1–7)">
+          <ConstructBar data={barData} />
+        </Card>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <Card title="Source comparison (this item)">
+          <SourceBar data={sourceData} />
+        </Card>
+        <Card title="Preferred response (this item)">
+          <PreferencePie data={preferenceData} />
+        </Card>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card">
+        <div className="border-b border-border px-5 py-3">
+          <h2 className="text-sm font-semibold text-foreground">Parent concerns</h2>
+          <p className="text-xs text-muted-foreground">
+            Select a row to load its aggregated review data above.
+          </p>
+        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Barrier</TableHead>
+              <TableHead>Parent concern</TableHead>
+              <TableHead className="text-right">Reviews</TableHead>
+              <TableHead className="text-right">Mean</TableHead>
+              <TableHead>Preferred</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {REVIEW_ITEMS.map((it) => {
+              const s = getItemSummary(it.id, group);
+              const isSelected = it.id === item.id;
+              return (
+                <TableRow
+                  key={it.id}
+                  onClick={() => onSelect(it.id)}
+                  className={`cursor-pointer ${isSelected ? "bg-muted" : ""}`}
+                >
+                  <TableCell className="font-mono text-xs">{it.id}</TableCell>
+                  <TableCell className="text-xs">{it.barrierCategory}</TableCell>
+                  <TableCell className="max-w-[24rem] truncate text-sm">
+                    {it.parentConcern}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">{s.reviews}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {s.meanParent.toFixed(1)}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{s.preferred}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </section>
+    </>
+  );
+}
+
 function KpiCard({
   label,
   value,
@@ -377,9 +543,7 @@ function KpiCard({
   return (
     <div className="rounded-lg border border-border bg-card p-4">
       <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">
-        {value}
-      </p>
+      <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">{value}</p>
       {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
     </div>
   );
@@ -396,20 +560,26 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 
 function RadarCard({
   title,
+  data,
+  parentKey,
+  expertKey,
   color,
-  seriesName,
-  dataKey,
+  group,
 }: {
   title: string;
+  data: ReturnType<typeof getConstructMeansForItem>;
+  parentKey: "humanParent" | "miraParent";
+  expertKey: "humanExpert" | "miraExpert";
   color: string;
-  seriesName: string;
-  dataKey: "human" | "mira";
+  group: Group;
 }) {
+  const showParent = group !== "expert";
+  const showExpert = group !== "parent";
   return (
     <Card title={title}>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart data={CONSTRUCT_MEANS_BY_SOURCE} outerRadius="75%">
+          <RadarChart data={data} outerRadius="72%">
             <PolarGrid stroke="var(--border)" />
             <PolarAngleAxis
               dataKey="short"
@@ -421,13 +591,26 @@ function RadarCard({
               tickCount={8}
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             />
-            <Radar
-              name={seriesName}
-              dataKey={dataKey}
-              stroke={color}
-              fill={color}
-              fillOpacity={0.35}
-            />
+            {showParent && (
+              <Radar
+                name="Parent"
+                dataKey={parentKey}
+                stroke={color}
+                fill={color}
+                fillOpacity={0.35}
+              />
+            )}
+            {showExpert && (
+              <Radar
+                name="Expert"
+                dataKey={expertKey}
+                stroke={color}
+                strokeDasharray="4 4"
+                fill={color}
+                fillOpacity={0.15}
+              />
+            )}
+            <Legend wrapperStyle={{ fontSize: 12 }} />
             <Tooltip
               contentStyle={{
                 background: "var(--card)",
@@ -440,5 +623,111 @@ function RadarCard({
         </ResponsiveContainer>
       </div>
     </Card>
+  );
+}
+
+function ConstructBar({
+  data,
+}: {
+  data: Array<{ name: string; "Response A": number; "Response B": number }>;
+}) {
+  return (
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 50 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <XAxis
+            dataKey="name"
+            interval={0}
+            angle={-20}
+            textAnchor="end"
+            height={70}
+            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          />
+          <YAxis
+            domain={[0, 7]}
+            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)" }}
+            contentStyle={{
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
+              fontSize: 12,
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Bar dataKey="Response A" fill="var(--primary)" />
+          <Bar dataKey="Response B" fill="var(--accent)" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
+  return (
+    <div className="h-72">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={data.map((d) => ({ name: d.label, mean: d.mean }))}
+          margin={{ top: 8, right: 8, left: 0, bottom: 20 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <XAxis dataKey="name" tick={{ fontSize: 11, fill: "var(--muted-foreground)" }} />
+          <YAxis
+            domain={[0, 7]}
+            tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
+          />
+          <Tooltip
+            cursor={{ fill: "var(--muted)" }}
+            contentStyle={{
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
+              fontSize: 12,
+            }}
+          />
+          <Bar dataKey="mean" name="Mean score" fill="var(--primary)" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function PreferencePie({
+  data,
+}: {
+  data: Array<{ label: string; value: number; color: string }>;
+}) {
+  return (
+    <div className="h-72">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="label"
+            innerRadius={55}
+            outerRadius={95}
+            paddingAngle={2}
+          >
+            {data.map((entry) => (
+              <Cell key={entry.label} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              borderRadius: 6,
+              fontSize: 12,
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
