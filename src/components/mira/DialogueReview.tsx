@@ -26,7 +26,7 @@ import {
 import { ReviewerComments } from "./ReviewerComments";
 import { ReviewActions } from "./ReviewActions";
 import { SubmittedState } from "./SubmittedState";
-import { ResearchMetadata } from "./ResearchMetadata";
+
 
 type ReviewState = {
   preferred: Selection;
@@ -249,11 +249,6 @@ export function DialogueReview() {
               onChange={(v) => updateReview({ comments: v })}
             />
 
-            <ResearchMetadata
-              item={current}
-              role={role}
-              status={review.status}
-            />
 
             <ReviewActions
               onSaveDraft={handleSaveDraft}

@@ -22,6 +22,7 @@ import {
   AGREEMENT_LABELS,
   DIALOGUES,
 } from "@/data/dialogues";
+import { ResearchMetadata } from "@/components/mira/ResearchMetadata";
 
 export const Route = createFileRoute("/reviews/$reviewerId/$itemId")({
   head: ({ params }) => ({
@@ -197,6 +198,15 @@ function ReviewerItemReviewPage() {
               "{review.comments}"
             </p>
           </section>
+        )}
+
+        {dialogue && (
+          <ResearchMetadata
+            item={dialogue}
+            reviewerId={reviewerId}
+            role="researcher"
+            status={review.status === "completed" ? "submitted" : "draft"}
+          />
         )}
       </main>
     </div>
