@@ -62,11 +62,14 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-primary">
-            MIRA Reviewer
+          <h1 className="text-3xl font-semibold tracking-tight text-primary">
+            MIRA
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Select an account type to continue
+          <p className="mt-1 text-sm font-medium text-foreground">
+            Motivational Interviewing Response Assessment
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Select an account to continue
           </p>
         </div>
 
@@ -109,9 +112,6 @@ function LoginPage() {
           Sign in
         </button>
 
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          No password required — this selection sets your account type for the session.
-        </p>
       </div>
     </div>
   );
