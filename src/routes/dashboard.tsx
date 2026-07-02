@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Bar,
@@ -76,6 +76,8 @@ export const Route = createFileRoute("/dashboard")({
 type View = "overall" | "byItem";
 
 function ResearchDashboardPage() {
+  const navigate = useNavigate();
+
   const [group, setGroup] = useState<Group>("all");
   const [view, setView] = useState<View>("overall");
   const [selectedItemId, setSelectedItemId] = useState<string>(REVIEW_ITEMS[0].id);
@@ -188,7 +190,17 @@ function ResearchDashboardPage() {
                 .map((r) => {
                   const pct = Math.round((r.completed / r.assigned) * 100);
                   return (
-                    <TableRow key={r.id}>
+                    <TableRow
+                      key={r.id}
+                      onClick={() =>
+                        navigate({
+                          to: "/reviewers/$reviewerId",
+                          params: { reviewerId: r.id },
+                        })
+                      }
+                      className="cursor-pointer transition hover:bg-muted/60"
+                    >
+
                       <TableCell>
                         <div className="font-medium text-foreground">{r.name}</div>
                         <div className="font-mono text-xs text-muted-foreground">
