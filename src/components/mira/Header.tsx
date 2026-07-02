@@ -50,11 +50,6 @@ export function Header({
                 Review {current} of {total}
               </span>
             </div>
-            {parentConcern && (
-              <p className="mt-1 truncate text-sm font-medium text-foreground">
-                "{parentConcern}"
-              </p>
-            )}
           </div>
           <Button variant="outline" size="sm" onClick={onNext} disabled={!hasNext}>
             Next <ChevronRight className="h-4 w-4" />

@@ -1,4 +1,5 @@
-import { Info } from "lucide-react";
+import { useState } from "react";
+import { Info, X } from "lucide-react";
 import type { ReviewerRole } from "@/lib/reviewerRole";
 
 const COPY: Record<ReviewerRole, { title: string; body: string }> = {
@@ -18,16 +19,28 @@ const COPY: Record<ReviewerRole, { title: string; body: string }> = {
 
 export function InstructionPanel({ role }: { role: ReviewerRole }) {
   const { title, body } = COPY[role];
+  const [open, setOpen] = useState(true);
+
+  if (!open) return null;
+
   return (
     <section
       aria-label={title}
-      className="flex gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4"
+      className="relative flex gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4 pr-10"
     >
       <Info className="mt-0.5 h-5 w-5 flex-none text-primary" aria-hidden />
       <div>
         <h2 className="text-sm font-semibold text-primary">{title}</h2>
         <p className="mt-1 text-sm leading-relaxed text-foreground/80">{body}</p>
       </div>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        aria-label="Dismiss instructions"
+        className="absolute right-3 top-3 rounded-md p-1 text-muted-foreground transition hover:bg-primary/10 hover:text-primary"
+      >
+        <X className="h-4 w-4" />
+      </button>
     </section>
   );
 }
