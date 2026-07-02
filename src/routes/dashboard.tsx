@@ -688,9 +688,19 @@ function RadarCard({
 
 function ConstructBar({
   data,
+  group,
 }: {
-  data: Array<{ name: string; Human: number; "MIRA agent": number }>;
+  data: Array<{
+    name: string;
+    humanParent: number;
+    humanExpert: number;
+    miraParent: number;
+    miraExpert: number;
+  }>;
+  group: Group;
 }) {
+  const showParent = group !== "expert";
+  const showExpert = group !== "parent";
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">
@@ -718,13 +728,32 @@ function ConstructBar({
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Human" fill="var(--primary)" />
-          <Bar dataKey="MIRA agent" fill="var(--accent)" />
+          {showParent && (
+            <Bar dataKey="humanParent" name="Human · Parent" fill="var(--primary)" />
+          )}
+          {showExpert && (
+            <Bar
+              dataKey="humanExpert"
+              name="Human · Expert"
+              fill="oklch(0.72 0.14 250)"
+            />
+          )}
+          {showParent && (
+            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--accent)" />
+          )}
+          {showExpert && (
+            <Bar
+              dataKey="miraExpert"
+              name="MIRA · Expert"
+              fill="oklch(0.78 0.14 45)"
+            />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
 
 
 function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
