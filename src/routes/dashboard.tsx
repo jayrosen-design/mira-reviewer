@@ -76,6 +76,8 @@ export const Route = createFileRoute("/dashboard")({
 type View = "overall" | "byItem";
 
 function ResearchDashboardPage() {
+  const navigate = useNavigate();
+
   const [group, setGroup] = useState<Group>("all");
   const [view, setView] = useState<View>("overall");
   const [selectedItemId, setSelectedItemId] = useState<string>(REVIEW_ITEMS[0].id);
