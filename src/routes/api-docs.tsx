@@ -4,6 +4,7 @@ const sections = [
   { to: "/api-docs", label: "Overview", exact: true },
   { to: "/api-docs/schema", label: "Database Schema", exact: false },
   { to: "/api-docs/auth", label: "Auth", exact: false },
+  { to: "/api-docs/users", label: "Users", exact: false },
   { to: "/api-docs/dialogues", label: "Dialogues", exact: false },
   { to: "/api-docs/reviews", label: "Reviews", exact: false },
   { to: "/api-docs/progress", label: "Progress", exact: false },
