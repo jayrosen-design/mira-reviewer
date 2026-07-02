@@ -27,7 +27,7 @@ import {
   type ReviewItemProgress,
 } from "@/data/mockProgress";
 
-export const Route = createFileRoute("/dashboard/reviewers/$reviewerId")({
+export const Route = createFileRoute("/reviewers/$reviewerId")({
   head: ({ params }) => ({
     meta: [
       { title: `Reviewer ${params.reviewerId} Progress — MIRA Reviewer` },
