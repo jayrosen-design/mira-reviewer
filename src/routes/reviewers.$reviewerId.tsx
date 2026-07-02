@@ -172,7 +172,16 @@ function ReviewerProgressPage() {
             </TableHeader>
             <TableBody>
               {pageItems.map((item) => (
-                <TableRow key={item.id}>
+                <TableRow
+                  key={item.id}
+                  onClick={() =>
+                    navigate({
+                      to: "/reviews/$reviewerId/$itemId",
+                      params: { reviewerId, itemId: item.id },
+                    })
+                  }
+                  className="cursor-pointer transition hover:bg-muted/60"
+                >
                   <TableCell className="font-mono text-xs text-muted-foreground">
                     {item.id}
                   </TableCell>
@@ -195,6 +204,7 @@ function ReviewerProgressPage() {
                   </TableCell>
                 </TableRow>
               ))}
+
             </TableBody>
           </Table>
 

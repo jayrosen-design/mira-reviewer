@@ -248,11 +248,107 @@ export function getReviewerItems(reviewerId: string): ReviewItemProgress[] {
   });
 }
 
+export type ReviewerItemReview = {
+  status: "completed" | "draft" | "not_started";
+  preferred: Selection;
+  /** 1–7 parent Likert ratings per statement, per response */
+  parentA: Record<string, number>;
+  parentB: Record<string, number>;
+  /** yes/no/unsure per expert question, per response */
+  expertA: Record<string, "yes" | "no" | "unsure">;
+  expertB: Record<string, "yes" | "no" | "unsure">;
+  expertNotesA: string;
+  expertNotesB: string;
+  comments: string;
+};
 
+const PARENT_COMMENTS = [
+  "Response A felt warmer and more like something I'd actually hear at the clinic.",
+  "Both were fine but B felt a little more information-dense.",
+  "I wanted more acknowledgment of my worry before the facts.",
+  "Neither was bad — I could see either one working depending on the parent.",
+  "The tone in one felt scripted; the other felt more like a conversation.",
+  "",
+];
 
+const EXPERT_COMMENTS = [
+  "No safety concerns. Content aligned with current ACIP guidance.",
+  "Accurate but slightly generic — could be more specific to the concern raised.",
+  "Both responses safe; A more clearly invited a follow-up question.",
+  "Would flag one phrasing as ambiguous; otherwise acceptable.",
+  "",
+];
+
+export function getReviewerItemReview(
+  reviewerId: string,
+  itemId: string,
+): ReviewerItemReview {
+  const items = getReviewerItems(reviewerId);
+  const item = items.find((i) => i.id === itemId);
+  const status = item?.status ?? "not_started";
+  const reviewer = getReviewerById(reviewerId);
+  const isExpert = reviewer?.type === "expert";
+  const seed = hashId(`${reviewerId}::${itemId}`);
+
+  if (status !== "completed") {
+    return {
+      status,
+      preferred: null,
+      parentA: {},
+      parentB: {},
+      expertA: {},
+      expertB: {},
+      expertNotesA: "",
+      expertNotesB: "",
+      comments: "",
+    };
+  }
+
+  const rate = (k: number) => {
+    // Bias toward 4–7 for a plausible completed review.
+    const v = 4 + Math.floor(rand(seed + k) * 4);
+    return Math.min(7, Math.max(1, v));
+  };
+  const yn = (k: number): "yes" | "no" | "unsure" => {
+    const r = rand(seed + k);
+    return r < 0.78 ? "yes" : r < 0.92 ? "unsure" : "no";
+  };
+
+  const parentA: Record<string, number> = {};
+  const parentB: Record<string, number> = {};
+  const expertA: Record<string, "yes" | "no" | "unsure"> = {};
+  const expertB: Record<string, "yes" | "no" | "unsure"> = {};
+
+  PARENT_STATEMENTS.forEach((s, i) => {
+    parentA[s] = rate(i * 2 + 1);
+    parentB[s] = rate(i * 2 + 2);
+  });
+  EXPERT_QUESTIONS.forEach((q, i) => {
+    expertA[q] = yn(i * 3 + 51);
+    expertB[q] = yn(i * 3 + 52);
+  });
+
+  const preferred = item?.preferred ?? null;
+  const comments = isExpert
+    ? EXPERT_COMMENTS[Math.floor(rand(seed + 99) * EXPERT_COMMENTS.length)]
+    : PARENT_COMMENTS[Math.floor(rand(seed + 99) * PARENT_COMMENTS.length)];
+
+  return {
+    status,
+    preferred,
+    parentA,
+    parentB,
+    expertA,
+    expertB,
+    expertNotesA: isExpert && rand(seed + 61) < 0.4 ? "Language clear; content medically sound." : "",
+    expertNotesB: isExpert && rand(seed + 62) < 0.4 ? "Consider a briefer, more direct opening." : "",
+    comments,
+  };
+}
 
 // Mean parent scores per construct (the 6 statements) by response.
-import { PARENT_STATEMENTS } from "./dialogues";
+import { PARENT_STATEMENTS, EXPERT_QUESTIONS } from "./dialogues";
+
 
 export const CONSTRUCT_MEANS = PARENT_STATEMENTS.map((s, idx) => ({
   statement: s,
