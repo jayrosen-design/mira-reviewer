@@ -413,6 +413,12 @@ function ByItemView({
     [item.id, group],
   );
   const summary = getItemSummary(item.id, group);
+  const responses = useMemo(() => getItemResponses(item.id), [item.id]);
+  const preferredSource: "Human" | "MIRA agent" | null =
+    summary.preferred === "Human" || summary.preferred === "MIRA agent"
+      ? summary.preferred
+      : null;
+
 
   return (
     <>
