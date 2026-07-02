@@ -564,18 +564,19 @@ function RadarCard({
   data,
   parentKey,
   expertKey,
-  color,
   group,
 }: {
   title: string;
   data: ReturnType<typeof getConstructMeansForItem>;
   parentKey: "humanParent" | "miraParent";
   expertKey: "humanExpert" | "miraExpert";
-  color: string;
+  color?: string;
   group: Group;
 }) {
   const showParent = group !== "expert";
   const showExpert = group !== "parent";
+  const parentColor = "oklch(0.62 0.17 250)"; // blue
+  const expertColor = "oklch(0.68 0.17 45)"; // orange
   return (
     <Card title={title}>
       <div className="h-80">
@@ -596,19 +597,18 @@ function RadarCard({
               <Radar
                 name="Parent"
                 dataKey={parentKey}
-                stroke={color}
-                fill={color}
-                fillOpacity={0.35}
+                stroke={parentColor}
+                fill={parentColor}
+                fillOpacity={0.3}
               />
             )}
             {showExpert && (
               <Radar
                 name="Expert"
                 dataKey={expertKey}
-                stroke={color}
-                strokeDasharray="4 4"
-                fill={color}
-                fillOpacity={0.15}
+                stroke={expertColor}
+                fill={expertColor}
+                fillOpacity={0.3}
               />
             )}
             <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -630,7 +630,7 @@ function RadarCard({
 function ConstructBar({
   data,
 }: {
-  data: Array<{ name: string; "Response A": number; "Response B": number }>;
+  data: Array<{ name: string; Human: number; "MIRA agent": number }>;
 }) {
   return (
     <div className="h-80">
@@ -659,13 +659,14 @@ function ConstructBar({
             }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          <Bar dataKey="Response A" fill="var(--primary)" />
-          <Bar dataKey="Response B" fill="var(--accent)" />
+          <Bar dataKey="Human" fill="var(--primary)" />
+          <Bar dataKey="MIRA agent" fill="var(--accent)" />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
 
 function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
   return (
