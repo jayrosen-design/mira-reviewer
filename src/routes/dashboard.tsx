@@ -583,7 +583,43 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
+function ResponseTextCard({
+  label,
+  text,
+  isPreferred,
+  accent,
+}: {
+  label: string;
+  text: string;
+  isPreferred: boolean;
+  accent: string;
+}) {
+  return (
+    <div
+      className="flex h-full flex-col rounded-lg border bg-card p-5"
+      style={{
+        borderColor: isPreferred ? accent : "var(--border)",
+        boxShadow: isPreferred ? `0 0 0 1px ${accent}` : undefined,
+      }}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+        {isPreferred && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white"
+            style={{ backgroundColor: accent }}
+          >
+            ★ Preferred
+          </span>
+        )}
+      </div>
+      <p className="text-sm leading-relaxed text-foreground">{text}</p>
+    </div>
+  );
+}
+
 function RadarCard({
+
   title,
   data,
   parentKey,
