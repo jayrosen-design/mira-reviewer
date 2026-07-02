@@ -112,9 +112,6 @@ function LoginPage() {
           Sign in
         </button>
 
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          No password required — this selection sets your account type for the session.
-        </p>
       </div>
     </div>
   );
