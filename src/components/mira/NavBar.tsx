@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown } from "lucide-react";
+import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown, Users } from "lucide-react";
 import { logout, useAuth } from "@/lib/auth";
 import type { ReviewerRole } from "@/lib/reviewerRole";
 import { ROLE_LABEL } from "@/lib/reviewerRole";
@@ -16,6 +16,7 @@ const ALL_LINKS = [
   { to: "/", label: "Review", icon: MessagesSquare, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/progress", label: "My Progress", icon: ClipboardList, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/dashboard", label: "Research Dashboard", icon: LayoutDashboard, exact: true, roles: ["researcher"] as ReviewerRole[] },
+  { to: "/users", label: "Users", icon: Users, exact: true, roles: ["researcher"] as ReviewerRole[] },
   { to: "/api-docs", label: "API / Data Model", icon: BookOpen, exact: false, roles: ["researcher"] as ReviewerRole[] },
 ] as const;
 
