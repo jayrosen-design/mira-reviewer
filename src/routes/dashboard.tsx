@@ -253,12 +253,13 @@ function OverallView({
           arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
         return {
           name: r.short,
-          "Response A": avg(humanValues),
-          "Response B": avg(miraValues),
+          Human: avg(humanValues),
+          "MIRA agent": avg(miraValues),
         };
       }),
     [constructRows, group],
   );
+
   const preferenceData = getAggregatePreference(group);
   const sourceData = getAggregateSourceMeans(group);
 
