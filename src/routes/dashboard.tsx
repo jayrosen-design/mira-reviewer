@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Bar,
@@ -76,7 +76,7 @@ export const Route = createFileRoute("/dashboard")({
 type View = "overall" | "byItem";
 
 function ResearchDashboardPage() {
-  const navigate = useNavigate();
+  
 
   const [group, setGroup] = useState<Group>("all");
   const [view, setView] = useState<View>("overall");
@@ -165,79 +165,6 @@ function ResearchDashboardPage() {
           />
         )}
 
-        <section className="rounded-lg border border-border bg-card">
-          <div className="border-b border-border px-5 py-3">
-            <h2 className="text-sm font-semibold text-foreground">
-              Reviewer completion summary
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Anonymous identifiers used to protect reviewer privacy.
-            </p>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Reviewer</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="w-64">Completion</TableHead>
-                <TableHead className="text-right">Mean parent score</TableHead>
-                <TableHead className="text-right">Expert 'Yes' rate</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {[...filteredReviewers]
-                .sort((a, b) => b.completed - a.completed)
-                .map((r) => {
-                  const pct = Math.round((r.completed / r.assigned) * 100);
-                  return (
-                    <TableRow
-                      key={r.id}
-                      onClick={() =>
-                        navigate({
-                          to: "/reviewers/$reviewerId",
-                          params: { reviewerId: r.id },
-                        })
-                      }
-                      className="cursor-pointer transition hover:bg-muted/60"
-                    >
-
-                      <TableCell>
-                        <div className="font-medium text-foreground">{r.name}</div>
-                        <div className="font-mono text-xs text-muted-foreground">
-                          {r.id}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                            r.type === "expert"
-                              ? "bg-primary-soft text-primary"
-                              : "bg-accent-soft text-accent-foreground"
-                          }`}
-                        >
-                          {r.type === "expert" ? "Expert" : "Parent"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Progress value={pct} className="h-2 flex-1" />
-                          <span className="w-24 text-right text-xs tabular-nums text-muted-foreground">
-                            {r.completed}/{r.assigned} ({pct}%)
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {r.type === "parent" ? r.meanParentScore.toFixed(1) : "—"}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {r.type === "expert" ? `${r.expertYesRate}%` : "—"}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </section>
       </main>
       <Toaster />
     </div>
