@@ -663,7 +663,7 @@ function RadarCard({
   const showParent = group !== "expert";
   const showExpert = group !== "parent";
   const parentColor = "oklch(0.62 0.17 250)"; // blue
-  const expertColor = "oklch(0.68 0.17 45)"; // orange
+  const expertColor = "oklch(0.6 0.22 25)"; // red
   return (
     <Card title={title}>
       <div className="h-80">
