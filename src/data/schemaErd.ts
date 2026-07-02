@@ -14,7 +14,7 @@ export const SCHEMA_ERD = `erDiagram
     uuid id PK
     text email
     text display_name
-    enum role
+    enum role "parent | expert | researcher"
     text credentials
     timestamptz created_at
     timestamptz last_active_at
@@ -22,16 +22,21 @@ export const SCHEMA_ERD = `erDiagram
   DIALOGUES {
     text id PK
     text review_set
-    text scenario
+    enum barrier_category
+    text parent_concern
     jsonb turns
+    text transcript_id
+    int turn_number
+    text mira_model_version
+    date generation_date
+    int randomization_seed
     timestamptz created_at
   }
   RESPONSES {
     uuid id PK
     text dialogue_id FK
-    text title
     text body
-    enum source
+    enum source "human | mira"
     text model_name
     uuid author_id FK
   }
@@ -46,23 +51,26 @@ export const SCHEMA_ERD = `erDiagram
   REVIEWS {
     uuid id PK
     uuid assignment_id FK
-    enum role
-    enum preferred
+    enum role "parent | expert"
+    enum status "draft | submitted"
+    enum preferred "A | B | neither | too_similar"
     text comments
     text expert_notes_a
     text expert_notes_b
     timestamptz submitted_at
+    timestamptz updated_at
   }
   RUBRIC_SCORES {
     uuid id PK
     uuid review_id FK
-    enum response_label
+    enum response_label "A | B"
     text criterion FK
     int score_1_to_7
-    enum expert_answer
+    enum expert_answer "yes | no | unsure"
   }
   RUBRIC_CRITERIA {
     text name PK
+    enum type "parent | expert"
     text description
     int display_order
     bool active
@@ -81,7 +89,7 @@ export const SCHEMA_ERD = `erDiagram
     uuid reviewer_id FK
     text dialogue_id FK
     uuid sent_response_id FK
-    enum sent_label
+    enum sent_label "A | B"
     text simulated_parent_reply
     text generator
     timestamptz created_at
