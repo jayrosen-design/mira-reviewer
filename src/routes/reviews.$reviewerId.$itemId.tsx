@@ -199,6 +199,15 @@ function ReviewerItemReviewPage() {
             </p>
           </section>
         )}
+
+        {dialogue && (
+          <ResearchMetadata
+            item={dialogue}
+            reviewerId={reviewerId}
+            role="researcher"
+            status={review.status === "completed" ? "submitted" : "draft"}
+          />
+        )}
       </main>
     </div>
   );
