@@ -221,11 +221,17 @@ export const CONSTRUCT_MEANS = PARENT_STATEMENTS.map((s, idx) => ({
   responseB: Math.round((4.6 + rand(idx + 27) * 1.6) * 10) / 10,
 }));
 
+export type Group = "all" | "parent" | "expert";
+
 export const CONSTRUCT_MEANS_BY_SOURCE = PARENT_STATEMENTS.map((s, idx) => ({
   statement: s,
   short: s.replace(/^This response /, "").replace(/\.$/, ""),
   human: Math.round((5.2 + rand(idx + 131) * 1.2) * 10) / 10,
   mira: Math.round((4.8 + rand(idx + 149) * 1.4) * 10) / 10,
+  humanParent: Math.round((5.3 + rand(idx + 131) * 1.1) * 10) / 10,
+  humanExpert: Math.round((4.8 + rand(idx + 137) * 1.1) * 10) / 10,
+  miraParent: Math.round((4.9 + rand(idx + 149) * 1.3) * 10) / 10,
+  miraExpert: Math.round((4.4 + rand(idx + 157) * 1.3) * 10) / 10,
 }));
 
 // Mean scores by true source (researcher-only — hidden from participants).
@@ -255,3 +261,124 @@ export const CATEGORY_RESULTS = BARRIER_CATEGORIES.map((c, idx) => ({
   safetyFlags: Math.round(rand(idx + 53) * 3),
   reviewsCompleted: Math.round(40 + rand(idx + 61) * 60),
 }));
+
+// -------- Per-item drilldown helpers (deterministic mock) --------
+
+function hashId(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function groupBias(group: Group): { parent: number; expert: number } {
+  if (group === "parent") return { parent: 1, expert: 0 };
+  if (group === "expert") return { parent: 0, expert: 1 };
+  return { parent: 1, expert: 1 };
+}
+
+export function getConstructMeansForItem(itemId: string) {
+  const seed = hashId(itemId);
+  return CONSTRUCT_MEANS_BY_SOURCE.map((c, idx) => {
+    const jitter = (k: number) => (rand(seed + idx * 7 + k) - 0.5) * 0.9;
+    const clamp = (v: number) => Math.max(1, Math.min(7, Math.round(v * 10) / 10));
+    return {
+      statement: c.statement,
+      short: c.short,
+      humanParent: clamp(c.humanParent + jitter(1)),
+      humanExpert: clamp(c.humanExpert + jitter(2)),
+      miraParent: clamp(c.miraParent + jitter(3)),
+      miraExpert: clamp(c.miraExpert + jitter(4)),
+    };
+  });
+}
+
+export function getConstructBarData(
+  rows: ReturnType<typeof getConstructMeansForItem>,
+  group: Group,
+) {
+  const b = groupBias(group);
+  return rows.map((r) => {
+    const humanValues = [
+      b.parent ? r.humanParent : null,
+      b.expert ? r.humanExpert : null,
+    ].filter((v): v is number => v !== null);
+    const miraValues = [
+      b.parent ? r.miraParent : null,
+      b.expert ? r.miraExpert : null,
+    ].filter((v): v is number => v !== null);
+    const avg = (arr: number[]) =>
+      arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
+    return {
+      name: r.short,
+      full: r.statement,
+      "Response A": avg(humanValues),
+      "Response B": avg(miraValues),
+    };
+  });
+}
+
+export function getPreferenceForItem(itemId: string, group: Group) {
+  const seed = hashId(itemId) + (group === "expert" ? 11 : group === "parent" ? 7 : 3);
+  return [
+    { label: "Response A", color: "var(--primary)", base: 34 },
+    { label: "Response B", color: "var(--accent)", base: 30 },
+    { label: "Too similar", color: "oklch(0.78 0.04 250)", base: 14 },
+    { label: "Neither acceptable", color: "var(--muted-foreground)", base: 6 },
+  ].map((r, i) => ({
+    label: r.label,
+    color: r.color,
+    value: Math.max(1, Math.round(r.base + (rand(seed + i * 5) - 0.5) * 18)),
+  }));
+}
+
+export function getSourceMeansForItem(itemId: string, group: Group) {
+  const seed = hashId(itemId);
+  const bump = group === "expert" ? -0.3 : group === "parent" ? 0.15 : 0;
+  const clamp = (v: number) => Math.max(1, Math.min(7, Math.round(v * 10) / 10));
+  return [
+    { label: "Human-authored", mean: clamp(5.4 + bump + (rand(seed + 1) - 0.5) * 1.2) },
+    { label: "Mira-generated", mean: clamp(5.1 + bump + (rand(seed + 2) - 0.5) * 1.4) },
+  ];
+}
+
+export function getItemReviewCounts(itemId: string) {
+  const seed = hashId(itemId);
+  const parents = 8 + Math.round(rand(seed + 1) * 10);
+  const experts = 2 + Math.round(rand(seed + 2) * 4);
+  return { parents, experts, total: parents + experts };
+}
+
+export function getItemSummary(itemId: string, group: Group) {
+  const seed = hashId(itemId);
+  const counts = getItemReviewCounts(itemId);
+  const meanParent = Math.round((4.6 + rand(seed + 21) * 2.0) * 10) / 10;
+  const yesRate = Math.round((0.55 + rand(seed + 33) * 0.4) * 100);
+  const pref = getPreferenceForItem(itemId, group);
+  const top = [...pref].sort((a, b) => b.value - a.value)[0];
+  return {
+    reviews:
+      group === "parent" ? counts.parents : group === "expert" ? counts.experts : counts.total,
+    parents: counts.parents,
+    experts: counts.experts,
+    meanParent,
+    yesRate,
+    preferred: top.label,
+  };
+}
+
+export function getAggregatePreference(group: Group) {
+  if (group === "all") return PREFERENCE_DISTRIBUTION;
+  const bump = group === "expert" ? -6 : 4;
+  return PREFERENCE_DISTRIBUTION.map((p, i) => ({
+    ...p,
+    value: Math.max(1, p.value + (i === 0 ? bump : i === 1 ? -bump / 2 : 0)),
+  }));
+}
+
+export function getAggregateSourceMeans(group: Group) {
+  const bump = group === "expert" ? -0.3 : group === "parent" ? 0.1 : 0;
+  return SOURCE_MEANS.map((s) => ({
+    ...s,
+    mean: Math.max(1, Math.min(7, Math.round((s.mean + bump) * 10) / 10)),
+  }));
+}
