@@ -312,11 +312,31 @@ export function getConstructBarData(
     return {
       name: r.short,
       full: r.statement,
-      "Response A": avg(humanValues),
-      "Response B": avg(miraValues),
+      Human: avg(humanValues),
+      "MIRA agent": avg(miraValues),
     };
   });
 }
+
+export function getItemResponses(itemId: string) {
+  const dlg = DIALOGUES.find((d) => d.id === itemId);
+  if (dlg) {
+    const a = dlg.responseA;
+    const b = dlg.responseB;
+    const human = a.source === "human" ? a : b;
+    const mira = a.source === "mira" ? a : b;
+    return { human: human.text, mira: mira.text };
+  }
+  const item = REVIEW_ITEMS.find((i) => i.id === itemId);
+  const concern = item?.parentConcern ?? "your concern";
+  return {
+    human:
+      `That's a really understandable worry. A lot of parents feel the same way about "${concern.toLowerCase()}", and it makes sense to want more information before deciding. Can I share what we typically see and then hear what would help you feel more comfortable?`,
+    mira:
+      `Thank you for sharing that concern. Many parents have questions about "${concern.toLowerCase()}", and it's completely reasonable to want clear information. I can walk through what the current research shows and answer any specific questions you have.`,
+  };
+}
+
 
 export function getPreferenceForItem(itemId: string, group: Group) {
   const seed = hashId(itemId) + (group === "expert" ? 11 : group === "parent" ? 7 : 3);
