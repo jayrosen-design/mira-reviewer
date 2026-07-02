@@ -47,7 +47,7 @@ export function NavBar() {
   return (
     <nav className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3">
-        <Link to={role === "researcher" ? "/dashboard" : "/"} className="text-base font-semibold tracking-tight text-primary">
+        <Link to={role === "researcher" ? "/dashboard" : "/about"} className="text-base font-semibold tracking-tight text-primary transition-colors hover:text-primary/80">
           MIRA Reviewer
         </Link>
         <ul className="flex flex-1 flex-wrap items-center gap-1">
