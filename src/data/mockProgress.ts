@@ -321,8 +321,8 @@ export function getConstructBarData(
 export function getPreferenceForItem(itemId: string, group: Group) {
   const seed = hashId(itemId) + (group === "expert" ? 11 : group === "parent" ? 7 : 3);
   return [
-    { label: "Response A", color: "var(--primary)", base: 34 },
-    { label: "Response B", color: "var(--accent)", base: 30 },
+    { label: "Human", color: "var(--primary)", base: 34 },
+    { label: "MIRA agent", color: "var(--accent)", base: 30 },
     { label: "Too similar", color: "oklch(0.78 0.04 250)", base: 14 },
     { label: "Neither acceptable", color: "var(--muted-foreground)", base: 6 },
   ].map((r, i) => ({
@@ -331,6 +331,7 @@ export function getPreferenceForItem(itemId: string, group: Group) {
     value: Math.max(1, Math.round(r.base + (rand(seed + i * 5) - 0.5) * 18)),
   }));
 }
+
 
 export function getSourceMeansForItem(itemId: string, group: Group) {
   const seed = hashId(itemId);
