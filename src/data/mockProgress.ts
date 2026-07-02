@@ -221,6 +221,13 @@ export const CONSTRUCT_MEANS = PARENT_STATEMENTS.map((s, idx) => ({
   responseB: Math.round((4.6 + rand(idx + 27) * 1.6) * 10) / 10,
 }));
 
+export const CONSTRUCT_MEANS_BY_SOURCE = PARENT_STATEMENTS.map((s, idx) => ({
+  statement: s,
+  short: s.replace(/^This response /, "").replace(/\.$/, ""),
+  human: Math.round((5.2 + rand(idx + 131) * 1.2) * 10) / 10,
+  mira: Math.round((4.8 + rand(idx + 149) * 1.4) * 10) / 10,
+}));
+
 // Mean scores by true source (researcher-only — hidden from participants).
 export const SOURCE_MEANS = [
   {
