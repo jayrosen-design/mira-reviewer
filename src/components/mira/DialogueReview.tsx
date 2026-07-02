@@ -249,11 +249,6 @@ export function DialogueReview() {
               onChange={(v) => updateReview({ comments: v })}
             />
 
-            <ResearchMetadata
-              item={current}
-              role={role}
-              status={review.status}
-            />
 
             <ReviewActions
               onSaveDraft={handleSaveDraft}
