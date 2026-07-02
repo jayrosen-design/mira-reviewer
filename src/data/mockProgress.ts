@@ -246,6 +246,9 @@ export function getReviewerItems(reviewerId: string): ReviewItemProgress[] {
       avgB: null,
     };
   });
+}
+
+
 
 
 // Mean parent scores per construct (the 6 statements) by response.
