@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown, Users } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, ClipboardList, LayoutDashboard, MessagesSquare, LogOut, UserRound, Stethoscope, ShieldCheck, ChevronDown, Users, UserCog } from "lucide-react";
 import { logout, useAuth } from "@/lib/auth";
 import type { ReviewerRole } from "@/lib/reviewerRole";
 import { ROLE_LABEL } from "@/lib/reviewerRole";
@@ -11,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditAccountDialog } from "./EditAccountDialog";
 
 const ALL_LINKS = [
   { to: "/", label: "Review", icon: MessagesSquare, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
@@ -29,6 +31,7 @@ const ROLE_ICON: Record<ReviewerRole, React.ComponentType<{ className?: string }
 export function NavBar() {
   const { isLoggedIn, role } = useAuth();
   const navigate = useNavigate();
+  const [editOpen, setEditOpen] = useState(false);
 
   if (!isLoggedIn || !role) return null;
 
@@ -80,6 +83,10 @@ export function NavBar() {
               {ROLE_LABEL[role]}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => setEditOpen(true)}>
+              <UserCog className="mr-2 h-4 w-4" />
+              Edit account
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Log out
@@ -87,6 +94,8 @@ export function NavBar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <EditAccountDialog open={editOpen} onOpenChange={setEditOpen} role={role} />
     </nav>
   );
 }
