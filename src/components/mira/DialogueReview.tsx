@@ -178,10 +178,23 @@ export function DialogueReview() {
   const handleNext = () => {
     if (hasNext) setIndex((i) => i + 1);
   };
+  const handlePrev = () => {
+    if (index > 0) setIndex((i) => i - 1);
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header current={index + 1} total={TOTAL_REVIEW_ITEMS} />
+      <Header
+        current={index + 1}
+        total={TOTAL_REVIEW_ITEMS}
+        onPrev={handlePrev}
+        onNext={handleNext}
+        hasPrev={index > 0}
+        hasNext={hasNext}
+        itemId={current.id}
+        barrierCategory={current.barrierCategory}
+        parentConcern={current.parentConcern}
+      />
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {review.status === "submitted" ? (
