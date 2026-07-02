@@ -447,8 +447,24 @@ function ByItemView({
         </div>
       </section>
 
+      <section className="grid gap-4 lg:grid-cols-2">
+        <ResponseTextCard
+          label="Human interviewer"
+          text={responses.human}
+          isPreferred={preferredSource === "Human"}
+          accent="var(--primary)"
+        />
+        <ResponseTextCard
+          label="MIRA agent"
+          text={responses.mira}
+          isPreferred={preferredSource === "MIRA agent"}
+          accent="var(--accent)"
+        />
+      </section>
+
       <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <KpiCard label="Reviews (filtered)" value={summary.reviews} sub={`of ${getItemReviewCounts(item.id).total} total`} />
+
         {group !== "expert" && (
           <KpiCard label="Mean parent score" value={summary.meanParent.toFixed(1)} sub="1–7 scale" />
         )}
