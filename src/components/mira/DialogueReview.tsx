@@ -184,12 +184,6 @@ export function DialogueReview() {
 
   return (
     <div className="min-h-screen bg-background">
-      {review.status !== "submitted" && (
-        <div className="mx-auto max-w-6xl px-6 pt-6">
-          <InstructionPanel role={role} />
-        </div>
-      )}
-
       <Header
         current={index + 1}
         total={TOTAL_REVIEW_ITEMS}
@@ -199,6 +193,9 @@ export function DialogueReview() {
         hasNext={hasNext}
         itemId={current.id}
         barrierCategory={current.barrierCategory}
+        beforeNav={
+          review.status !== "submitted" ? <InstructionPanel role={role} /> : undefined
+        }
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
