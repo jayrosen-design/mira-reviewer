@@ -248,11 +248,12 @@ export const SOURCE_MEANS = [
 
 // Preferred response distribution across all completed reviews.
 export const PREFERENCE_DISTRIBUTION = [
-  { label: "Response A", value: 38, color: "var(--primary)" },
-  { label: "Response B", value: 31, color: "var(--accent)" },
+  { label: "Human", value: 38, color: "var(--primary)" },
+  { label: "MIRA agent", value: 31, color: "var(--accent)" },
   { label: "Too similar", value: 12, color: "oklch(0.78 0.04 250)" },
   { label: "Neither acceptable", value: 6, color: "var(--muted-foreground)" },
 ];
+
 
 // Aggregate results broken down by barrier category.
 export const CATEGORY_RESULTS = BARRIER_CATEGORIES.map((c, idx) => ({
