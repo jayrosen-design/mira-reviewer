@@ -392,9 +392,17 @@ function ByItemView({
 
   const constructRows = useMemo(() => getConstructMeansForItem(item.id), [item.id]);
   const barData = useMemo(
-    () => getConstructBarData(constructRows, group),
-    [constructRows, group],
+    () =>
+      constructRows.map((r) => ({
+        name: r.short,
+        humanParent: r.humanParent,
+        humanExpert: r.humanExpert,
+        miraParent: r.miraParent,
+        miraExpert: r.miraExpert,
+      })),
+    [constructRows],
   );
+
   const preferenceData = useMemo(
     () => getPreferenceForItem(item.id, group),
     [item.id, group],
