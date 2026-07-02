@@ -314,9 +314,9 @@ flowchart LR
     D --> RV
     P --> RV
 
-    DB -. future .-> API1[/v1/metrics/*]
-    US -. future .-> API2[/v1/users/*]
-    RD -. future .-> API3[/v1/reviewers/:id/progress]
+    DB -. future .-> API1["/v1/metrics/*"]
+    US -. future .-> API2["/v1/users/*"]
+    RD -. future .-> API3["/v1/reviewers/:id/progress"]
 ```
 
 ### Role-based navigation state
