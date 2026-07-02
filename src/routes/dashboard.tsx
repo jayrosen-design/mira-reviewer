@@ -242,25 +242,16 @@ function OverallView({
   const constructRows = CONSTRUCT_MEANS_BY_SOURCE;
   const barData = useMemo(
     () =>
-      constructRows.map((r) => {
-        const humanValues = [
-          group !== "expert" ? r.humanParent : null,
-          group !== "parent" ? r.humanExpert : null,
-        ].filter((v): v is number => v !== null);
-        const miraValues = [
-          group !== "expert" ? r.miraParent : null,
-          group !== "parent" ? r.miraExpert : null,
-        ].filter((v): v is number => v !== null);
-        const avg = (arr: number[]) =>
-          arr.length ? Math.round((arr.reduce((s, v) => s + v, 0) / arr.length) * 10) / 10 : 0;
-        return {
-          name: r.short,
-          Human: avg(humanValues),
-          "MIRA agent": avg(miraValues),
-        };
-      }),
-    [constructRows, group],
+      constructRows.map((r) => ({
+        name: r.short,
+        humanParent: r.humanParent,
+        humanExpert: r.humanExpert,
+        miraParent: r.miraParent,
+        miraExpert: r.miraExpert,
+      })),
+    [constructRows],
   );
+
 
   const preferenceData = getAggregatePreference(group);
   const sourceData = getAggregateSourceMeans(group);
