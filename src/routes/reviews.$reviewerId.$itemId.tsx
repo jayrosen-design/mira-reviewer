@@ -22,6 +22,7 @@ import {
   AGREEMENT_LABELS,
   DIALOGUES,
 } from "@/data/dialogues";
+import { ResearchMetadata } from "@/components/mira/ResearchMetadata";
 
 export const Route = createFileRoute("/reviews/$reviewerId/$itemId")({
   head: ({ params }) => ({
