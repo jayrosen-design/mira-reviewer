@@ -123,9 +123,41 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <NavBar />
+      <AuthGate />
+    </QueryClientProvider>
+  );
+}
+
+import { useRouterState, Navigate } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
+
+function AuthGate() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { isLoggedIn, role } = useAuth();
+  const isLogin = pathname === "/login";
+
+  if (!isLoggedIn && !isLogin) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Role-based route access: parents/experts blocked from researcher-only pages.
+  if (isLoggedIn && role && role !== "researcher") {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/api-docs") || pathname.startsWith("/reviewers") || pathname.startsWith("/reviews/")) {
+      return <Navigate to="/" replace />;
+    }
+  }
+  // Researcher blocked from reviewer pages.
+  if (isLoggedIn && role === "researcher") {
+    if (pathname === "/" || pathname === "/progress") {
+      return <Navigate to="/dashboard" replace />;
+    }
+  }
+
+  return (
+    <>
+      {!isLogin && <NavBar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-    </QueryClientProvider>
+    </>
   );
 }
