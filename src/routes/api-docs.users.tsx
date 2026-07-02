@@ -22,20 +22,19 @@ function UsersDocs() {
         <h2 className="text-lg font-semibold">Users</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Administration endpoints backing the researcher Users page. All
-          endpoints require a researcher or admin bearer token. Roles are one
-          of <code className="font-mono">parent</code>,{" "}
-          <code className="font-mono">expert</code>,{" "}
-          <code className="font-mono">researcher</code>, or{" "}
-          <code className="font-mono">admin</code>.
+          endpoints require a researcher bearer token. Roles are one of{" "}
+          <code className="font-mono">parent</code>,{" "}
+          <code className="font-mono">expert</code>, or{" "}
+          <code className="font-mono">researcher</code>.
         </p>
       </header>
 
       <ApiEndpoint
         method="GET"
         path="/v1/users"
-        summary="List all users. Supports filtering by role for the Users page toggle (All / Parents / Experts / Researchers). Parent and expert rows include assignment and completion aggregates; researcher and admin rows omit them."
+        summary="List all users. Supports filtering by role for the Users page toggle (All / Parents / Experts / Researchers). Parent and expert rows include assignment and completion aggregates; researcher rows omit them."
         auth="researcher"
-        requestExample={{ role: "parent | expert | researcher | admin (optional)" }}
+        requestExample={{ role: "parent | expert | researcher (optional)" }}
         responseExample={{
           data: [
             {
