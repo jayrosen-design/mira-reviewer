@@ -17,6 +17,7 @@ import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
 import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
+import { Route as ApiDocsUsersRouteImport } from './routes/api-docs.users'
 import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
 import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
 import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
@@ -64,6 +65,11 @@ const ReviewersReviewerIdRoute = ReviewersReviewerIdRouteImport.update({
   id: '/reviewers/$reviewerId',
   path: '/reviewers/$reviewerId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDocsUsersRoute = ApiDocsUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ApiDocsRoute,
 } as any)
 const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
   id: '/schema',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
   '/reviews/$reviewerId/$itemId': typeof ReviewsReviewerIdItemIdRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs': typeof ApiDocsIndexRoute
   '/reviews/$reviewerId/$itemId': typeof ReviewsReviewerIdItemIdRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
   '/reviews/$reviewerId/$itemId': typeof ReviewsReviewerIdItemIdRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
     | '/reviews/$reviewerId/$itemId'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs'
     | '/reviews/$reviewerId/$itemId'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
     | '/reviews/$reviewerId/$itemId'
@@ -274,6 +286,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewersReviewerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api-docs/users': {
+      id: '/api-docs/users'
+      path: '/users'
+      fullPath: '/api-docs/users'
+      preLoaderRoute: typeof ApiDocsUsersRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
     '/api-docs/schema': {
       id: '/api-docs/schema'
       path: '/schema'
@@ -333,6 +352,7 @@ interface ApiDocsRouteChildren {
   ApiDocsProgressRoute: typeof ApiDocsProgressRoute
   ApiDocsReviewsRoute: typeof ApiDocsReviewsRoute
   ApiDocsSchemaRoute: typeof ApiDocsSchemaRoute
+  ApiDocsUsersRoute: typeof ApiDocsUsersRoute
   ApiDocsIndexRoute: typeof ApiDocsIndexRoute
 }
 
@@ -343,6 +363,7 @@ const ApiDocsRouteChildren: ApiDocsRouteChildren = {
   ApiDocsProgressRoute: ApiDocsProgressRoute,
   ApiDocsReviewsRoute: ApiDocsReviewsRoute,
   ApiDocsSchemaRoute: ApiDocsSchemaRoute,
+  ApiDocsUsersRoute: ApiDocsUsersRoute,
   ApiDocsIndexRoute: ApiDocsIndexRoute,
 }
 
