@@ -14,6 +14,7 @@ import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
 import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
@@ -49,6 +50,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ApiDocsRoute = ApiDocsRouteImport.update({
   id: '/api-docs',
   path: '/api-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -109,6 +115,7 @@ const ReviewsReviewerIdItemIdRoute = ReviewsReviewerIdItemIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/api-docs'
     | '/dashboard'
     | '/login'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/dashboard'
     | '/login'
     | '/progress'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/api-docs'
     | '/dashboard'
     | '/login'
@@ -219,6 +231,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
@@ -263,6 +276,13 @@ declare module '@tanstack/react-router' {
       path: '/api-docs'
       fullPath: '/api-docs'
       preLoaderRoute: typeof ApiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -372,6 +392,7 @@ const ApiDocsRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,

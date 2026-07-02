@@ -149,7 +149,7 @@ function AuthGate() {
   }
   // Researcher blocked from reviewer pages.
   if (isLoggedIn && role === "researcher") {
-    if (pathname === "/" || pathname === "/progress") {
+    if (pathname === "/" || pathname === "/about" || pathname === "/progress") {
       return <Navigate to="/dashboard" replace />;
     }
   }

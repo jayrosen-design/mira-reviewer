@@ -50,21 +50,21 @@ function LoginPage() {
 
   useEffect(() => {
     if (isLoggedIn && role) {
-      navigate({ to: role === "researcher" ? "/dashboard" : "/", replace: true });
+      navigate({ to: role === "researcher" ? "/dashboard" : "/about", replace: true });
     }
   }, [isLoggedIn, role, navigate]);
 
   // Warm the likely destinations so the target page is ready to paint together
   // with the navbar the instant we navigate.
   useEffect(() => {
-    router.preloadRoute({ to: "/" }).catch(() => {});
+    router.preloadRoute({ to: "/about" }).catch(() => {});
     router.preloadRoute({ to: "/dashboard" }).catch(() => {});
   }, [router]);
 
   const handleSignIn = async () => {
     if (!selected || signingIn) return;
     setSigningIn(true);
-    const to = selected === "researcher" ? "/dashboard" : "/";
+    const to = selected === "researcher" ? "/dashboard" : "/about";
     // Preload the destination route chunk + loader BEFORE flipping auth so the
     // navbar and the page appear in the same paint.
     try {
