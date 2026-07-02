@@ -311,7 +311,7 @@ function OverallView({
 
       <section>
         <Card title="Average rating by construct (1–7)">
-          <ConstructBar data={barData} />
+          <ConstructBar data={barData} group={group} />
         </Card>
       </section>
 
@@ -494,7 +494,7 @@ function ByItemView({
 
       <section>
         <Card title="Average rating by construct (1–7)">
-          <ConstructBar data={barData} />
+          <ConstructBar data={barData} group={group} />
         </Card>
       </section>
 
