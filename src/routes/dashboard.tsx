@@ -188,7 +188,17 @@ function ResearchDashboardPage() {
                 .map((r) => {
                   const pct = Math.round((r.completed / r.assigned) * 100);
                   return (
-                    <TableRow key={r.id}>
+                    <TableRow
+                      key={r.id}
+                      onClick={() =>
+                        navigate({
+                          to: "/reviewers/$reviewerId",
+                          params: { reviewerId: r.id },
+                        })
+                      }
+                      className="cursor-pointer transition hover:bg-muted/60"
+                    >
+
                       <TableCell>
                         <div className="font-medium text-foreground">{r.name}</div>
                         <div className="font-mono text-xs text-muted-foreground">
