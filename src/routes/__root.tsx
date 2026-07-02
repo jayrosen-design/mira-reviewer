@@ -131,8 +131,6 @@ function RootComponent() {
   );
 }
 
-import { useRouterState, Navigate } from "@tanstack/react-router";
-import { useAuth } from "@/lib/auth";
 
 function AuthGate() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
