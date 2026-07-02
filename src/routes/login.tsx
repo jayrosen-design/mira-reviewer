@@ -68,6 +68,14 @@ function LoginPage() {
           <p className="mt-1 text-sm font-medium text-foreground">
             Motivational Interviewing Response Assessment
           </p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <span className="rounded-full border border-primary/30 bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-primary">
+              Research Preview
+            </span>
+            <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+              Version 0.0.1
+            </span>
+          </div>
           <p className="mt-3 text-sm text-muted-foreground">
             Select an account to continue
           </p>
