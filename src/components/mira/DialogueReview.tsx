@@ -181,12 +181,7 @@ export function DialogueReview() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header
-        current={index + 1}
-        total={TOTAL_REVIEW_ITEMS}
-        role={role}
-        onRoleChange={setRole}
-      />
+      <Header current={index + 1} total={TOTAL_REVIEW_ITEMS} />
 
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         {review.status === "submitted" ? (
