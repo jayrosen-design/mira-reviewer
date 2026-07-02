@@ -15,6 +15,7 @@ import {
 import { EditAccountDialog } from "./EditAccountDialog";
 
 const ALL_LINKS = [
+  { to: "/about", label: "About", icon: Info, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/", label: "Review", icon: MessagesSquare, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/progress", label: "My Progress", icon: ClipboardList, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/dashboard", label: "Research Dashboard", icon: LayoutDashboard, exact: true, roles: ["researcher"] as ReviewerRole[] },
