@@ -620,12 +620,28 @@ function ResponseTextCard({
   text,
   isPreferred,
   accent,
+  parentVotes,
+  expertVotes,
+  parentTotal,
+  expertTotal,
+  maxVotes,
 }: {
   label: string;
   text: string;
   isPreferred: boolean;
   accent: string;
+  parentVotes: number;
+  expertVotes: number;
+  parentTotal: number;
+  expertTotal: number;
+  maxVotes: number;
 }) {
+  const totalVotes = parentVotes + expertVotes;
+  const meterFill = (totalVotes / Math.max(maxVotes, 1)) * 100;
+  const parentPortion = totalVotes ? (parentVotes / totalVotes) * meterFill : 0;
+  const expertPortion = totalVotes ? (expertVotes / totalVotes) * meterFill : 0;
+  const parentColor = "oklch(0.62 0.17 250)";
+  const expertColor = "oklch(0.68 0.17 45)";
   return (
     <div
       className="flex h-full flex-col rounded-lg border bg-card p-5"
@@ -645,10 +661,50 @@ function ResponseTextCard({
           </span>
         )}
       </div>
-      <p className="text-sm leading-relaxed text-foreground">{text}</p>
+      <p className="flex-1 text-sm leading-relaxed text-foreground">{text}</p>
+
+      <div className="mt-4">
+        <div className="mb-1 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>Preferred by</span>
+          <span className="tabular-nums">
+            {totalVotes} of {parentTotal + expertTotal} reviewers
+          </span>
+        </div>
+        <div
+          className="flex h-2.5 w-full overflow-hidden rounded-full bg-muted"
+          role="img"
+          aria-label={`${parentVotes} of ${parentTotal} parents and ${expertVotes} of ${expertTotal} experts preferred this response`}
+        >
+          <div
+            style={{ width: `${parentPortion}%`, backgroundColor: parentColor }}
+            title={`Parents: ${parentVotes}/${parentTotal}`}
+          />
+          <div
+            style={{ width: `${expertPortion}%`, backgroundColor: expertColor }}
+            title={`Experts: ${expertVotes}/${expertTotal}`}
+          />
+        </div>
+        <div className="mt-1.5 flex items-center gap-4 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              className="inline-block h-2 w-2 rounded-sm"
+              style={{ backgroundColor: parentColor }}
+            />
+            Parents {parentVotes}/{parentTotal}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span
+              className="inline-block h-2 w-2 rounded-sm"
+              style={{ backgroundColor: expertColor }}
+            />
+            Experts {expertVotes}/{expertTotal}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
+
 
 function RadarCard({
 
