@@ -20,6 +20,7 @@ const ALL_LINKS = [
   { to: "/progress", label: "My Progress", icon: ClipboardList, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
   { to: "/dashboard", label: "Research Dashboard", icon: LayoutDashboard, exact: true, roles: ["researcher"] as ReviewerRole[] },
   { to: "/users", label: "Users", icon: Users, exact: true, roles: ["researcher"] as ReviewerRole[] },
+  { to: "/generate", label: "Generate Transcripts", icon: Sparkles, exact: true, roles: ["researcher"] as ReviewerRole[] },
   { to: "/api-docs", label: "API / Data Model", icon: BookOpen, exact: false, roles: ["researcher"] as ReviewerRole[] },
 ] as const;
 

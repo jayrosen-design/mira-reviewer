@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
 import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
 import { Route as ApiDocsUsersRouteImport } from './routes/api-docs.users'
+import { Route as ApiDocsTranscriptsRouteImport } from './routes/api-docs.transcripts'
 import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
 import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
 import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
@@ -84,6 +85,11 @@ const ApiDocsUsersRoute = ApiDocsUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => ApiDocsRoute,
 } as any)
+const ApiDocsTranscriptsRoute = ApiDocsTranscriptsRouteImport.update({
+  id: '/transcripts',
+  path: '/transcripts',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
 const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
   id: '/schema',
   path: '/schema',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs': typeof ApiDocsIndexRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
@@ -345,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsUsersRouteImport
       parentRoute: typeof ApiDocsRoute
     }
+    '/api-docs/transcripts': {
+      id: '/api-docs/transcripts'
+      path: '/transcripts'
+      fullPath: '/api-docs/transcripts'
+      preLoaderRoute: typeof ApiDocsTranscriptsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
     '/api-docs/schema': {
       id: '/api-docs/schema'
       path: '/schema'
@@ -412,6 +431,7 @@ interface ApiDocsRouteChildren {
   ApiDocsProgressRoute: typeof ApiDocsProgressRoute
   ApiDocsReviewsRoute: typeof ApiDocsReviewsRoute
   ApiDocsSchemaRoute: typeof ApiDocsSchemaRoute
+  ApiDocsTranscriptsRoute: typeof ApiDocsTranscriptsRoute
   ApiDocsUsersRoute: typeof ApiDocsUsersRoute
   ApiDocsIndexRoute: typeof ApiDocsIndexRoute
 }
@@ -424,6 +444,7 @@ const ApiDocsRouteChildren: ApiDocsRouteChildren = {
   ApiDocsProgressRoute: ApiDocsProgressRoute,
   ApiDocsReviewsRoute: ApiDocsReviewsRoute,
   ApiDocsSchemaRoute: ApiDocsSchemaRoute,
+  ApiDocsTranscriptsRoute: ApiDocsTranscriptsRoute,
   ApiDocsUsersRoute: ApiDocsUsersRoute,
   ApiDocsIndexRoute: ApiDocsIndexRoute,
 }
