@@ -10,6 +10,7 @@ const sections = [
   { to: "/api-docs/reviews", label: "Reviews", exact: false },
   { to: "/api-docs/progress", label: "Progress", exact: false },
   { to: "/api-docs/metrics", label: "Metrics", exact: false },
+  { to: "/api-docs/transcripts", label: "Transcripts & REDCap", exact: false },
 ] as const;
 
 export const Route = createFileRoute("/api-docs")({

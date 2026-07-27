@@ -143,7 +143,7 @@ function AuthGate() {
 
   // Role-based route access: parents/experts blocked from researcher-only pages.
   if (isLoggedIn && role && role !== "researcher") {
-    if (pathname.startsWith("/dashboard") || pathname.startsWith("/api-docs") || pathname.startsWith("/reviewers") || pathname.startsWith("/reviews/") || pathname.startsWith("/users")) {
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/api-docs") || pathname.startsWith("/reviewers") || pathname.startsWith("/reviews/") || pathname.startsWith("/users") || pathname.startsWith("/generate")) {
       return <Navigate to="/" replace />;
     }
   }
