@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GenerateRouteImport } from './routes/generate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AboutRouteImport } from './routes/about'
@@ -19,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
 import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
 import { Route as ApiDocsUsersRouteImport } from './routes/api-docs.users'
+import { Route as ApiDocsTranscriptsRouteImport } from './routes/api-docs.transcripts'
 import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
 import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
 import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
@@ -41,6 +43,11 @@ const ProgressRoute = ProgressRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateRoute = GenerateRouteImport.update({
+  id: '/generate',
+  path: '/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -76,6 +83,11 @@ const ReviewersReviewerIdRoute = ReviewersReviewerIdRouteImport.update({
 const ApiDocsUsersRoute = ApiDocsUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsTranscriptsRoute = ApiDocsTranscriptsRouteImport.update({
+  id: '/transcripts',
+  path: '/transcripts',
   getParentRoute: () => ApiDocsRoute,
 } as any)
 const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
@@ -124,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -134,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
@@ -143,6 +157,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -153,6 +168,7 @@ export interface FileRoutesByTo {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs': typeof ApiDocsIndexRoute
@@ -164,6 +180,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -174,6 +191,7 @@ export interface FileRoutesById {
   '/api-docs/progress': typeof ApiDocsProgressRoute
   '/api-docs/reviews': typeof ApiDocsReviewsRoute
   '/api-docs/schema': typeof ApiDocsSchemaRoute
+  '/api-docs/transcripts': typeof ApiDocsTranscriptsRoute
   '/api-docs/users': typeof ApiDocsUsersRoute
   '/reviewers/$reviewerId': typeof ReviewersReviewerIdRoute
   '/api-docs/': typeof ApiDocsIndexRoute
@@ -186,6 +204,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -196,6 +215,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
@@ -205,6 +225,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -215,6 +236,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs'
@@ -225,6 +247,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -235,6 +258,7 @@ export interface FileRouteTypes {
     | '/api-docs/progress'
     | '/api-docs/reviews'
     | '/api-docs/schema'
+    | '/api-docs/transcripts'
     | '/api-docs/users'
     | '/reviewers/$reviewerId'
     | '/api-docs/'
@@ -246,6 +270,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  GenerateRoute: typeof GenerateRoute
   LoginRoute: typeof LoginRoute
   ProgressRoute: typeof ProgressRoute
   UsersRoute: typeof UsersRoute
@@ -274,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate': {
+      id: '/generate'
+      path: '/generate'
+      fullPath: '/generate'
+      preLoaderRoute: typeof GenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -323,6 +355,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/api-docs/users'
       preLoaderRoute: typeof ApiDocsUsersRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/transcripts': {
+      id: '/api-docs/transcripts'
+      path: '/transcripts'
+      fullPath: '/api-docs/transcripts'
+      preLoaderRoute: typeof ApiDocsTranscriptsRouteImport
       parentRoute: typeof ApiDocsRoute
     }
     '/api-docs/schema': {
@@ -392,6 +431,7 @@ interface ApiDocsRouteChildren {
   ApiDocsProgressRoute: typeof ApiDocsProgressRoute
   ApiDocsReviewsRoute: typeof ApiDocsReviewsRoute
   ApiDocsSchemaRoute: typeof ApiDocsSchemaRoute
+  ApiDocsTranscriptsRoute: typeof ApiDocsTranscriptsRoute
   ApiDocsUsersRoute: typeof ApiDocsUsersRoute
   ApiDocsIndexRoute: typeof ApiDocsIndexRoute
 }
@@ -404,6 +444,7 @@ const ApiDocsRouteChildren: ApiDocsRouteChildren = {
   ApiDocsProgressRoute: ApiDocsProgressRoute,
   ApiDocsReviewsRoute: ApiDocsReviewsRoute,
   ApiDocsSchemaRoute: ApiDocsSchemaRoute,
+  ApiDocsTranscriptsRoute: ApiDocsTranscriptsRoute,
   ApiDocsUsersRoute: ApiDocsUsersRoute,
   ApiDocsIndexRoute: ApiDocsIndexRoute,
 }
@@ -416,6 +457,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  GenerateRoute: GenerateRoute,
   LoginRoute: LoginRoute,
   ProgressRoute: ProgressRoute,
   UsersRoute: UsersRoute,
@@ -425,13 +467,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

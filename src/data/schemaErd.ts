@@ -6,6 +6,8 @@ export const SCHEMA_ERD = `erDiagram
   DIALOGUES ||--o{ ASSIGNMENTS : "appears in"
   DIALOGUES ||--o{ SIMULATED_EXCHANGES : "simulated in"
   RESPONSES ||--o{ SIMULATED_EXCHANGES : "sent as"
+  REVIEWERS ||--o{ TRANSCRIPT_BATCHES : "generates"
+  TRANSCRIPT_BATCHES ||--o{ GENERATED_TRANSCRIPTS : "contains"
   ASSIGNMENTS ||--o| REVIEWS : "produces"
   REVIEWS ||--o{ RUBRIC_SCORES : "contains"
   RUBRIC_CRITERIA ||--o{ RUBRIC_SCORES : "scored by"
@@ -83,6 +85,28 @@ export const SCHEMA_ERD = `erDiagram
     text entity_id
     timestamptz at
     jsonb meta
+  }
+  TRANSCRIPT_BATCHES {
+    uuid id PK
+    uuid created_by FK
+    text prompt
+    int count
+    text model_version
+    enum status "draft | queued | sent | coded"
+    text redcap_record_id
+    timestamptz created_at
+    timestamptz sent_at
+    timestamptz coded_at
+  }
+  GENERATED_TRANSCRIPTS {
+    uuid id PK
+    uuid batch_id FK
+    text blinded_id
+    enum barrier_category
+    jsonb turns
+    text model_version
+    jsonb miti_results
+    timestamptz generated_at
   }
   SIMULATED_EXCHANGES {
     uuid id PK

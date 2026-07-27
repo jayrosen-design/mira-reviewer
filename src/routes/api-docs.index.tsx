@@ -48,9 +48,17 @@ function ApiDocsOverview() {
           <li><strong className="text-foreground">/dashboard</strong> — aggregate research dashboard (Metrics).</li>
           <li><strong className="text-foreground">/users</strong> — researcher user roster and Manage User dialog (Users).</li>
           <li><strong className="text-foreground">/reviewers/:id</strong> and <strong className="text-foreground">/reviews/:reviewerId/:itemId</strong> — researcher drilldown into a reviewer and one of their reviews (Progress + Reviews).</li>
+          <li><strong className="text-foreground">/generate</strong> — transcript generation and REDCap transmission (Transcripts &amp; REDCap).</li>
           <li><strong className="text-foreground">Edit Account dialog</strong> (top nav) — self-service name change, password reset, review reset (Account).</li>
         </ul>
+        <p className="mt-3 text-sm text-muted-foreground">
+          A secondary, blinded review runs outside this app: MIRA-generated transcripts are pushed to
+          REDCap, where the research team codes them with MITI. This app only queues generation,
+          previews the blinded transcripts, and tracks transmission status — no coding happens here,
+          and no model is called at request time.
+        </p>
       </section>
+
 
       <section className="rounded-lg border border-border bg-card p-5">
         <h3 className="text-base font-semibold">Blinding &amp; randomization</h3>

@@ -1,64 +1,72 @@
 ## Goal
 
-Extend the Research Dashboard so researchers can:
-1. Filter every chart/table by reviewer group (All / Parents / Experts).
-2. Toggle between **Overall Summary** (current aggregate view) and **By Parent Concern** (per-item drilldown).
-3. In drilldown mode, pick a parent concern from a table (styled like My Progress) or step through with prev/next arrows — all charts re-render for just that item.
-4. See both **Expert** and **Parent** series overlaid inside each of the two radar charts (Human-authored / MIRA-generated).
+Add a Researcher/Admin-only **Generate Transcripts** page where a researcher writes a scenario prompt, "generates" MIRA transcripts (mocked — no LLM at runtime), reads them turn-by-turn, previews the blinded MITI coding sheet, and pushes batches to REDCap with tracked statuses.
 
-Purely presentational — mock data only, no schema or API changes.
+## Navigation & access
 
-## Changes
+- New nav item **Generate Transcripts**, researcher-only, placed after **Users** in the navbar.
+- Route `/generate`, added to the researcher allow-list in the `__root` auth gate (blocked for parent/expert).
+- Page `head()` with its own title/description.
 
-### `src/data/mockProgress.ts`
-
-- Extend `CONSTRUCT_MEANS_BY_SOURCE` shape to include per-group values:
-  `{ statement, short, humanParent, humanExpert, miraParent, miraExpert }`
-  Seed with `rand()` so expert values sit slightly below parent values (experts are stricter).
-- Add `getConstructMeansForItem(itemId, group)` — returns the same 6-row shape but perturbed by a stable per-item hash so each parent concern has its own radar/bar values.
-- Add `getPreferenceForItem(itemId, group)`, `getSourceMeansForItem(itemId, group)`, `getCategoryResultsForItem(itemId)` helpers returning the same shapes as the existing aggregate exports, all deterministically seeded from the item id.
-- Add `getAggregateByGroup(group)` returning `{ constructs, preference, sourceMeans }` for the Overall view when a group filter is applied.
-
-### `src/routes/dashboard.tsx`
-
-Top of `ResearchDashboardPage`:
-
-- Add `group` state: `"all" | "parent" | "expert"` — segmented control (shadcn `ToggleGroup`) in the header row, right under the title.
-- Add `view` state: `"overall" | "byItem"` — tabs (`Tabs` component) above the KPI cards. Labels: **Overall Summary** and **By Parent Concern**.
-- Add `selectedItemId` state (defaults to first `REVIEW_ITEMS` id). Only used in `byItem` mode.
-
-Overall view: renders the current sections, but data comes from `getAggregateByGroup(group)` so the filter applies.
-
-By-Parent-Concern view layout:
+## Page layout (`src/routes/generate.tsx`)
 
 ```text
-[ ◀ Prev ]  MIRA-014 — "How well does this vaccine really work?"  [ Next ▶ ]
-             Barrier: Vaccine effectiveness · Reviews: 12 parents / 4 experts
+Generate Transcripts                       [ Research preview — mock output ]
+Scenario prompt
+[ textarea: "Parent hesitant about HPV vaccine for a 9-year-old…" ]
+Barrier category (auto-tagged)  ·  # transcripts [1–5]  ·  Model: mira-v0.4.1
+                                                        [ Generate ]
 
-[ small KPI strip: reviews, mean parent score, expert yes-rate, preferred response ]
+Batches
+┌ Batch · prompt excerpt · count · created · status chip · [Send to REDCap] ┐
+└ rows clickable → expands / selects batch                                  ┘
 
-[ Radar: Human-authored ]   [ Radar: MIRA-generated ]
-[ Bar chart: construct means for this item ]
-[ Preferred response pie (this item) ]  [ Source comparison bar (this item) ]
-
-[ Parent Concerns table — click a row to jump to it ]
-  columns: ID · Barrier category · Parent concern · Reviews · Mean · Preferred
-  the selected row is highlighted (bg-muted).
+Selected batch → transcript list (T-001 … T-00n)  [ ◀ Prev  Next ▶ ]
+  ┌ Transcript viewer ─────────────┐ ┌ MITI coding preview (blinded) ──────┐
+  │ clinician / parent turn bubbles│ │ Global: Cultivating Change Talk 1–5 │
+  │ blinded ID: MIRA-GEN-7c41      │ │ Partnership, Empathy, Softening     │
+  │ (no source label shown)        │ │ Behavior counts: OQ, CQ, SR, CR,    │
+  └────────────────────────────────┘ │ Affirm, Seek Collab, MI Adherent    │
+                                     │ read-only, "coded in REDCap" note   │
+                                     └──────────────────────────────────────┘
 ```
 
-Prev/Next buttons wrap around `REVIEW_ITEMS`. Table row click sets `selectedItemId`.
+- A generation run is simulated: button shows a short "Generating…" state, then transcripts appear (deterministic mock builder seeded from the prompt text).
+- Note under the header: *"Prototype only — transcripts are pre-scripted mock content. The production system generates these offline; MIRA does not run an LLM at review time."*
+- Blinding note in the viewer: transcripts are labeled with an opaque generated ID and never show `source`.
 
-### Radar chart update (both views)
+## REDCap transmission
 
-`RadarCard` renders two `<Radar>` series in the same chart:
-- **Parent** — solid `var(--primary)` for Human card / `var(--accent)` for MIRA card, `fillOpacity={0.35}`.
-- **Expert** — dashed stroke (`strokeDasharray="4 4"`), same base color, `fillOpacity={0.15}`.
-Include a `<Legend>` so the two series are distinguishable. When `group === "parent"` hide the Expert series; when `group === "expert"` hide the Parent series.
+- Per-batch status chip: **Draft → Queued → Sent → Coded**, with mocked REDCap record ID (`REDCAP-2026-0142`) and timestamp shown once sent.
+- **Send to REDCap** button advances Draft → Queued → Sent after a brief simulated delay; a **Mark coded** action (researcher-only mock) advances Sent → Coded.
+- Sent batches become read-only; a small legend explains each status.
 
-### Group filter applied everywhere
+## Mock data (`src/data/mockTranscripts.ts`)
 
-- KPI cards: hide expert-only KPI when `group === "parent"` and vice versa; recompute counts from `REVIEWERS` filtered by type.
-- Reviewer completion table: filter rows by group.
-- Preferred distribution pie / source comparison bar / category table: use the group-filtered helper.
+New file, matching the style of `mockProgress.ts`:
+- `GeneratedTranscript` — `{ id, blindedId, batchId, barrierCategory, turns: DialogueTurn[], modelVersion, generatedAt }`
+- `TranscriptBatch` — `{ id, prompt, count, createdAt, status, redcapRecordId?, sentAt? }`
+- `MITI_GLOBAL_SCORES` (Cultivating Change Talk, Softening Sustain Talk, Partnership, Empathy — 1–5) and `MITI_BEHAVIOR_COUNTS` (Open/Closed Questions, Simple/Complex Reflections, Affirmations, Seeking Collaboration, MI Adherent/Non-Adherent).
+- `generateTranscripts(prompt, count)` — deterministic seeded builder that assembles turns from templated MI fragments per barrier category.
+- Two pre-seeded batches so the page isn't empty on first load (one `Sent`, one `Coded`).
 
-No routing changes, no new files.
+State lives in React (`useState`) on the page — no persistence, consistent with the rest of the prototype.
+
+## Docs
+
+- **New API docs page** `src/routes/api-docs.transcripts.tsx`, linked in the API Docs sidebar after Users:
+  - `POST /v1/transcripts/generate` — scenario prompt + count → batch
+  - `GET /v1/transcripts/batches` and `GET /v1/transcripts/batches/:id`
+  - `GET /v1/transcripts/:id` — blinded transcript payload
+  - `POST /v1/transcripts/batches/:id/redcap` — push to REDCap, returns record ID
+  - `GET /v1/transcripts/batches/:id/redcap/status` — coding progress webhook/poll
+  - All researcher-auth, with error codes.
+- **`src/data/schemaErd.ts`** — add `TRANSCRIPT_BATCHES` and `GENERATED_TRANSCRIPTS` tables and their relations to `REVIEWERS`.
+- **`README.md`** — new "Generate Transcripts / REDCap MITI review" section describing the secondary blinded review loop, the two new tables with sample rows, and a Mermaid sequence diagram (Researcher → app → generation service → REDCap → MITI coders → results back).
+- **`api-docs.index.tsx`** — mention the new section and note that REDCap coding happens outside this app.
+
+## Technical notes
+
+- Purely presentational; no backend, no Lovable Cloud, no LLM calls.
+- Reuses `DialogueTurn`/`BarrierCategory` types from `src/data/dialogues.ts`.
+- Uses existing shadcn primitives (Card, Table, Badge, Button, Textarea, Select) and the same design tokens as the dashboard — no new colors.
