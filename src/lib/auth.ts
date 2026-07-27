@@ -43,13 +43,16 @@ export function logout() {
 }
 
 export function useAuth() {
-  const [state, setState] = useState<{ isLoggedIn: boolean; role: ReviewerRole | null }>(
-    () => ({ isLoggedIn: false, role: null })
-  );
+  const [state, setState] = useState<{
+    isLoggedIn: boolean;
+    role: ReviewerRole | null;
+    /** False until localStorage has been read on the client. */
+    ready: boolean;
+  }>(() => ({ isLoggedIn: false, role: null, ready: false }));
 
   useEffect(() => {
     const sync = () =>
-      setState({ isLoggedIn: getIsLoggedIn(), role: getStoredRole() });
+      setState({ isLoggedIn: getIsLoggedIn(), role: getStoredRole(), ready: true });
     sync();
     window.addEventListener(EVENT, sync);
     window.addEventListener("storage", sync);
@@ -61,3 +64,4 @@ export function useAuth() {
 
   return state;
 }
+
