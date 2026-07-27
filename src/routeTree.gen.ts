@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GenerateRouteImport } from './routes/generate'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AboutRouteImport } from './routes/about'
@@ -41,6 +42,11 @@ const ProgressRoute = ProgressRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateRoute = GenerateRouteImport.update({
+  id: '/generate',
+  path: '/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/dashboard': typeof DashboardRoute
+  '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
   '/progress': typeof ProgressRoute
   '/users': typeof UsersRoute
@@ -186,6 +195,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/dashboard'
+    | '/generate'
     | '/login'
     | '/progress'
     | '/users'
@@ -246,6 +258,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
   DashboardRoute: typeof DashboardRoute
+  GenerateRoute: typeof GenerateRoute
   LoginRoute: typeof LoginRoute
   ProgressRoute: typeof ProgressRoute
   UsersRoute: typeof UsersRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate': {
+      id: '/generate'
+      path: '/generate'
+      fullPath: '/generate'
+      preLoaderRoute: typeof GenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -416,6 +436,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  GenerateRoute: GenerateRoute,
   LoginRoute: LoginRoute,
   ProgressRoute: ProgressRoute,
   UsersRoute: UsersRoute,
