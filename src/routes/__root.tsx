@@ -134,8 +134,14 @@ function RootComponent() {
 
 function AuthGate() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { isLoggedIn, role } = useAuth();
+  const { isLoggedIn, role, ready } = useAuth();
   const isLogin = pathname === "/login";
+
+  // Auth lives in localStorage, so it is unknown during SSR and the first client
+  // render. Redirecting before it is read would bounce deep links to /login.
+  if (!ready) {
+    return <div className="min-h-screen bg-background" />;
+  }
 
   if (!isLoggedIn && !isLogin) {
     return <Navigate to="/login" replace />;
