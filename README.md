@@ -32,7 +32,8 @@ Routes are file-based under `src/routes/`. Access is enforced in `AuthGate` (`sr
 - **`/users`** — full user roster (reviewers + researchers) with filter toggle. Each row has a Manage gear that opens the **Manage User** dialog (edit name, change account type, reset reviews, send password reset, delete account).
 - **`/reviewers/$reviewerId`** — per-reviewer progress detail (same shape as `/progress` but for a chosen reviewer).
 - **`/reviews/$reviewerId/$itemId`** — researcher view of a single submitted review. Response cards are unblinded (true source visible), full rubric table, reviewer comments, collapsible research metadata (transcript id, turn number, model version, seed).
-- **`/api-docs/*`** — in-app REST API documentation with sidebar: Overview, Database Schema (Mermaid ERD), Auth, Account (self-service), Users (admin), Dialogues, Reviews, Progress, Metrics.
+- **`/generate`** — **Generate Transcripts**. Free-text scenario prompt → mock MIRA-generated counseling transcripts, grouped into batches. Includes a blinded transcript viewer with prev/next, a read-only MITI coding preview (4 global scores + 8 behavior counts), and mock REDCap transmission with per-batch status (Draft → Queued → Sent → MITI coded).
+- **`/api-docs/*`** — in-app REST API documentation with sidebar: Overview, Database Schema (Mermaid ERD), Auth, Account (self-service), Users (admin), Dialogues, Reviews, Progress, Metrics, Transcripts & REDCap.
 
 ### Global (all roles)
 
@@ -519,6 +520,75 @@ Optional record of the in-app **"Preview in dialogue context"** action. When a r
 | `generator` | text | e.g. `template-v1` |
 | `created_at` | timestamptz | |
 
+### `transcript_batches`
+One generation run. Created from a researcher's free-text scenario prompt on `/generate`.
+
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | surfaced as `BATCH-2026-004` |
+| `created_by` | fk → reviewers | must be a researcher |
+| `prompt` | text | scenario prompt supplied by the researcher |
+| `count` | int | transcripts requested (1–5) |
+| `model_version` | text | e.g. `mira-v0.4.1` |
+| `status` | enum(`draft`,`queued`,`sent`,`coded`) | REDCap transmission lifecycle |
+| `redcap_record_id` | text | assigned once transmitted, e.g. `REDCAP-2026-0142` |
+| `created_at` / `sent_at` / `coded_at` | timestamptz | |
+
+```json
+{ "id": "BATCH-2026-004",
+  "prompt": "Parent unsure the vaccine really prevents cancer; wants long-term evidence.",
+  "count": 3, "model_version": "mira-v0.4.1", "status": "sent",
+  "redcap_record_id": "REDCAP-2026-0142", "sent_at": "2026-07-22T13:31:00Z" }
+```
+
+### `generated_transcripts`
+An individual MIRA-generated conversation inside a batch. Delivered to REDCap **blinded** — coders see `blinded_id` and the turns only.
+
+| column | type | notes |
+|---|---|---|
+| `id` | uuid (pk) | |
+| `batch_id` | fk → transcript_batches | |
+| `blinded_id` | text | opaque coder-facing label, e.g. `TRX-4C1A` |
+| `barrier_category` | enum | inferred from the prompt |
+| `turns` | jsonb | `[{ speaker: "clinician" \| "parent", text }]` |
+| `model_version` | text | withheld from coder-scoped tokens |
+| `miti_results` | jsonb | written back after REDCap coding completes |
+| `generated_at` | timestamptz | |
+
+```json
+{ "id": "BATCH-2026-004-T001", "blinded_id": "TRX-4C1A",
+  "barrier_category": "Vaccine effectiveness",
+  "turns": [{ "speaker": "clinician", "text": "Where are you with the HPV vaccine right now?" }],
+  "miti_results": { "globals": { "partnership": 5, "empathy": 5 },
+                    "behaviors": { "complex_reflections": 5, "mi_non_adherent": 0 } } }
+```
+
+### Secondary review: transcript generation → REDCap MITI coding
+
+The A/B reviewer workflow is the *primary* study. A **secondary** blinded review runs in REDCap: MIRA-generated transcripts are coded with MITI as if they were real expert-authored counseling sessions. MIRA itself never runs an LLM at request time — generation is an offline batch job, and this app is only the operator interface for it.
+
+```mermaid
+sequenceDiagram
+    participant R as Researcher (/generate)
+    participant App as MIRA app
+    participant Gen as Offline generation job
+    participant RC as REDCap
+    participant C as MITI coders
+
+    R->>App: Submit scenario prompt + count
+    App->>Gen: POST /v1/transcripts/generate
+    Gen-->>App: Batch (status: draft) + blinded transcripts
+    R->>App: Review transcripts, MITI preview
+    R->>App: Send to REDCap
+    App->>RC: POST batch (blinded_id + turns only)
+    RC-->>App: redcap_record_id (status: sent)
+    C->>RC: Code each transcript with MITI 4.2.1
+    RC-->>App: Coding complete (status: coded)
+    App->>App: Store miti_results on generated_transcripts
+```
+
+Blinding rules: coders receive `blinded_id`, `barrier_category`, and `turns`. Generator identity, model version, prompt text, and batch grouping are withheld so transcripts are coded as if human-authored.
+
 ### Randomization & assignment rules
 
 - **Unseen sampling**: each reviewer only ever gets dialogues they haven't reviewed.
@@ -529,7 +599,7 @@ Optional record of the in-app **"Preview in dialogue context"** action. When a r
 
 ### Prototype boundary
 
-This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, real authentication, or production data storage. The "Preview in dialogue context" panel uses canned parent replies and is purely illustrative. Password reset, review reset, and account deletion in both the Edit Account and Manage User dialogs show a toast but do not persist any change.
+This prototype demonstrates the MIRA dialogue review workflow only. It does not include live AI generation, chatbot interaction, real transcripts, real authentication, or production data storage. On `/generate`, transcript text is pre-scripted mock content assembled deterministically from the prompt, and both the REDCap transmission and the MITI coding preview are simulated — nothing leaves the browser. The "Preview in dialogue context" panel uses canned parent replies and is purely illustrative. Password reset, review reset, and account deletion in both the Edit Account and Manage User dialogs show a toast but do not persist any change.
 
 See the in-app **API Docs** section (`/api-docs`) for the full endpoint surface that would back these tables.
 
