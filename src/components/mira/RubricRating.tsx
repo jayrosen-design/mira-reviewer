@@ -28,7 +28,7 @@ function AgreementRow({
   ariaLabelPrefix: string;
 }) {
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-nowrap gap-1">
       {[1, 2, 3, 4, 5, 6, 7].map((n) => {
         const active = value === n;
         return (
@@ -69,7 +69,7 @@ export function ParentRubric({ ratingsA, ratingsB, onChange }: ParentProps) {
         </p>
       </div>
 
-      <div className="hidden grid-cols-[1fr_auto_1fr] items-center gap-6 border-b border-border pb-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground sm:grid">
+      <div className="hidden lg:grid-cols-[minmax(0,1fr)_15rem_minmax(0,1fr)] items-center gap-6 border-b border-border pb-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground lg:grid">
         <span className="justify-self-center">Response A</span>
         <span className="text-center">Statement</span>
         <span className="justify-self-center">Response B</span>
@@ -79,10 +79,10 @@ export function ParentRubric({ ratingsA, ratingsB, onChange }: ParentProps) {
         {PARENT_STATEMENTS.map((s) => (
           <li
             key={s}
-            className="grid gap-3 py-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6"
+            className="grid gap-3 py-4 lg:grid-cols-[minmax(0,1fr)_15rem_minmax(0,1fr)] lg:items-center lg:gap-6"
           >
-            <div className="order-2 sm:order-1 sm:justify-self-center">
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
+            <div className="order-2 lg:order-1 lg:justify-self-center">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground lg:hidden">
                 Response A
               </div>
               <AgreementRow
@@ -91,11 +91,11 @@ export function ParentRubric({ ratingsA, ratingsB, onChange }: ParentProps) {
                 ariaLabelPrefix={`A — ${s}`}
               />
             </div>
-            <div className="order-1 max-w-xs text-sm text-foreground sm:order-2 sm:text-center">
+            <div className="order-1 text-sm text-foreground lg:order-2 lg:text-center">
               {s}
             </div>
-            <div className="order-3 sm:justify-self-center">
-              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:hidden">
+            <div className="order-3 lg:justify-self-center">
+              <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground lg:hidden">
                 Response B
               </div>
               <AgreementRow

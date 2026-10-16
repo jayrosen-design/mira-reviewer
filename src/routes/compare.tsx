@@ -19,7 +19,7 @@ export const Route = createFileRoute("/compare")({
 });
 
 const PAGES = [
-  { path: "/login", label: "Sign in" },
+  { path: "/login?preview=1", label: "Sign in" },
   { path: "/about", label: "About" },
   { path: "/", label: "Review" },
   { path: "/progress", label: "My progress" },
@@ -59,7 +59,7 @@ function ComparePage() {
             <h2 className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-heading">
               <Swatch colors={t.swatch} /> {t.label}
             </h2>
-            <ScaledFrame src={`${page}?theme=${t.id}`} title={`${t.label} preview`} />
+            <ScaledFrame src={`${page}${page.includes("?") ? "&" : "?"}theme=${t.id}`} title={`${t.label} preview`} />
           </section>
         ))}
       </div>
