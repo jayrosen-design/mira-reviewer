@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as GenerateRouteImport } from './routes/generate'
 import { Route as LoginRouteImport } from './routes/login'
@@ -43,6 +44,11 @@ const AboutRoute = AboutRouteImport.update({
 const ApiDocsRoute = ApiDocsRouteImport.update({
   id: '/api-docs',
   path: '/api-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -135,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/generate': typeof GenerateRoute
   '/login': typeof LoginRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api-docs'
+    | '/compare'
     | '/dashboard'
     | '/generate'
     | '/login'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/compare'
     | '/dashboard'
     | '/generate'
     | '/login'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api-docs'
+    | '/compare'
     | '/dashboard'
     | '/generate'
     | '/login'
@@ -269,6 +281,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
+  CompareRoute: typeof CompareRoute
   DashboardRoute: typeof DashboardRoute
   GenerateRoute: typeof GenerateRoute
   LoginRoute: typeof LoginRoute
@@ -299,6 +312,13 @@ declare module '@tanstack/react-router' {
       path: '/api-docs'
       fullPath: '/api-docs'
       preLoaderRoute: typeof ApiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -456,6 +476,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
+  CompareRoute: CompareRoute,
   DashboardRoute: DashboardRoute,
   GenerateRoute: GenerateRoute,
   LoginRoute: LoginRoute,

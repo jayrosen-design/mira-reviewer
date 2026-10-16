@@ -9,6 +9,7 @@ import {
   HeadContent,
   Scripts,
   type ErrorComponentProps,
+  retainSearchParams,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -16,6 +17,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { NavBar } from "@/components/mira/NavBar";
 import { useAuth } from "@/lib/auth";
+import { ThemeProvider, isTheme, useUrlTheme, type ThemeId } from "@/lib/theme";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +80,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  validateSearch: (search: Record<string, unknown>): { theme?: ThemeId } =>
+    isTheme(search.theme) ? { theme: search.theme } : {},
+  // Keep ?theme= on every internal link, navigate() and <Navigate> redirect.
+  search: { middlewares: [retainSearchParams(["theme"])] },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -115,8 +121,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const theme = useUrlTheme();
   return (
-    <html lang="en">
+    <html lang="en" data-theme={theme}>
       <head>
         <HeadContent />
       </head>
@@ -133,7 +140,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthGate />
+      <ThemeProvider>
+        <AuthGate />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
@@ -143,6 +152,7 @@ function AuthGate() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { isLoggedIn, role, ready } = useAuth();
   const isLogin = pathname === "/login";
+  const isCompare = pathname === "/compare";
 
   // Auth lives in localStorage, so it is unknown during SSR and the first client
   // render. Redirecting before it is read would bounce deep links to /login.
@@ -150,7 +160,7 @@ function AuthGate() {
     return <div className="min-h-screen bg-background" />;
   }
 
-  if (!isLoggedIn && !isLogin) {
+  if (!isLoggedIn && !isLogin && !isCompare) {
     return <Navigate to="/login" replace />;
   }
 
@@ -169,7 +179,7 @@ function AuthGate() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {!isLogin && <NavBar />}
+      {!isLogin && isLoggedIn && <NavBar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className="flex-1">
         <Outlet />
