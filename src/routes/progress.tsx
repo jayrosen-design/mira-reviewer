@@ -28,10 +28,10 @@ import {
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
-      { title: "My Progress — MIRA Reviewer" },
+      { title: "My Progress · Response Review" },
       {
         name: "description",
-        content: "Track your review progress across the assigned MIRA review items.",
+        content: "Track your review progress across the assigned review items.",
       },
     ],
   }),
@@ -108,7 +108,7 @@ function ProgressTrackerPage() {
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         <header>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
             My Progress
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -184,12 +184,10 @@ function ProgressTrackerPage() {
                   className="cursor-pointer transition hover:bg-muted/60"
                 >
                   <TableCell className="font-mono text-xs text-muted-foreground">
-                    {item.id}
+                    {displayItemId(item.id)}
                   </TableCell>
                   <TableCell>
-                    <span className="rounded-full bg-accent-soft px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
-                      {item.barrierCategory}
-                    </span>
+                    <BarrierChip category={item.barrierCategory} />
                   </TableCell>
                   <TableCell className="max-w-md">
                     <p className="line-clamp-2 text-sm text-foreground">

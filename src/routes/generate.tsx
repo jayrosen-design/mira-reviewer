@@ -171,7 +171,7 @@ function GenerateTranscriptsPage() {
 
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Generate Transcripts</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">Generate Transcripts</h1>
           <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
             Produce MIRA-generated counseling transcripts for the secondary, blinded MITI review that
             the research team completes in REDCap.
