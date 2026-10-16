@@ -71,7 +71,7 @@ export function PreferredResponse({ responseA, responseB, selected, onSelect }: 
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Preferred response</h2>
+        <h2 className="font-display text-lg font-semibold text-foreground">Preferred response</h2>
         <p className="text-sm text-muted-foreground">
           After rating both responses, choose which one you prefer overall.
         </p>
@@ -87,7 +87,7 @@ export function PreferredResponse({ responseA, responseB, selected, onSelect }: 
               aria-pressed={active}
               className={`flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition ${
                 active
-                  ? "border-accent bg-accent-soft ring-2 ring-accent/40"
+                  ? "border-2 border-primary bg-primary-soft"
                   : "border-border bg-card hover:border-primary/40"
               }`}
             >
@@ -95,7 +95,7 @@ export function PreferredResponse({ responseA, responseB, selected, onSelect }: 
                 {opt.icon}
                 {opt.label}
                 {active && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">
                     <Star className="h-3 w-3" /> Preferred
                   </span>
                 )}

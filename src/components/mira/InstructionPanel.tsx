@@ -26,7 +26,7 @@ export function InstructionPanel({ role }: { role: ReviewerRole }) {
   return (
     <section
       aria-label={title}
-      className="relative flex gap-3 rounded-2xl border border-primary/15 bg-primary-soft/60 p-4 pr-10"
+      className="relative flex gap-3 rounded-2xl border border-primary/15 bg-primary-soft p-4 pr-10"
     >
       <Info className="mt-0.5 h-5 w-5 flex-none text-primary" aria-hidden />
       <div>

@@ -12,13 +12,13 @@ export function ResponseCard({ response, preferred, onSend, sendDisabled }: Prop
   return (
     <div
       className={`flex h-full flex-col rounded-2xl border bg-card p-6 shadow-sm transition ${
-        preferred ? "border-accent ring-2 ring-accent/40" : "border-border"
+        preferred ? "border-2 border-primary bg-primary-soft" : "border-border"
       }`}
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-primary">{response.title}</h3>
+        <h3 className="font-display text-lg font-semibold text-primary">{response.title}</h3>
         {preferred && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
             <Star className="h-3 w-3" /> Preferred
           </span>
         )}
