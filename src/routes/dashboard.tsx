@@ -708,7 +708,7 @@ function RadarCard({
                 fillOpacity={0.3}
               />
             )}
-            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
             <Tooltip
               contentStyle={{
                 background: "var(--card)",
@@ -765,7 +765,7 @@ function ConstructBar({
               fontSize: 12,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
           {showParent && (
             <Bar dataKey="humanParent" name="Human · Parent" fill="var(--chart-human)" />
           )}
@@ -872,7 +872,7 @@ function PreferencePie({
               fontSize: 12,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
         </PieChart>
       </ResponsiveContainer>
     </div>
