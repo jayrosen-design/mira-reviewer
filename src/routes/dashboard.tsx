@@ -147,10 +147,11 @@ function ResearchDashboardPage() {
               size="sm"
               value={group}
               onValueChange={(v) => v && setGroup(v as Group)}
+              className="rounded-lg bg-muted p-1"
             >
-              <ToggleGroupItem value="all">All</ToggleGroupItem>
-              <ToggleGroupItem value="parent">Parents</ToggleGroupItem>
-              <ToggleGroupItem value="expert">Experts</ToggleGroupItem>
+              <ToggleGroupItem value="all" className={TAB_LIKE}>All</ToggleGroupItem>
+              <ToggleGroupItem value="parent" className={TAB_LIKE}>Parents</ToggleGroupItem>
+              <ToggleGroupItem value="expert" className={TAB_LIKE}>Experts</ToggleGroupItem>
             </ToggleGroup>
           </div>
         </div>
@@ -545,6 +546,9 @@ function KpiCard({
   );
 }
 
+const TAB_LIKE =
+  "px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm";
+
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-border bg-card p-5">
@@ -767,13 +771,15 @@ function ConstructBar({
             />
           )}
           {showParent && (
-            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--chart-ai)" stroke="var(--chart-ai-stroke)" />
+            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--chart-ai)" stroke="var(--chart-ai-stroke)" strokeWidth={1.5} />
           )}
           {showExpert && (
             <Bar
               dataKey="miraExpert"
               name="MIRA · Expert"
               fill="var(--chart-ai-soft)"
+              stroke="var(--chart-ai-stroke)"
+              strokeWidth={1.5}
             />
           )}
         </BarChart>
@@ -807,7 +813,19 @@ function SourceBar({ data }: { data: Array<{ label: string; mean: number }> }) {
               fontSize: 12,
             }}
           />
-          <Bar dataKey="mean" name="Mean score" fill="var(--primary)" />
+          <Bar dataKey="mean" name="Mean score">
+            {data.map((d) => {
+              const ai = /mira/i.test(d.label);
+              return (
+                <Cell
+                  key={d.label}
+                  fill={ai ? "var(--chart-ai)" : "var(--chart-human)"}
+                  stroke={ai ? "var(--chart-ai-stroke)" : "transparent"}
+                  strokeWidth={1.5}
+                />
+              );
+            })}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -832,7 +850,12 @@ function PreferencePie({
             paddingAngle={2}
           >
             {data.map((entry) => (
-              <Cell key={entry.label} fill={entry.color} />
+              <Cell
+                key={entry.label}
+                fill={entry.color}
+                stroke={entry.color === "var(--chart-ai)" ? "var(--chart-ai-stroke)" : "transparent"}
+                strokeWidth={1.5}
+              />
             ))}
           </Pie>
           <Tooltip

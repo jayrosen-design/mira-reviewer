@@ -7,6 +7,9 @@ import { ParentVaccineTalkLogo } from "@/components/mira/ParentVaccineTalkLogo";
 import { ThemeSwitcher } from "@/components/mira/ThemeSwitcher";
 
 export const Route = createFileRoute("/login")({
+  // ?preview=1 shows the sign-in card even when signed in (used by /compare).
+  validateSearch: (s: Record<string, unknown>): { preview?: 1 } =>
+    s.preview === 1 || s.preview === "1" ? { preview: 1 } : {},
   head: () => ({
     meta: [
       { title: "Sign in · Response Review" },
@@ -47,14 +50,15 @@ function LoginPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const { isLoggedIn, role } = useAuth();
+  const { preview } = Route.useSearch();
   const [selected, setSelected] = useState<ReviewerRole | null>(null);
   const [signingIn, setSigningIn] = useState(false);
 
   useEffect(() => {
-    if (isLoggedIn && role) {
+    if (isLoggedIn && role && !preview) {
       navigate({ to: role === "researcher" ? "/dashboard" : "/about", replace: true });
     }
-  }, [isLoggedIn, role, navigate]);
+  }, [isLoggedIn, role, navigate, preview]);
 
   // Warm the likely destinations so the target page is ready to paint together
   // with the navbar the instant we navigate.

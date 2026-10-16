@@ -275,14 +275,14 @@ function Stat({ label, value }: { label: string; value: string | number }) {
 function StatusCell({ status }: { status: ReviewItemProgress["status"] }) {
   if (status === "completed")
     return (
-      <span className="inline-flex items-center gap-1 text-emerald-700">
+      <span className="inline-flex items-center gap-1 text-success-text">
         <CheckCircle2 className="h-4 w-4" />
         <span className="text-xs font-medium">Submitted</span>
       </span>
     );
   if (status === "draft")
     return (
-      <span className="inline-flex items-center gap-1 text-amber-700">
+      <span className="inline-flex items-center gap-1 text-warning-foreground">
         <FileEdit className="h-4 w-4" />
         <span className="text-xs font-medium">Draft saved</span>
       </span>
@@ -298,25 +298,25 @@ function StatusCell({ status }: { status: ReviewItemProgress["status"] }) {
 function PreferenceCell({ value }: { value: ReviewItemProgress["preferred"] }) {
   if (value === "A")
     return (
-      <Badge className="bg-primary-soft text-primary hover:bg-primary-soft">
+      <Badge className="bg-muted text-foreground hover:bg-muted">
         Response A
       </Badge>
     );
   if (value === "B")
     return (
-      <Badge className="bg-accent text-accent-foreground hover:bg-accent">
+      <Badge className="bg-muted text-foreground hover:bg-muted">
         Response B
       </Badge>
     );
   if (value === "neither")
     return (
-      <Badge variant="outline" className="gap-1">
+      <Badge className="gap-1 bg-muted text-foreground hover:bg-muted">
         <Ban className="h-3 w-3" /> Neither
       </Badge>
     );
   if (value === "too_similar")
     return (
-      <Badge variant="outline" className="gap-1">
+      <Badge className="gap-1 bg-muted text-foreground hover:bg-muted">
         <Equal className="h-3 w-3" /> Too similar
       </Badge>
     );

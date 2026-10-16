@@ -114,9 +114,9 @@ function ReviewerItemReviewPage() {
           <span
             className={`rounded-full px-2.5 py-1 text-xs font-medium ${
               review.status === "completed"
-                ? "bg-emerald-100 text-emerald-800"
+                ? "bg-success/15 text-success-text"
                 : review.status === "draft"
-                  ? "bg-amber-100 text-amber-800"
+                  ? "bg-warning/15 text-warning-foreground"
                   : "bg-muted text-muted-foreground"
             }`}
           >
@@ -227,7 +227,7 @@ function ResponseCard({
   return (
     <div
       className={`flex h-full flex-col rounded-lg border bg-card p-5 ${
-        preferred ? "border-accent ring-2 ring-accent/40" : "border-border"
+        preferred ? "border-2 border-primary bg-primary-soft" : "border-border"
       }`}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -238,7 +238,7 @@ function ResponseCard({
           </p>
         </div>
         {preferred && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[11px] font-medium text-accent-foreground">
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[11px] font-medium text-primary-foreground">
             <Star className="h-3 w-3" /> Preferred
           </span>
         )}
@@ -364,7 +364,7 @@ function ExpertRatingsTable({
 function YesNo({ value }: { value?: "yes" | "no" | "unsure" }) {
   if (!value) return <span className="text-xs text-muted-foreground">—</span>;
   const map = {
-    yes: { Icon: Check, cls: "bg-emerald-100 text-emerald-800", label: "Yes" },
+    yes: { Icon: Check, cls: "bg-success/15 text-success-text", label: "Yes" },
     no: { Icon: X, cls: "bg-destructive/10 text-destructive", label: "No" },
     unsure: { Icon: HelpCircle, cls: "bg-muted text-muted-foreground", label: "Unsure" },
   } as const;
