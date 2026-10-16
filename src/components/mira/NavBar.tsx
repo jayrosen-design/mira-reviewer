@@ -54,13 +54,13 @@ export function NavBar() {
 
   return (
     <nav className="border-b border-border bg-card">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
+      <div className={`mx-auto flex items-center gap-3 px-4 py-3 sm:px-6 ${isResearcher ? "max-w-7xl" : "max-w-6xl"}`}>
         <Link to={isResearcher ? "/dashboard" : "/about"} className="flex min-w-0 shrink-0 items-center gap-2 transition-opacity hover:opacity-80" aria-label="Parent Vaccine Talk · Response Review">
           <ParentVaccineTalkLogo className="h-7 w-auto shrink-0" />
           <span className="hidden whitespace-nowrap font-display text-base font-semibold tracking-tight text-foreground min-[380px]:inline">
             Parent Vaccine Talk
           </span>
-          <span className="hidden whitespace-nowrap text-xs font-medium text-muted-foreground sm:inline">Response Review</span>
+          <span className={`hidden whitespace-nowrap text-xs font-medium text-muted-foreground sm:inline ${isResearcher ? "xl:hidden 2xl:inline" : ""}`}>Response Review</span>
         </Link>
         <ul className={`${inlineCls} min-w-0 flex-1 items-center gap-1`}>
           {links.map(({ to, label, icon: Icon, exact }) => (
