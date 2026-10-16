@@ -60,9 +60,9 @@ export function NavBar() {
           <span className="hidden whitespace-nowrap font-display text-base font-semibold tracking-tight text-foreground min-[380px]:inline">
             Parent Vaccine Talk
           </span>
-          <span className={`hidden whitespace-nowrap text-xs font-medium text-muted-foreground sm:inline ${isResearcher ? "xl:hidden 2xl:inline" : ""}`}>Response Review</span>
+          <span className={`hidden whitespace-nowrap text-xs font-medium text-muted-foreground ${isResearcher ? "min-[1800px]:inline" : "sm:inline"}`}>Response Review</span>
         </Link>
-        <ul className={`${inlineCls} min-w-0 flex-1 items-center gap-1`}>
+        <ul className={`${inlineCls} min-w-0 flex-1 basis-0 items-center gap-1 overflow-hidden`}>
           {links.map(({ to, label, icon: Icon, exact }) => (
             <li key={to}>
               <Link
