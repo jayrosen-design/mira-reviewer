@@ -9,55 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UsersRouteImport } from './routes/users'
-import { Route as ProgressRouteImport } from './routes/progress'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as GenerateRouteImport } from './routes/generate'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as ApiDocsRouteImport } from './routes/api-docs'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ApiDocsRouteImport } from './routes/api-docs'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as GenerateRouteImport } from './routes/generate'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as ApiDocsIndexRouteImport } from './routes/api-docs.index'
-import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
-import { Route as ApiDocsUsersRouteImport } from './routes/api-docs.users'
-import { Route as ApiDocsTranscriptsRouteImport } from './routes/api-docs.transcripts'
-import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
-import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
-import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
-import { Route as ApiDocsMetricsRouteImport } from './routes/api-docs.metrics'
-import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogues'
-import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
 import { Route as ApiDocsAccountRouteImport } from './routes/api-docs.account'
+import { Route as ApiDocsAuthRouteImport } from './routes/api-docs.auth'
+import { Route as ApiDocsDialoguesRouteImport } from './routes/api-docs.dialogues'
+import { Route as ApiDocsMetricsRouteImport } from './routes/api-docs.metrics'
+import { Route as ApiDocsProgressRouteImport } from './routes/api-docs.progress'
+import { Route as ApiDocsReviewsRouteImport } from './routes/api-docs.reviews'
+import { Route as ApiDocsSchemaRouteImport } from './routes/api-docs.schema'
+import { Route as ApiDocsTranscriptsRouteImport } from './routes/api-docs.transcripts'
+import { Route as ApiDocsUsersRouteImport } from './routes/api-docs.users'
+import { Route as ReviewersReviewerIdRouteImport } from './routes/reviewers.$reviewerId'
 import { Route as ReviewsReviewerIdItemIdRouteImport } from './routes/reviews.$reviewerId.$itemId'
 
-const UsersRoute = UsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProgressRoute = ProgressRouteImport.update({
-  id: '/progress',
-  path: '/progress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateRoute = GenerateRouteImport.update({
-  id: '/generate',
-  path: '/generate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDocsRoute = ApiDocsRouteImport.update({
-  id: '/api-docs',
-  path: '/api-docs',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -65,9 +40,34 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ApiDocsRoute = ApiDocsRouteImport.update({
+  id: '/api-docs',
+  path: '/api-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateRoute = GenerateRouteImport.update({
+  id: '/generate',
+  path: '/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDocsIndexRoute = ApiDocsIndexRouteImport.update({
@@ -75,44 +75,9 @@ const ApiDocsIndexRoute = ApiDocsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ApiDocsRoute,
 } as any)
-const ReviewersReviewerIdRoute = ReviewersReviewerIdRouteImport.update({
-  id: '/reviewers/$reviewerId',
-  path: '/reviewers/$reviewerId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDocsUsersRoute = ApiDocsUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsTranscriptsRoute = ApiDocsTranscriptsRouteImport.update({
-  id: '/transcripts',
-  path: '/transcripts',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
-  id: '/schema',
-  path: '/schema',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsReviewsRoute = ApiDocsReviewsRouteImport.update({
-  id: '/reviews',
-  path: '/reviews',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsProgressRoute = ApiDocsProgressRouteImport.update({
-  id: '/progress',
-  path: '/progress',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsMetricsRoute = ApiDocsMetricsRouteImport.update({
-  id: '/metrics',
-  path: '/metrics',
-  getParentRoute: () => ApiDocsRoute,
-} as any)
-const ApiDocsDialoguesRoute = ApiDocsDialoguesRouteImport.update({
-  id: '/dialogues',
-  path: '/dialogues',
+const ApiDocsAccountRoute = ApiDocsAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => ApiDocsRoute,
 } as any)
 const ApiDocsAuthRoute = ApiDocsAuthRouteImport.update({
@@ -120,10 +85,45 @@ const ApiDocsAuthRoute = ApiDocsAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => ApiDocsRoute,
 } as any)
-const ApiDocsAccountRoute = ApiDocsAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const ApiDocsDialoguesRoute = ApiDocsDialoguesRouteImport.update({
+  id: '/dialogues',
+  path: '/dialogues',
   getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsMetricsRoute = ApiDocsMetricsRouteImport.update({
+  id: '/metrics',
+  path: '/metrics',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsProgressRoute = ApiDocsProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsReviewsRoute = ApiDocsReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsSchemaRoute = ApiDocsSchemaRouteImport.update({
+  id: '/schema',
+  path: '/schema',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsTranscriptsRoute = ApiDocsTranscriptsRouteImport.update({
+  id: '/transcripts',
+  path: '/transcripts',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ApiDocsUsersRoute = ApiDocsUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
+const ReviewersReviewerIdRoute = ReviewersReviewerIdRouteImport.update({
+  id: '/reviewers/$reviewerId',
+  path: '/reviewers/$reviewerId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ReviewsReviewerIdItemIdRoute = ReviewsReviewerIdItemIdRouteImport.update({
   id: '/reviews/$reviewerId/$itemId',
@@ -280,46 +280,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/users': {
-      id: '/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof UsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/progress': {
-      id: '/progress'
-      path: '/progress'
-      fullPath: '/progress'
-      preLoaderRoute: typeof ProgressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/generate': {
-      id: '/generate'
-      path: '/generate'
-      fullPath: '/generate'
-      preLoaderRoute: typeof GenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api-docs': {
-      id: '/api-docs'
-      path: '/api-docs'
-      fullPath: '/api-docs'
-      preLoaderRoute: typeof ApiDocsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -329,11 +294,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/api-docs': {
+      id: '/api-docs'
+      path: '/api-docs'
+      fullPath: '/api-docs'
+      preLoaderRoute: typeof ApiDocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate': {
+      id: '/generate'
+      path: '/generate'
+      fullPath: '/generate'
+      preLoaderRoute: typeof GenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api-docs/': {
@@ -343,60 +343,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsIndexRouteImport
       parentRoute: typeof ApiDocsRoute
     }
-    '/reviewers/$reviewerId': {
-      id: '/reviewers/$reviewerId'
-      path: '/reviewers/$reviewerId'
-      fullPath: '/reviewers/$reviewerId'
-      preLoaderRoute: typeof ReviewersReviewerIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api-docs/users': {
-      id: '/api-docs/users'
-      path: '/users'
-      fullPath: '/api-docs/users'
-      preLoaderRoute: typeof ApiDocsUsersRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/transcripts': {
-      id: '/api-docs/transcripts'
-      path: '/transcripts'
-      fullPath: '/api-docs/transcripts'
-      preLoaderRoute: typeof ApiDocsTranscriptsRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/schema': {
-      id: '/api-docs/schema'
-      path: '/schema'
-      fullPath: '/api-docs/schema'
-      preLoaderRoute: typeof ApiDocsSchemaRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/reviews': {
-      id: '/api-docs/reviews'
-      path: '/reviews'
-      fullPath: '/api-docs/reviews'
-      preLoaderRoute: typeof ApiDocsReviewsRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/progress': {
-      id: '/api-docs/progress'
-      path: '/progress'
-      fullPath: '/api-docs/progress'
-      preLoaderRoute: typeof ApiDocsProgressRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/metrics': {
-      id: '/api-docs/metrics'
-      path: '/metrics'
-      fullPath: '/api-docs/metrics'
-      preLoaderRoute: typeof ApiDocsMetricsRouteImport
-      parentRoute: typeof ApiDocsRoute
-    }
-    '/api-docs/dialogues': {
-      id: '/api-docs/dialogues'
-      path: '/dialogues'
-      fullPath: '/api-docs/dialogues'
-      preLoaderRoute: typeof ApiDocsDialoguesRouteImport
+    '/api-docs/account': {
+      id: '/api-docs/account'
+      path: '/account'
+      fullPath: '/api-docs/account'
+      preLoaderRoute: typeof ApiDocsAccountRouteImport
       parentRoute: typeof ApiDocsRoute
     }
     '/api-docs/auth': {
@@ -406,12 +357,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsAuthRouteImport
       parentRoute: typeof ApiDocsRoute
     }
-    '/api-docs/account': {
-      id: '/api-docs/account'
-      path: '/account'
-      fullPath: '/api-docs/account'
-      preLoaderRoute: typeof ApiDocsAccountRouteImport
+    '/api-docs/dialogues': {
+      id: '/api-docs/dialogues'
+      path: '/dialogues'
+      fullPath: '/api-docs/dialogues'
+      preLoaderRoute: typeof ApiDocsDialoguesRouteImport
       parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/metrics': {
+      id: '/api-docs/metrics'
+      path: '/metrics'
+      fullPath: '/api-docs/metrics'
+      preLoaderRoute: typeof ApiDocsMetricsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/progress': {
+      id: '/api-docs/progress'
+      path: '/progress'
+      fullPath: '/api-docs/progress'
+      preLoaderRoute: typeof ApiDocsProgressRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/reviews': {
+      id: '/api-docs/reviews'
+      path: '/reviews'
+      fullPath: '/api-docs/reviews'
+      preLoaderRoute: typeof ApiDocsReviewsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/schema': {
+      id: '/api-docs/schema'
+      path: '/schema'
+      fullPath: '/api-docs/schema'
+      preLoaderRoute: typeof ApiDocsSchemaRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/transcripts': {
+      id: '/api-docs/transcripts'
+      path: '/transcripts'
+      fullPath: '/api-docs/transcripts'
+      preLoaderRoute: typeof ApiDocsTranscriptsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/api-docs/users': {
+      id: '/api-docs/users'
+      path: '/users'
+      fullPath: '/api-docs/users'
+      preLoaderRoute: typeof ApiDocsUsersRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
+    '/reviewers/$reviewerId': {
+      id: '/reviewers/$reviewerId'
+      path: '/reviewers/$reviewerId'
+      fullPath: '/reviewers/$reviewerId'
+      preLoaderRoute: typeof ReviewersReviewerIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/reviews/$reviewerId/$itemId': {
       id: '/reviews/$reviewerId/$itemId'
