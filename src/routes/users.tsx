@@ -55,7 +55,7 @@ const RESEARCHERS: UserRow[] = [
 export const Route = createFileRoute("/users")({
   head: () => ({
     meta: [
-      { title: "Users — MIRA Reviewer" },
+      { title: "Users · Response Review" },
       {
         name: "description",
         content: "Reviewer and admin roster for the MIRA study.",

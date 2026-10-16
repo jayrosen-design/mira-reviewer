@@ -16,7 +16,7 @@ const sections = [
 export const Route = createFileRoute("/api-docs")({
   head: () => ({
     meta: [
-      { title: "API Docs — MIRA" },
+      { title: "API Docs · Response Review" },
       {
         name: "description",
         content:

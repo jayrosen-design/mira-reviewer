@@ -62,7 +62,7 @@ import {
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Research Dashboard — MIRA Reviewer" },
+      { title: "Research Dashboard · Response Review" },
       {
         name: "description",
         content:

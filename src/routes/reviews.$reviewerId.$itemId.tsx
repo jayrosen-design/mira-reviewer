@@ -28,7 +28,7 @@ export const Route = createFileRoute("/reviews/$reviewerId/$itemId")({
   head: ({ params }) => ({
     meta: [
       {
-        title: `Reviewer ${params.reviewerId} · ${params.itemId} — MIRA Reviewer`,
+        title: `Reviewer ${params.reviewerId} · ${params.itemId} · Response Review`,
       },
       { name: "robots", content: "noindex" },
     ],

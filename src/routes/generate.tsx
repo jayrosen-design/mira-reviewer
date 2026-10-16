@@ -44,13 +44,13 @@ import {
 export const Route = createFileRoute("/generate")({
   head: () => ({
     meta: [
-      { title: "Generate Transcripts — MIRA" },
+      { title: "Generate Transcripts · Response Review" },
       {
         name: "description",
         content:
           "Researcher tool for generating blinded MIRA transcripts and transmitting them to REDCap for MITI coding.",
       },
-      { property: "og:title", content: "Generate Transcripts — MIRA" },
+      { property: "og:title", content: "Generate Transcripts · Response Review" },
       {
         property: "og:description",
         content:

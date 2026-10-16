@@ -7,7 +7,7 @@ import type { ReviewerRole } from "@/lib/reviewerRole";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — MIRA Reviewer" },
+      { title: "Sign in · Response Review" },
       { name: "description", content: "Select an account type to enter the MIRA Reviewer." },
       { name: "robots", content: "noindex" },
     ],

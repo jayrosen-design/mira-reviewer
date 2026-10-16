@@ -30,7 +30,7 @@ import {
 export const Route = createFileRoute("/reviewers/$reviewerId")({
   head: ({ params }) => ({
     meta: [
-      { title: `Reviewer ${params.reviewerId} Progress — MIRA Reviewer` },
+      { title: `Reviewer ${params.reviewerId} Progress · Response Review` },
       { name: "robots", content: "noindex" },
     ],
   }),

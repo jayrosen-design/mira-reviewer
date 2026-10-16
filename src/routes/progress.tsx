@@ -19,6 +19,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
+import { BarrierChip } from "@/components/mira/BarrierChip";
+import { displayItemId } from "@/lib/brand";
 import {
   REVIEW_ITEMS,
   summarizeProgress,
