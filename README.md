@@ -1,5 +1,7 @@
 # MIRA — Motivational Interviewing Response Assessment
 
+> **Product:** "Parent Vaccine Talk · Response Review" at review.parentvaccinetalk.org (internal codename MIRA). Reviewer-facing UI does not show the MIRA/Mira names.
+
 MIRA is a research review interface for evaluating Motivational Interviewing (MI) dialogue responses. Reviewers are shown a parent concern with two blinded candidate counselor responses (Response A and Response B). Source identity (human interviewer vs Mira) is hidden from reviewers during the task and stored internally for researcher-side analysis. The platform also provides progress tracking for individual reviewers, aggregate analytics across the full reviewer pool, and researcher-side administration of user accounts.
 
 ## Purpose

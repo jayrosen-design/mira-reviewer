@@ -383,10 +383,10 @@ export const SOURCE_MEANS = [
 
 // Preferred response distribution across all completed reviews.
 export const PREFERENCE_DISTRIBUTION = [
-  { label: "Human", value: 38, color: "var(--primary)" },
-  { label: "MIRA agent", value: 31, color: "var(--accent)" },
-  { label: "Too similar", value: 12, color: "oklch(0.78 0.04 250)" },
-  { label: "Neither acceptable", value: 6, color: "var(--muted-foreground)" },
+  { label: "Human", value: 38, color: "var(--chart-human)" },
+  { label: "MIRA agent", value: 31, color: "var(--chart-ai)" },
+  { label: "Too similar", value: 12, color: "var(--chart-similar)" },
+  { label: "Neither acceptable", value: 6, color: "var(--chart-neither)" },
 ];
 
 
@@ -476,10 +476,10 @@ export function getItemResponses(itemId: string) {
 export function getPreferenceForItem(itemId: string, group: Group) {
   const seed = hashId(itemId) + (group === "expert" ? 11 : group === "parent" ? 7 : 3);
   return [
-    { label: "Human", color: "var(--primary)", base: 34 },
-    { label: "MIRA agent", color: "var(--accent)", base: 30 },
-    { label: "Too similar", color: "oklch(0.78 0.04 250)", base: 14 },
-    { label: "Neither acceptable", color: "var(--muted-foreground)", base: 6 },
+    { label: "Human", color: "var(--chart-human)", base: 34 },
+    { label: "MIRA agent", color: "var(--chart-ai)", base: 30 },
+    { label: "Too similar", color: "var(--chart-similar)", base: 14 },
+    { label: "Neither acceptable", color: "var(--chart-neither)", base: 6 },
   ].map((r, i) => ({
     label: r.label,
     color: r.color,

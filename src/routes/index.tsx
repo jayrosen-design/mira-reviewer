@@ -4,17 +4,19 @@ import { DialogueReview } from "@/components/mira/DialogueReview";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MIRA Reviewer — Dialogue Review" },
+      { title: "Review · Response Review" },
       {
         name: "description",
         content:
-          "Research evaluation interface for reviewing motivational interviewing responses related to HPV vaccination.",
+          "Parent Vaccine Talk Response Review — review two responses to a parent concern about HPV vaccination.",
       },
-      { property: "og:title", content: "MIRA Reviewer — Dialogue Review" },
+      { property: "og:title", content: "Review · Response Review" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       {
         property: "og:description",
         content:
-          "Blinded reviewer interface for evaluating Mira-generated responses against human interviewer responses.",
+          "Blinded review of responses to parent concerns about HPV vaccination.",
       },
     ],
   }),

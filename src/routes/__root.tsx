@@ -8,6 +8,7 @@ import {
   useRouterState,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
@@ -38,7 +39,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -81,20 +82,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MIRA" },
-      { name: "description", content: "Motivational Interviewing Response Assessment" },
+      { title: "Response Review · Parent Vaccine Talk" },
+      { name: "description", content: "Parent Vaccine Talk Response Review — a University of Florida research study where parents and experts review responses to HPV vaccine concerns." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "MIRA" },
-      { property: "og:description", content: "Motivational Interviewing Response Assessment" },
+      { property: "og:title", content: "Response Review · Parent Vaccine Talk" },
+      { property: "og:description", content: "A University of Florida research study reviewing responses to parent concerns about HPV vaccination." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "MIRA" },
-      { name: "twitter:description", content: "Motivational Interviewing Response Assessment" },
+      { name: "twitter:title", content: "Response Review · Parent Vaccine Talk" },
+      { name: "twitter:description", content: "A University of Florida research study reviewing responses to parent concerns about HPV vaccination." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/516cf84a-a2e1-46eb-8f5f-e99cd6409728/id-preview-293a28d5--b6d70d23-f9c0-459a-bbac-4512c1d2011f.lovable.app-1780940085948.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/516cf84a-a2e1-46eb-8f5f-e99cd6409728/id-preview-293a28d5--b6d70d23-f9c0-459a-bbac-4512c1d2011f.lovable.app-1780940085948.png" },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -168,7 +175,7 @@ function AuthGate() {
         <Outlet />
       </div>
       <footer className="border-t border-border bg-card py-4 text-center text-xs text-muted-foreground">
-        © 2026 University of Florida
+        © 2026 University of Florida · Parent Vaccine Talk
       </footer>
     </div>
   );

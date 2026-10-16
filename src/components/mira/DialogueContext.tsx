@@ -1,5 +1,6 @@
 import type { DialogueTurn, BarrierCategory } from "@/data/dialogues";
 import { Info, X } from "lucide-react";
+import { BarrierChip } from "./BarrierChip";
 
 type Props = {
   parentConcern: string;
@@ -89,8 +90,7 @@ export function DialogueContext({
 
             <p className="mt-3 inline-flex items-start gap-1.5 text-[11px] text-muted-foreground">
               <Info className="mt-px h-3 w-3 shrink-0" />
-              Prototype preview only — no live AI is used, the simulated parent
-              reply is canned, and nothing here affects your review or scoring.
+              Preview only — no live AI is used, the simulated parent reply is pre-written, and nothing here affects your review or scoring.
             </p>
           </div>
         )}
@@ -112,9 +112,7 @@ function ConcernCard({
         <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Parent Concern
         </h2>
-        <span className="rounded-full bg-accent-soft px-2.5 py-0.5 text-[11px] font-medium text-accent-foreground">
-          {barrierCategory}
-        </span>
+        <BarrierChip category={barrierCategory} />
       </div>
       <p className="mt-3 text-lg leading-relaxed text-foreground">
         “{parentConcern}”

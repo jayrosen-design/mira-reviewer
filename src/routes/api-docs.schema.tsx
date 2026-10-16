@@ -5,7 +5,7 @@ import { SCHEMA_ERD } from "@/data/schemaErd";
 export const Route = createFileRoute("/api-docs/schema")({
   head: () => ({
     meta: [
-      { title: "Database Schema — MIRA API Docs" },
+      { title: "Database Schema API · Response Review" },
       {
         name: "description",
         content:

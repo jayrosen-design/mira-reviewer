@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditAccountDialog } from "./EditAccountDialog";
+import { ParentVaccineTalkLogo } from "./ParentVaccineTalkLogo";
 
 const ALL_LINKS = [
   { to: "/about", label: "About", icon: Info, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
@@ -48,8 +49,12 @@ export function NavBar() {
   return (
     <nav className="border-b border-border bg-card">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-3">
-        <Link to={role === "researcher" ? "/dashboard" : "/about"} className="text-base font-semibold tracking-tight text-primary transition-colors hover:text-primary/80">
-          MIRA Reviewer
+        <Link to={role === "researcher" ? "/dashboard" : "/about"} className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80" aria-label="Parent Vaccine Talk · Response Review">
+          <ParentVaccineTalkLogo className="h-7 w-auto" />
+          <span className="hidden font-display text-base font-semibold tracking-tight text-foreground sm:inline">
+            Parent Vaccine Talk
+          </span>
+          <span className="hidden text-xs font-medium text-muted-foreground md:inline">Response Review</span>
         </Link>
         <ul className="flex flex-1 flex-wrap items-center gap-1">
           {links.map(({ to, label, icon: Icon, exact }) => (

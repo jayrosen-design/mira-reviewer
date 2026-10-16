@@ -16,7 +16,7 @@ const sections = [
 export const Route = createFileRoute("/api-docs")({
   head: () => ({
     meta: [
-      { title: "API Docs — MIRA" },
+      { title: "API Docs · Response Review" },
       {
         name: "description",
         content:
@@ -31,7 +31,7 @@ function ApiDocsLayout() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">API Documentation</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">API Documentation</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Proposed REST surface for the real-backend version of MIRA. All payloads are illustrative — no endpoints are live yet.
         </p>

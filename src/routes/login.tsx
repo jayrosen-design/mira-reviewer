@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { UserRound, Stethoscope, ShieldCheck } from "lucide-react";
 import { loginAs, useAuth } from "@/lib/auth";
 import type { ReviewerRole } from "@/lib/reviewerRole";
+import { ParentVaccineTalkLogo } from "@/components/mira/ParentVaccineTalkLogo";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — MIRA Reviewer" },
-      { name: "description", content: "Select an account type to enter the MIRA Reviewer." },
+      { title: "Sign in · Response Review" },
+      { name: "description", content: "Sign in to Parent Vaccine Talk Response Review, a University of Florida research study." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -81,20 +82,16 @@ function LoginPage() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
-          <h1 className="text-5xl font-bold tracking-tight text-primary">
-            MIRA
+          <ParentVaccineTalkLogo className="mx-auto h-14 w-auto" />
+          <h1 className="mt-4 text-3xl tracking-tight text-foreground">
+            Parent Vaccine Talk
           </h1>
-          <p className="mt-2 text-lg font-semibold text-foreground">
-            Motivational Interviewing Response Assessment
+          <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-primary">
+            Response Review
           </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <span className="rounded-full border border-primary/30 bg-primary-soft px-2.5 py-0.5 text-[11px] font-medium text-primary">
-              Research Preview
-            </span>
-            <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-              Version 0.0.1
-            </span>
-          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            A University of Florida research study
+          </p>
           <p className="mt-8 text-base font-semibold text-foreground">
             Select an account to continue
           </p>

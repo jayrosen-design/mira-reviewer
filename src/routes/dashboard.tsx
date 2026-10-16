@@ -62,7 +62,7 @@ import {
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
-      { title: "Research Dashboard — MIRA Reviewer" },
+      { title: "Research Dashboard · Response Review" },
       {
         name: "description",
         content:
@@ -103,7 +103,7 @@ function ResearchDashboardPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
                 Research Dashboard
               </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -235,7 +235,7 @@ function OverallView({
           data={constructRows}
           parentKey="humanParent"
           expertKey="humanExpert"
-          color="var(--primary)"
+          color="var(--chart-human)"
           group={group}
         />
         <RadarCard
@@ -243,7 +243,7 @@ function OverallView({
           data={constructRows}
           parentKey="miraParent"
           expertKey="miraExpert"
-          color="var(--accent)"
+          color="var(--chart-ai)"
           group={group}
         />
       </section>
@@ -412,7 +412,7 @@ function ByItemView({
           label="Human interviewer"
           text={responses.human}
           isPreferred={preferredSource === "Human"}
-          accent="var(--primary)"
+          accent="var(--chart-human)"
           parentVotes={votes.human.parent}
           expertVotes={votes.human.expert}
           parentTotal={counts.parents}
@@ -423,7 +423,7 @@ function ByItemView({
           label="MIRA agent"
           text={responses.mira}
           isPreferred={preferredSource === "MIRA agent"}
-          accent="var(--accent)"
+          accent="var(--chart-ai)"
           parentVotes={votes.mira.parent}
           expertVotes={votes.mira.expert}
           parentTotal={counts.parents}
@@ -451,7 +451,7 @@ function ByItemView({
           data={constructRows}
           parentKey="humanParent"
           expertKey="humanExpert"
-          color="var(--primary)"
+          color="var(--chart-human)"
           group={group}
         />
         <RadarCard
@@ -459,7 +459,7 @@ function ByItemView({
           data={constructRows}
           parentKey="miraParent"
           expertKey="miraExpert"
-          color="var(--accent)"
+          color="var(--chart-ai)"
           group={group}
         />
       </section>
@@ -548,7 +548,7 @@ function KpiCard({
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h2 className="mb-3 text-sm font-semibold text-foreground">{title}</h2>
+      <h2 className="mb-3 font-display text-base font-semibold text-foreground">{title}</h2>
       {children}
     </div>
   );
@@ -579,8 +579,8 @@ function ResponseTextCard({
   const meterFill = (totalVotes / Math.max(maxVotes, 1)) * 100;
   const parentPortion = totalVotes ? (parentVotes / totalVotes) * meterFill : 0;
   const expertPortion = totalVotes ? (expertVotes / totalVotes) * meterFill : 0;
-  const parentColor = "oklch(0.62 0.17 250)";
-  const expertColor = "oklch(0.68 0.17 45)";
+  const parentColor = "var(--chart-parent)";
+  const expertColor = "var(--chart-expert)";
   return (
     <div
       className="flex h-full flex-col rounded-lg border bg-card p-5"
@@ -593,7 +593,7 @@ function ResponseTextCard({
         <h3 className="text-sm font-semibold text-foreground">{label}</h3>
         {isPreferred && (
           <span
-            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white"
+            className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-primary-foreground"
             style={{ backgroundColor: accent }}
           >
             ★ Preferred
@@ -662,8 +662,8 @@ function RadarCard({
 }) {
   const showParent = group !== "expert";
   const showExpert = group !== "parent";
-  const parentColor = "oklch(0.62 0.17 250)"; // blue
-  const expertColor = "oklch(0.6 0.22 25)"; // red
+  const parentColor = "var(--chart-parent)"; // blue
+  const expertColor = "var(--chart-expert)"; // red
   return (
     <Card title={title}>
       <div className="h-80">
@@ -757,23 +757,23 @@ function ConstructBar({
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {showParent && (
-            <Bar dataKey="humanParent" name="Human · Parent" fill="var(--primary)" />
+            <Bar dataKey="humanParent" name="Human · Parent" fill="var(--chart-human)" />
           )}
           {showExpert && (
             <Bar
               dataKey="humanExpert"
               name="Human · Expert"
-              fill="oklch(0.72 0.14 250)"
+              fill="var(--chart-human-soft)"
             />
           )}
           {showParent && (
-            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--accent)" />
+            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--chart-ai)" />
           )}
           {showExpert && (
             <Bar
               dataKey="miraExpert"
               name="MIRA · Expert"
-              fill="oklch(0.78 0.14 45)"
+              fill="var(--chart-ai-soft)"
             />
           )}
         </BarChart>

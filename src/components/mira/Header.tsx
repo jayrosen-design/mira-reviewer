@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { displayItemId } from "@/lib/brand";
 
 type Props = {
   current: number;
@@ -28,11 +29,11 @@ export function Header({
   return (
     <header className="mx-auto max-w-6xl space-y-4 px-6 pt-8 pb-2">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
           Dialogue Review
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Mira Dialogue Review System · Review Item {current} of {total}
+          Response Review · Item {current} of {total}
         </p>
       </div>
 
@@ -45,7 +46,7 @@ export function Header({
           </Button>
           <div className="min-w-0 flex-1 text-center">
             <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              {itemId && <span className="font-mono">{itemId}</span>}
+              {itemId && <span>{displayItemId(itemId)}</span>}
               {itemId && barrierCategory && <span>·</span>}
               {barrierCategory && <span>{barrierCategory}</span>}
               <span>·</span>

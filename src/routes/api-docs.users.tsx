@@ -4,7 +4,7 @@ import { ApiEndpoint } from "@/components/mira/ApiEndpoint";
 export const Route = createFileRoute("/api-docs/users")({
   head: () => ({
     meta: [
-      { title: "Users — MIRA API Docs" },
+      { title: "Users API · Response Review" },
       {
         name: "description",
         content:

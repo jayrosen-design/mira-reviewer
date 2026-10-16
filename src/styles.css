@@ -27,57 +27,86 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-parent-bubble: var(--parent-bubble);
-  --color-parent-bubble-foreground: var(--parent-bubble-foreground);
   --color-clinician-bubble: var(--clinician-bubble);
   --color-clinician-bubble-foreground: var(--clinician-bubble-foreground);
+  --color-parent-bubble: var(--parent-bubble);
+  --color-parent-bubble-foreground: var(--parent-bubble-foreground);
+  --color-chip-sky: var(--chip-sky);
+  --color-chip-sky-foreground: var(--chip-sky-foreground);
+  --color-chip-lavender: var(--chip-lavender);
+  --color-chip-lavender-foreground: var(--chip-lavender-foreground);
+  --color-chip-sage: var(--chip-sage);
+  --color-chip-sage-foreground: var(--chip-sage-foreground);
+  --color-chip-amber: var(--chip-amber);
+  --color-chip-amber-foreground: var(--chip-amber-foreground);
+  --color-chip-rose: var(--chip-rose);
+  --color-chip-rose-foreground: var(--chip-rose-foreground);
+  --color-ring-offset-background: var(--background);
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
 }
 
+/* Warm Sage — Parent Vaccine Talk brand. All app colors come from these tokens. */
 :root {
-  --radius: 0.875rem;
-
-  --background: oklch(0.99 0.005 80);
-  --foreground: oklch(0.22 0.04 255);
-
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.04 255);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.04 255);
-
-  /* UF-inspired deep blue */
-  --primary: oklch(0.34 0.12 255);
-  --primary-foreground: oklch(0.985 0.003 247);
-  --primary-soft: oklch(0.95 0.03 255);
-
-  --secondary: oklch(0.96 0.01 250);
-  --secondary-foreground: oklch(0.34 0.12 255);
-
-  --muted: oklch(0.965 0.008 250);
-  --muted-foreground: oklch(0.5 0.03 255);
-
-  /* Subtle warm orange accent */
-  --accent: oklch(0.74 0.15 55);
-  --accent-foreground: oklch(0.2 0.05 60);
-  --accent-soft: oklch(0.96 0.04 70);
-
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(0.985 0.003 247);
-
-  --border: oklch(0.92 0.012 250);
-  --input: oklch(0.92 0.012 250);
-  --ring: oklch(0.34 0.12 255);
-
-  --parent-bubble: oklch(0.96 0.04 70);
-  --parent-bubble-foreground: oklch(0.28 0.07 60);
-  --clinician-bubble: oklch(0.95 0.03 255);
-  --clinician-bubble-foreground: oklch(0.3 0.1 255);
+  --radius: 1rem;
+  --background: oklch(0.977 0.007 80.7); /* #FAF7F2 */
+  --foreground: oklch(0.276 0.017 222.1); /* #1F2A2E */
+  --card: oklch(1.000 0 0); /* #FFFFFF */
+  --card-foreground: oklch(0.276 0.017 222.1); /* #1F2A2E */
+  --popover: oklch(1.000 0 0); /* #FFFFFF */
+  --popover-foreground: oklch(0.276 0.017 222.1); /* #1F2A2E */
+  --primary: oklch(0.494 0.075 190.1); /* #1F6F6B */
+  --primary-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --primary-soft: oklch(0.945 0.014 174.2); /* #E4F0EC */
+  --secondary: oklch(0.945 0.014 174.2); /* #E4F0EC */
+  --secondary-foreground: oklch(0.408 0.053 188.0); /* #23534F */
+  --muted: oklch(0.951 0.012 79.8); /* #F3EEE6 */
+  --muted-foreground: oklch(0.518 0.016 213.2); /* #5E6B6E */
+  --accent: oklch(0.795 0.104 51.2); /* #F2A97E */
+  --accent-foreground: oklch(0.371 0.057 51.4); /* #583723 */
+  --accent-soft: oklch(0.954 0.020 58.1); /* #FBEDE3 */
+  --success: oklch(0.574 0.059 169.8); /* #548473 */
+  --success-foreground: oklch(0.384 0.049 167.3); /* #274C3E */
+  --warning: oklch(0.574 0.115 70.5); /* #A36B19 */
+  --warning-foreground: oklch(0.409 0.081 69.0); /* #66410F */
+  --destructive: oklch(0.557 0.120 8.7); /* #AD5265 */
+  --destructive-foreground: oklch(1.000 0 0); /* #FFFFFF */
+  --border: oklch(0.912 0.017 79.3); /* #E8E1D6 */
+  --input: oklch(0.912 0.017 79.3); /* #E8E1D6 */
+  --ring: oklch(0.494 0.075 190.1); /* #1F6F6B */
+  --logo-primary: oklch(0.581 0.080 184.3); /* #398A80 */
+  --logo-accent: oklch(0.795 0.104 51.2); /* #F2A97E */
+  --clinician-bubble: oklch(0.945 0.014 174.2); /* #E4F0EC */
+  --clinician-bubble-foreground: oklch(0.408 0.053 188.0); /* #23534F */
+  --parent-bubble: oklch(0.954 0.020 58.1); /* #FBEDE3 */
+  --parent-bubble-foreground: oklch(0.371 0.057 51.4); /* #583723 */
+  --chip-sky: oklch(0.953 0.016 245.1); /* #E7F1FA */
+  --chip-sky-foreground: oklch(0.444 0.072 238.3); /* #285977 */
+  --chip-lavender: oklch(0.945 0.018 306.7); /* #F0EAF7 */
+  --chip-lavender-foreground: oklch(0.477 0.081 307.5); /* #695080 */
+  --chip-sage: oklch(0.945 0.014 174.2); /* #E4F0EC */
+  --chip-sage-foreground: oklch(0.433 0.059 164.1); /* #2F5B48 */
+  --chip-amber: oklch(0.959 0.032 82.8); /* #FCF0DA */
+  --chip-amber-foreground: oklch(0.468 0.091 72.8); /* #795113 */
+  --chip-rose: oklch(0.946 0.020 357.6); /* #F9E8ED */
+  --chip-rose-foreground: oklch(0.476 0.108 7.9); /* #8E3F51 */
+  --chart-human: oklch(0.494 0.075 190.1); /* #1F6F6B */
+  --chart-human-soft: oklch(0.669 0.070 154.9); /* #72A282 */
+  --chart-ai: oklch(0.649 0.140 65.0); /* #C87A15 */
+  --chart-ai-soft: oklch(0.795 0.104 51.2); /* #F2A97E */
+  --chart-parent: oklch(0.551 0.128 241.0); /* #0079B5 */
+  --chart-expert: oklch(0.557 0.120 8.7); /* #AD5265 */
+  --chart-similar: oklch(0.811 0.013 177.9); /* #B9C4C1 */
+  --chart-neither: oklch(0.518 0.016 213.2); /* #5E6B6E */
 }
 
 @layer base {
@@ -88,7 +117,12 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
   }
 }

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/reviews/$reviewerId/$itemId")({
   head: ({ params }) => ({
     meta: [
       {
-        title: `Reviewer ${params.reviewerId} · ${params.itemId} — MIRA Reviewer`,
+        title: `Reviewer ${params.reviewerId} · ${params.itemId} · Response Review`,
       },
       { name: "robots", content: "noindex" },
     ],
@@ -103,7 +103,7 @@ function ReviewerItemReviewPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
               Review by {reviewer.name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
