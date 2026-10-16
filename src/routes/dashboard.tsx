@@ -548,7 +548,7 @@ function KpiCard({
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h2 className="mb-3 text-sm font-semibold text-foreground">{title}</h2>
+      <h2 className="mb-3 font-display text-base font-semibold text-foreground">{title}</h2>
       {children}
     </div>
   );
