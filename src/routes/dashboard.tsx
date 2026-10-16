@@ -103,7 +103,7 @@ function ResearchDashboardPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+              <h1 className="font-display text-2xl font-semibold tracking-tight text-heading">
                 Research Dashboard
               </h1>
               <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
@@ -268,7 +268,7 @@ function OverallView({
 
       <section className="rounded-lg border border-border bg-card">
         <div className="border-b border-border px-5 py-3">
-          <h2 className="text-sm font-semibold text-foreground">
+          <h2 className="text-sm font-semibold text-heading">
             Results by barrier category
           </h2>
           <p className="text-xs text-muted-foreground">
@@ -481,7 +481,7 @@ function ByItemView({
 
       <section className="rounded-lg border border-border bg-card">
         <div className="border-b border-border px-5 py-3">
-          <h2 className="text-sm font-semibold text-foreground">Parent concerns</h2>
+          <h2 className="text-sm font-semibold text-heading">Parent concerns</h2>
           <p className="text-xs text-muted-foreground">
             Select a row to load its aggregated review data above.
           </p>
@@ -548,7 +548,7 @@ function KpiCard({
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h2 className="mb-3 font-display text-base font-semibold text-foreground">{title}</h2>
+      <h2 className="mb-3 font-display text-base font-semibold text-heading">{title}</h2>
       {children}
     </div>
   );
@@ -590,7 +590,7 @@ function ResponseTextCard({
       }}
     >
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+        <h3 className="text-sm font-semibold text-heading">{label}</h3>
         {isPreferred && (
           <span
             className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-primary-foreground"
@@ -767,7 +767,7 @@ function ConstructBar({
             />
           )}
           {showParent && (
-            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--chart-ai)" />
+            <Bar dataKey="miraParent" name="MIRA · Parent" fill="var(--chart-ai)" stroke="var(--chart-ai-stroke)" />
           )}
           {showExpert && (
             <Bar

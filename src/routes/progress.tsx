@@ -110,7 +110,7 @@ function ProgressTrackerPage() {
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl space-y-6 px-6 py-8">
         <header>
-          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-heading">
             My Progress
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -148,7 +148,7 @@ function ProgressTrackerPage() {
         </section>
 
         <section className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground">
+          <h2 className="text-sm font-semibold text-heading">
             Items by barrier category
           </h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

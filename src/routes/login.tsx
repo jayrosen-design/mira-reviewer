@@ -83,7 +83,7 @@ function LoginPage() {
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
           <ParentVaccineTalkLogo className="mx-auto h-14 w-auto" />
-          <h1 className="mt-4 text-3xl tracking-tight text-foreground">
+          <h1 className="mt-4 text-3xl tracking-tight text-heading">
             Parent Vaccine Talk
           </h1>
           <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-primary">

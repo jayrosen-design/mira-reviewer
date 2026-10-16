@@ -85,7 +85,7 @@ function ReviewerProgressPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-heading">
               {reviewer.name}'s Progress
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -140,7 +140,7 @@ function ReviewerProgressPage() {
         </section>
 
         <section className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground">
+          <h2 className="text-sm font-semibold text-heading">
             Items by barrier category
           </h2>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
