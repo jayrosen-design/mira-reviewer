@@ -75,6 +75,12 @@ export const Route = createFileRoute("/dashboard")({
 
 type View = "overall" | "byItem";
 
+// Recharts paints legend label text with the series colour; keep the swatch
+// coloured but render every label in the theme foreground.
+function legendLabel(value: React.ReactNode) {
+  return <span className="text-foreground">{value}</span>;
+}
+
 function ResearchDashboardPage() {
   
 
