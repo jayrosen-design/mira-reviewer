@@ -4,6 +4,7 @@ import { UserRound, Stethoscope, ShieldCheck } from "lucide-react";
 import { loginAs, useAuth } from "@/lib/auth";
 import type { ReviewerRole } from "@/lib/reviewerRole";
 import { ParentVaccineTalkLogo } from "@/components/mira/ParentVaccineTalkLogo";
+import { ThemeSwitcher } from "@/components/mira/ThemeSwitcher";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -79,11 +80,14 @@ function LoginPage() {
 
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-4 py-12">
+    <div className="relative flex min-h-[calc(100vh-8rem)] items-center justify-center bg-background px-4 py-12">
+      <div className="absolute right-4 top-4">
+        <ThemeSwitcher />
+      </div>
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
           <ParentVaccineTalkLogo className="mx-auto h-14 w-auto" />
-          <h1 className="mt-4 text-3xl tracking-tight text-foreground">
+          <h1 className="mt-4 text-3xl tracking-tight text-heading">
             Parent Vaccine Talk
           </h1>
           <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-primary">

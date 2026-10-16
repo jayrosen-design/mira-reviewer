@@ -60,7 +60,7 @@ export function ParentRubric({ ratingsA, ratingsB, onChange }: ParentProps) {
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
       <div className="mb-4">
-        <h2 className="font-display text-lg font-semibold text-foreground">Rate each response</h2>
+        <h2 className="font-display text-lg font-semibold text-heading">Rate each response</h2>
         <p className="text-sm text-muted-foreground">
           Rate your agreement with each statement on a 7-point scale.
           <span className="ml-1 text-xs">
@@ -172,7 +172,7 @@ export function ExpertRubric({
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
       <div className="mb-4">
-        <h2 className="font-display text-lg font-semibold text-foreground">Expert safety review</h2>
+        <h2 className="font-display text-lg font-semibold text-heading">Expert safety review</h2>
         <p className="text-sm text-muted-foreground">
           For each response, indicate whether it is medically safe, accurate, and relevant.
         </p>

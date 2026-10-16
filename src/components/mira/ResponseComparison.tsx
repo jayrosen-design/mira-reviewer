@@ -71,7 +71,7 @@ export function PreferredResponse({ responseA, responseB, selected, onSelect }: 
       className="rounded-2xl border border-border bg-card p-6 shadow-sm"
     >
       <div className="mb-4">
-        <h2 className="font-display text-lg font-semibold text-foreground">Preferred response</h2>
+        <h2 className="font-display text-lg font-semibold text-heading">Preferred response</h2>
         <p className="text-sm text-muted-foreground">
           After rating both responses, choose which one you prefer overall.
         </p>

@@ -13,7 +13,7 @@ export function SubmittedState({ onNext, hasNext }: Props) {
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
         <CheckCircle2 className="h-6 w-6" />
       </div>
-      <h2 className="mt-4 text-xl font-semibold text-foreground">
+      <h2 className="mt-4 text-xl font-semibold text-heading">
         Review submitted. Thank you.
       </h2>
       <p className="mt-2 text-sm text-muted-foreground">

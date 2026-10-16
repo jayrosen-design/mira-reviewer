@@ -103,7 +103,7 @@ function ReviewerItemReviewPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-heading">
               Review by {reviewer.name}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -151,7 +151,7 @@ function ReviewerItemReviewPage() {
         </section>
 
         <section className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold text-foreground">Preferred response</h2>
+          <h2 className="text-sm font-semibold text-heading">Preferred response</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {reviewer.name} selected{" "}
             <span className="font-medium text-foreground">{preferredLabel}</span>
@@ -193,7 +193,7 @@ function ReviewerItemReviewPage() {
 
         {review.comments && (
           <section className="rounded-lg border border-border bg-card p-5">
-            <h2 className="text-sm font-semibold text-foreground">Reviewer comments</h2>
+            <h2 className="text-sm font-semibold text-heading">Reviewer comments</h2>
             <p className="mt-2 text-sm leading-relaxed text-foreground">
               "{review.comments}"
             </p>
@@ -232,7 +232,7 @@ function ResponseCard({
     >
       <div className="mb-2 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">{label}</h3>
+          <h3 className="text-sm font-semibold text-heading">{label}</h3>
           <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
             Source (researcher-only): {source === "human" ? "Human interviewer" : "MIRA agent"}
           </p>
@@ -258,7 +258,7 @@ function ParentRatingsTable({
   return (
     <section className="rounded-lg border border-border bg-card">
       <div className="border-b border-border px-5 py-3">
-        <h2 className="text-sm font-semibold text-foreground">
+        <h2 className="text-sm font-semibold text-heading">
           Parent Likert ratings (1–7)
         </h2>
         <p className="text-xs text-muted-foreground">
@@ -319,7 +319,7 @@ function ExpertRatingsTable({
   return (
     <section className="rounded-lg border border-border bg-card">
       <div className="border-b border-border px-5 py-3">
-        <h2 className="text-sm font-semibold text-foreground">
+        <h2 className="text-sm font-semibold text-heading">
           Expert safety / accuracy / relevance
         </h2>
       </div>

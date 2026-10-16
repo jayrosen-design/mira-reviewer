@@ -23,7 +23,7 @@ function AboutPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
       <header className="mb-8">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-heading">
           Welcome to Response Review
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -35,7 +35,7 @@ function AboutPage() {
       <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
         <section className="space-y-6">
           <div className="rounded-xl border border-border bg-card p-6">
-            <h2 className="font-display text-lg font-semibold text-foreground">
+            <h2 className="font-display text-lg font-semibold text-heading">
               About the review process
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -96,7 +96,7 @@ function AboutPage() {
         </section>
 
         <aside className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">
+          <h2 className="text-sm font-semibold text-heading">
             Watch: Study overview
           </h2>
           <div className="aspect-video overflow-hidden rounded-xl border border-border bg-foreground shadow-sm">
@@ -135,7 +135,7 @@ function Step({
         <Icon className="h-4 w-4" />
       </span>
       <div>
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <h3 className="text-sm font-semibold text-heading">{title}</h3>
         <p className="mt-1 text-sm text-muted-foreground">{body}</p>
       </div>
     </li>

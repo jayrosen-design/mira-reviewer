@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EditAccountDialog } from "./EditAccountDialog";
 import { ParentVaccineTalkLogo } from "./ParentVaccineTalkLogo";
+import { ThemeSwitcher, ThemeMenuItems } from "./ThemeSwitcher";
 
 const ALL_LINKS = [
   { to: "/about", label: "About", icon: Info, exact: true, roles: ["parent", "expert"] as ReviewerRole[] },
@@ -77,6 +78,8 @@ export function NavBar() {
           ))}
         </ul>
 
+        <ThemeSwitcher className="hidden md:inline-flex" />
+
         <DropdownMenu>
           <DropdownMenuTrigger className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-muted">
             <RoleIcon className="h-4 w-4" />
@@ -90,6 +93,11 @@ export function NavBar() {
               {ROLE_LABEL[role]}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
+            <div className="md:hidden">
+              <DropdownMenuLabel>Color scheme</DropdownMenuLabel>
+              <ThemeMenuItems />
+              <DropdownMenuSeparator />
+            </div>
             <DropdownMenuItem onSelect={() => setEditOpen(true)}>
               <UserCog className="mr-2 h-4 w-4" />
               Edit account
