@@ -376,7 +376,7 @@ export const SOURCE_MEANS = [
     mean: Math.round((5.5 + rand(91) * 0.6) * 10) / 10,
   },
   {
-    label: "Mira-generated",
+    label: "MIRA-generated",
     mean: Math.round((5.2 + rand(92) * 0.7) * 10) / 10,
   },
 ];
@@ -494,7 +494,7 @@ export function getSourceMeansForItem(itemId: string, group: Group) {
   const clamp = (v: number) => Math.max(1, Math.min(7, Math.round(v * 10) / 10));
   return [
     { label: "Human-authored", mean: clamp(5.4 + bump + (rand(seed + 1) - 0.5) * 1.2) },
-    { label: "Mira-generated", mean: clamp(5.1 + bump + (rand(seed + 2) - 0.5) * 1.4) },
+    { label: "MIRA-generated", mean: clamp(5.1 + bump + (rand(seed + 2) - 0.5) * 1.4) },
   ];
 }
 

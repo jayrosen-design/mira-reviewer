@@ -75,6 +75,12 @@ export const Route = createFileRoute("/dashboard")({
 
 type View = "overall" | "byItem";
 
+// Recharts paints legend label text with the series colour; keep the swatch
+// coloured but render every label in the theme foreground.
+function legendLabel(value: React.ReactNode) {
+  return <span className="text-foreground">{value}</span>;
+}
+
 function ResearchDashboardPage() {
   
 
@@ -702,7 +708,7 @@ function RadarCard({
                 fillOpacity={0.3}
               />
             )}
-            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
             <Tooltip
               contentStyle={{
                 background: "var(--card)",
@@ -759,7 +765,7 @@ function ConstructBar({
               fontSize: 12,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
           {showParent && (
             <Bar dataKey="humanParent" name="Human · Parent" fill="var(--chart-human)" />
           )}
@@ -866,7 +872,7 @@ function PreferencePie({
               fontSize: 12,
             }}
           />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Legend wrapperStyle={{ fontSize: 12 }} formatter={legendLabel} />
         </PieChart>
       </ResponsiveContainer>
     </div>
